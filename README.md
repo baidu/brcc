@@ -2,9 +2,9 @@
 &ensp;&ensp;BRCC（better remote config center）是一个分布式配置中心，用于统一管理应用服务的配置信息，避免各类资源散落在各个项目中，简化资源配置的维护成本。作为一种轻量级的解决方案，部署简单，同时支持多环境、多版本、多角色的资源管理，可以在不改变应用源码的情况下无缝切换和实时生效配置信息。
 
  &ensp;&ensp;BRCC由三部分组成：管理端、服务端、SDK，其中：<br/>
-（1）管理端 : 前后端分离，后端基于Spring Boot 2.0开发，支持6个维度（产品、工程、环境、版本、分组、配置项）管理key-value格式的配置；支持细粒度的权限控制层级、操作轨迹等能力。安全易用，支持插件化的扩展轻松集成任何公司/组织的账号管理系统。<br/>
-（2）服务端：基于spring boot 2.0开发，打包后可以直接运行，支持配置的分发、更新推送。<br/>
-（3）SDK：支持java、go等多种开发语言和开发框架集成，支持spring注解、配置变更监听和刷新，零业务侵入性，低门槛集成（提供spring boot starter方式接入）。<br/>
+（1）**管理端** : 前后端分离，后端基于Spring Boot 2.0开发，支持6个维度（产品、工程、环境、版本、分组、配置项）管理key-value格式的配置；支持细粒度的权限控制层级、操作轨迹等能力。安全易用，支持插件化的扩展轻松集成任何公司/组织的账号管理系统。<br/>
+（2）**服务端**： 基于spring boot 2.0开发，打包后可以直接运行，支持配置的分发、更新推送。<br/>
+（3）**SDK**：支持java、go等多种开发语言和开发框架集成，支持spring注解、配置变更监听和刷新，零业务侵入性，低门槛集成（提供spring boot starter方式接入）。<br/>
 
 
 ## 快速开始
@@ -55,15 +55,28 @@
 - 支持模糊匹配检索
 
 
+## 维护者
+- [shinansheng](https://github.com/sns1988)
+- [zengqingyong](https://github.com/ghzengqy568)
+- [xiemalin](https://github.com/jhunters)
+- [caolei](https://github.com/hubeicaolei)
+- [liangchanchan](https://github.com/lena2liang)
+
+## 贡献
+issues贡献： 如在使用中遇到问题，请在 https://github.com/baidu/brcc/issues 新建 issues 反馈问题。
+
+
 ## 讨论
 
-如果您有任何意见或问题都可以提issue到Github或Gitee，我们将及时为您解答。
+如果您有任何意见或问题都可以提issue到github或gitee，我们将及时为您解答。
 
 如在使用中遇到问题，快速沟通，可微信扫描二维码，加入brcc技术交流群，添加下列管理员微信，并备注“brcc”，管理员邀您入群：
 
-![微信联系管理员](./doc/img/contact.jpg)
+<img src="./doc/img/contact.jpg" width="200">
 
-您也可加入以下讨论群进行讨论：
-钉钉讨论群：34734395
+您也可以加入百度如流讨论群直接参与讨论和提问：3664772
+
+## 版本更新
+- 1.0.0 brcc第一版发布，具备六个维度管理K-V的配置能力、五级权限控制能力、操作轨迹追踪、变更推送、支持spring原生配置注解等功能；
 
 
