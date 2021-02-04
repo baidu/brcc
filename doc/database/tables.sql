@@ -271,3 +271,16 @@ CREATE TABLE `rcc_version` (
   KEY `idx_envid` (`environment_id`) USING BTREE,
   KEY `idx_project_id` (`project_id`,`environment_id`,`name`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8 COMMENT='版本';
+
+-- /******************************************/
+-- /*   数据库全名 = brcc   */
+-- /*   表名称 = rcc_operation_config   */
+-- /******************************************/
+CREATE TABLE `rcc_operation_config` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `config_key` varchar(50) NOT NULL DEFAULT '' COMMENT '运营配置KEY',
+  `config_val` varchar(2000) NOT NULL DEFAULT '' COMMENT '运营配置Value',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_key` (`config_key`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='运营配置';
