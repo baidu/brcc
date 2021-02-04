@@ -1,0 +1,238 @@
+/*
+ * Copyright (C) 2021 Baidu, Inc. All Rights Reserved.
+ */
+package com.baidu.brcc.service.impl;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import com.baidu.brcc.dao.ProductMapper;
+import com.baidu.brcc.dao.base.BaseMapper;
+import com.baidu.brcc.domain.EnvironmentUser;
+import com.baidu.brcc.domain.EnvironmentUserExample;
+import com.baidu.brcc.domain.Product;
+import com.baidu.brcc.domain.ProductExample;
+import com.baidu.brcc.domain.ProductUser;
+import com.baidu.brcc.domain.ProductUserExample;
+import com.baidu.brcc.domain.ProjectUser;
+import com.baidu.brcc.domain.ProjectUserExample;
+import com.baidu.brcc.domain.User;
+import com.baidu.brcc.domain.base.Pagination;
+import com.baidu.brcc.domain.em.ProductUserAdmin;
+import com.baidu.brcc.domain.em.UserRole;
+import com.baidu.brcc.domain.meta.MetaEnvironmentUser;
+import com.baidu.brcc.domain.meta.MetaProduct;
+import com.baidu.brcc.domain.meta.MetaProductUser;
+import com.baidu.brcc.domain.meta.MetaProjectUser;
+import com.baidu.brcc.domain.vo.ProductVo;
+import com.baidu.brcc.service.EnvironmentUserService;
+import com.baidu.brcc.service.ProductService;
+import com.baidu.brcc.service.ProductUserService;
+import com.baidu.brcc.service.ProjectUserService;
+import com.baidu.brcc.service.UserService;
+import com.baidu.brcc.service.base.GenericServiceImpl;
+
+@Service("productService")
+public class ProductServiceImpl extends GenericServiceImpl<Product, Long, ProductExample> implements ProductService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    @Autowired
+    private ProductUserService productUserService;
+
+    @Autowired
+    private ProjectUserService projectUserService;
+
+    @Autowired
+    private EnvironmentUserService environmentUserService;
+
+    @Autowired
+    private UserService userService;
+
+    @Value("${rcc.user.type.default}")
+    private byte defaultUserType;
+
+    @Override
+    public BaseMapper<Product, Long, ProductExample> getMapper() {
+        return productMapper;
+    }
+
+    @Override
+    public ProductExample newExample() {
+        return ProductExample.newBuilder().build();
+    }
+
+    @Override
+    public ProductExample newIdInExample(List<Long> ids) {
+        return ProductExample.newBuilder().build().createCriteria().andIdIn(ids).toExample();
+    }
+
+    @Override
+    public Pagination<ProductVo> queryProductByUser(String name,
+                                                    String sortField,
+                                                    String sortBy,
+                                                    User user,
+                                                    Integer pageNo,
+                                                    Integer pageSize
+    ) {
+        int offset = (pageNo - 1) * pageSize;
+        boolean isAdmin = UserRole.SYSADMIN.getValue().equals(user.getRole());
+
+        Set<Long> productIds = null;
+        if (!isAdmin) {
+            List<ProductUser> products = productUserService.selectByExample(ProductUserExample.newBuilder()
+                            .build()
+                            .createCriteria()
+                            .andUserIdEqualTo(user.getId())
+                            .toExample(),
+                    MetaProductUser.COLUMN_NAME_PRODUCTID
+            );
+
+            productIds = CollectionUtils.isEmpty(products) ?
+                    new HashSet<>() : products.stream().map(ProductUser :: getProductId).collect(Collectors.toSet());
+
+            List<ProjectUser> projectUsers = projectUserService.selectByExample(ProjectUserExample.newBuilder()
+                            .distinct(true)
+                            .build()
+                            .createCriteria()
+                            .andUserIdEqualTo(user.getId())
+                            .toExample(),
+                    MetaProjectUser.COLUMN_NAME_PRODUCTID);
+            if (!CollectionUtils.isEmpty(projectUsers)) {
+                for (ProjectUser projectUser : projectUsers) {
+                    productIds.add(projectUser.getProductId());
+                }
+            }
+
+            List<EnvironmentUser> environmentUsers =
+                    environmentUserService.selectByExample(EnvironmentUserExample.newBuilder()
+                                    .distinct(true)
+                                    .build()
+                                    .createCriteria()
+                                    .andUserIdEqualTo(user.getId())
+                                    .toExample(),
+                            MetaEnvironmentUser.COLUMN_NAME_PRODUCTID
+                    );
+            if (!CollectionUtils.isEmpty(environmentUsers)) {
+                for (EnvironmentUser environmentUser : environmentUsers) {
+                    productIds.add(environmentUser.getProductId());
+                }
+            }
+            if (CollectionUtils.isEmpty(productIds)) {
+                Pagination empty = new Pagination<>();
+                empty.setDataList(new ArrayList(0));
+                empty.setTotal(0L);
+                return empty;
+            }
+        }
+
+        Set<Long> pids = new HashSet<>();
+        Pagination<ProductVo> products = pagination(ProductExample.newBuilder()
+                        .orderByClause(MetaProduct.getSafeColumnNameByField(sortField) + " " + sortBy,
+                                isNotBlank(sortField))
+                        .start(offset)
+                        .limit(pageSize)
+                        .build()
+                        .createCriteria()
+                        .andIdIn(productIds, !isAdmin)
+                        .andNameLikeBoth(name, isNotBlank(name))
+                        .toExample(),
+                item -> {
+                    pids.add(item.getId());
+                    return Product.copyFrom(item, new ProductVo());
+                }
+        );
+
+        if (!CollectionUtils.isEmpty(pids)) {
+            Map<Long, List<String>> memberMap =
+                    productUserService.selectMapListByExample(ProductUserExample.newBuilder()
+                                    .build()
+                                    .createCriteria()
+                                    .andProductIdIn(pids)
+                                    .andIsAdminEqualTo(ProductUserAdmin.YES.getValue())
+                                    .toExample(),
+                            ProductUser :: getProductId,
+                            ProductUser :: getUserName
+                    );
+            if (!CollectionUtils.isEmpty(memberMap)) {
+                products.each(item -> {
+                    Long pid = item.getId();
+                    List<String> members = memberMap.get(pid);
+                    item.setMembers(members);
+                });
+            }
+
+        }
+        return products;
+    }
+
+    @Override
+    @Transactional
+    public void addMember(List<String> members, Long productId) {
+
+        Map<Long, ProductUser> userProductMap =
+                productUserService.queryProductUserByProductId(productId);
+
+        Map<Long, Boolean> tmp = new HashMap<>();
+        for (String name : members) {
+            User user = userService.addUserIfNotExist(name, UserRole.PRODUCT.getValue(), defaultUserType);
+            if (user == null) {
+                LOGGER.warn("user name[{}] cannot save.", name);
+                continue;
+            }
+
+            Long userId = user.getId();
+            tmp.put(userId, Boolean.TRUE);
+            if (userProductMap.containsKey(userId)) {
+                continue;
+            }
+
+            productUserService.insertSelective(ProductUser.newBuilder()
+                    .createTime(new Date())
+                    .productId(productId)
+                    .updateTime(new Date())
+                    .userId(userId)
+                    .userName(user.getName())
+                    .isAdmin((byte) 1)
+                    .build()
+            );
+        }
+
+        // 删除不存在的
+        for (Long userId : userProductMap.keySet()) {
+            if (!tmp.containsKey(userId)) {
+                ProductUser productUser = userProductMap.get(userId);
+                productUserService.deleteByPrimaryKey(productUser.getId());
+            }
+        }
+    }
+
+    @Override
+    public Product selectByName(String name) {
+        return selectOneByExample(ProductExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andNameEqualTo(name)
+                .toExample()
+        );
+    }
+}

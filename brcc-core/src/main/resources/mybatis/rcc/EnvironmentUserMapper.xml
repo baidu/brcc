@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baidu.brcc.dao.EnvironmentUserMapper">
+  <resultMap id="BaseResultMap" type="com.baidu.brcc.domain.EnvironmentUser">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="product_id" jdbcType="BIGINT" property="productId" />
+    <result column="project_id" jdbcType="BIGINT" property="projectId" />
+    <result column="environment_id" jdbcType="BIGINT" property="environmentId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="pri_type" jdbcType="TINYINT" property="priType" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.type == 0">
+                  <choose>
+                    <when test="criterion.noValue">
+                      AND ${criterion.condition}
+                    </when>
+                    <when test="criterion.singleValue">
+                      AND ${criterion.condition} #{criterion.value}
+                    </when>
+                    <when test="criterion.betweenValue">
+                      AND ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                    </when>
+                    <when test="criterion.listValue">
+                      AND ${criterion.condition}
+                      <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                        #{listItem}
+                      </foreach>
+                    </when>
+                  </choose>
+                </when>
+                <when test="criterion.type == 1">
+                  <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <foreach collection="criterion.inlineOrCriteria" item="criterion">
+                      <choose>
+                        <when test="criterion.noValue">
+                          OR ${criterion.condition}
+                        </when>
+                        <when test="criterion.singleValue">
+                          OR ${criterion.condition} #{criterion.value}
+                        </when>
+                        <when test="criterion.betweenValue">
+                          OR ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                        </when>
+                        <when test="criterion.listValue">
+                          OR ${criterion.condition}
+                          <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                            #{listItem}
+                          </foreach>
+                        </when>
+                      </choose>
+                    </foreach>
+                  </trim>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.type == 0">
+                  <choose>
+                    <when test="criterion.noValue">
+                      AND ${criterion.condition}
+                    </when>
+                    <when test="criterion.singleValue">
+                      AND ${criterion.condition} #{criterion.value}
+                    </when>
+                    <when test="criterion.betweenValue">
+                      AND ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                    </when>
+                    <when test="criterion.listValue">
+                      AND ${criterion.condition}
+                      <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                        #{listItem}
+                      </foreach>
+                    </when>
+                  </choose>
+                </when>
+                <when test="criterion.type == 1">
+                  <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <foreach collection="criterion.inlineOrCriteria" item="criterion">
+                      <choose>
+                        <when test="criterion.noValue">
+                          OR ${criterion.condition}
+                        </when>
+                        <when test="criterion.singleValue">
+                          OR ${criterion.condition} #{criterion.value}
+                        </when>
+                        <when test="criterion.betweenValue">
+                          OR ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                        </when>
+                        <when test="criterion.listValue">
+                          OR ${criterion.condition}
+                          <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                            #{listItem}
+                          </foreach>
+                        </when>
+                      </choose>
+                    </foreach>
+                  </trim>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, product_id, project_id, environment_id, user_id, user_name, pri_type, update_time,
+    create_time
+  </sql>
+  <select id="selectByExample" parameterType="com.baidu.brcc.domain.EnvironmentUserExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <if test="columns!=null and columns.size() &gt; 0">
+      <foreach collection="columns" item="listItem" separator=",">
+        ${listItem}
+      </foreach>
+    </if>
+    <if test="columns==null or columns.size() &lt;= 0">
+      <include refid="Base_Column_List" />
+    </if>
+    from rcc_environment_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null and limit > 0">
+       limit
+      <if test="start != null and start > 0">
+         #{start},
+      </if>
+       #{limit}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from rcc_environment_user
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from rcc_environment_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.baidu.brcc.domain.EnvironmentUserExample">
+    delete from rcc_environment_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.baidu.brcc.domain.EnvironmentUser">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into rcc_environment_user (product_id, project_id, environment_id,
+      user_id, user_name, pri_type,
+      update_time, create_time)
+    values (#{productId,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT}, #{environmentId,jdbcType=BIGINT},
+      #{userId,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{priType,jdbcType=TINYINT},
+      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.baidu.brcc.domain.EnvironmentUser">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into rcc_environment_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="productId != null">
+        product_id,
+      </if>
+      <if test="projectId != null">
+        project_id,
+      </if>
+      <if test="environmentId != null">
+        environment_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="priType != null">
+        pri_type,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="productId != null">
+        #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="projectId != null">
+        #{projectId,jdbcType=BIGINT},
+      </if>
+      <if test="environmentId != null">
+        #{environmentId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="priType != null">
+        #{priType,jdbcType=TINYINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.baidu.brcc.domain.EnvironmentUserExample" resultType="java.lang.Long">
+    select count(*) from rcc_environment_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update rcc_environment_user
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.productId != null">
+        product_id = #{record.productId,jdbcType=BIGINT},
+      </if>
+      <if test="record.projectId != null">
+        project_id = #{record.projectId,jdbcType=BIGINT},
+      </if>
+      <if test="record.environmentId != null">
+        environment_id = #{record.environmentId,jdbcType=BIGINT},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=BIGINT},
+      </if>
+      <if test="record.userName != null">
+        user_name = #{record.userName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.priType != null">
+        pri_type = #{record.priType,jdbcType=TINYINT},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update rcc_environment_user
+    set id = #{record.id,jdbcType=BIGINT},
+      product_id = #{record.productId,jdbcType=BIGINT},
+      project_id = #{record.projectId,jdbcType=BIGINT},
+      environment_id = #{record.environmentId,jdbcType=BIGINT},
+      user_id = #{record.userId,jdbcType=BIGINT},
+      user_name = #{record.userName,jdbcType=VARCHAR},
+      pri_type = #{record.priType,jdbcType=TINYINT},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.baidu.brcc.domain.EnvironmentUser">
+    update rcc_environment_user
+    <set>
+      <if test="productId != null">
+        product_id = #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="projectId != null">
+        project_id = #{projectId,jdbcType=BIGINT},
+      </if>
+      <if test="environmentId != null">
+        environment_id = #{environmentId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="priType != null">
+        pri_type = #{priType,jdbcType=TINYINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.baidu.brcc.domain.EnvironmentUser">
+    update rcc_environment_user
+    set product_id = #{productId,jdbcType=BIGINT},
+      project_id = #{projectId,jdbcType=BIGINT},
+      environment_id = #{environmentId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      user_name = #{userName,jdbcType=VARCHAR},
+      pri_type = #{priType,jdbcType=TINYINT},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

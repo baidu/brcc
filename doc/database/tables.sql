@@ -1,8 +1,8 @@
 
-use new_rcc;
+use brcc;
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_api_token   */
 -- /******************************************/
 CREATE TABLE `rcc_api_token` (
@@ -21,7 +21,7 @@ CREATE TABLE `rcc_api_token` (
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='api token信息表';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_config_change_log   */
 -- /******************************************/
 CREATE TABLE `rcc_config_change_log` (
@@ -43,7 +43,7 @@ CREATE TABLE `rcc_config_change_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8 COMMENT='配置变更记录';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_config_group   */
 -- /******************************************/
 CREATE TABLE `rcc_config_group` (
@@ -65,7 +65,7 @@ CREATE TABLE `rcc_config_group` (
 ) ENGINE=InnoDB AUTO_INCREMENT=477 DEFAULT CHARSET=utf8 COMMENT='分组';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_config_item   */
 -- /******************************************/
 CREATE TABLE `rcc_config_item` (
@@ -92,7 +92,7 @@ CREATE TABLE `rcc_config_item` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7147 DEFAULT CHARSET=utf8 COMMENT='配置项';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_environment   */
 -- /******************************************/
 CREATE TABLE `rcc_environment` (
@@ -110,7 +110,7 @@ CREATE TABLE `rcc_environment` (
 ) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8 COMMENT='环境';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_environment_user   */
 -- /******************************************/
 CREATE TABLE `rcc_environment_user` (
@@ -129,7 +129,7 @@ CREATE TABLE `rcc_environment_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8 COMMENT='环境用户关系';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_item_type   */
 -- /******************************************/
 CREATE TABLE `rcc_item_type` (
@@ -144,7 +144,7 @@ CREATE TABLE `rcc_item_type` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置项类型';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_operation_log   */
 -- /******************************************/
 CREATE TABLE `rcc_operation_log` (
@@ -161,7 +161,7 @@ CREATE TABLE `rcc_operation_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=446 DEFAULT CHARSET=utf8 COMMENT='操作日志表';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_product   */
 -- /******************************************/
 CREATE TABLE `rcc_product` (
@@ -175,7 +175,7 @@ CREATE TABLE `rcc_product` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='产品线';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_product_user   */
 -- /******************************************/
 CREATE TABLE `rcc_product_user` (
@@ -191,7 +191,7 @@ CREATE TABLE `rcc_product_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COMMENT='产品线用户关系';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_project   */
 -- /******************************************/
 CREATE TABLE `rcc_project` (
@@ -214,7 +214,7 @@ CREATE TABLE `rcc_project` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='工程信息表';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_project_user   */
 -- /******************************************/
 CREATE TABLE `rcc_project_user` (
@@ -231,7 +231,7 @@ CREATE TABLE `rcc_project_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='工程用户关系';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_user   */
 -- /******************************************/
 CREATE TABLE `rcc_user` (
@@ -250,7 +250,7 @@ CREATE TABLE `rcc_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8 COMMENT='用户';
 
 -- /******************************************/
--- /*   数据库全名 = new_rcc   */
+-- /*   数据库全名 = brcc   */
 -- /*   表名称 = rcc_version   */
 -- /******************************************/
 CREATE TABLE `rcc_version` (

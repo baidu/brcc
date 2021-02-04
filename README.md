@@ -1,9 +1,9 @@
-# BRCC
+# BRCC：Better Remote Config Center
 
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # 简介
-&ensp;&ensp;BRCC（better remote config center）是一个分布式配置中心，用于统一管理应用服务的配置信息，避免各类资源散落在各个项目中，简化资源配置的维护成本。作为一种轻量级的解决方案，部署简单，同时支持多环境、多版本、多角色的资源管理，可以在不改变应用源码的情况下无缝切换和实时生效配置信息。
+&ensp;&ensp;BRCC是一个分布式配置中心，用于统一管理应用服务的配置信息，避免各类资源散落在各个项目中，简化资源配置的维护成本。作为一种轻量级的解决方案，部署简单，同时支持多环境、多版本、多角色的资源管理，可以在不改变应用源码的情况下无缝切换和实时生效配置信息。
 
  &ensp;&ensp;BRCC由三部分组成：管理端、服务端、SDK，其中：<br/>
 （1）**管理端** : 前后端分离，后端基于Spring Boot 2.0开发，支持6个维度（产品、工程、环境、版本、分组、配置项）管理key-value格式的配置；支持细粒度的权限控制层级、操作轨迹等能力。安全易用，支持插件化的扩展轻松集成任何公司/组织的账号管理系统。<br/>

@@ -1,0 +1,8 @@
+rcc:
+  cc-server-url: http://127.0.0.1:8300/
+  cc-password: xxx
+  logProperties: true
+  projectName: example
+  env-name: dev
+  cc-version-name: 1.0
+  enableUpdateCallback: true
