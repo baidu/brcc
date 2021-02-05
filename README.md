@@ -1,6 +1,6 @@
 # BRCC：Better Remote Config Center
 
-[![Build Status](hhttps://travis-ci.org/baidu/brcc.svg?branch=main)](https://travis-ci.org/github/baidu/brcc)
+[![Build Status](https://travis-ci.org/baidu/brcc.svg?branch=main)](https://travis-ci.org/github/baidu/brcc)
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
