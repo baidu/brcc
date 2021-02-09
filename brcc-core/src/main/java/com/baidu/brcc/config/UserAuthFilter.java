@@ -136,7 +136,7 @@ public class UserAuthFilter implements Filter {
     }
 
     private void write(HttpServletResponse httpServletResponse, R r) throws IOException {
-        httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        httpServletResponse.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
 
         httpServletResponse.getWriter().print(GsonUtils.toJsonString(r));
         httpServletResponse.getWriter().flush();
