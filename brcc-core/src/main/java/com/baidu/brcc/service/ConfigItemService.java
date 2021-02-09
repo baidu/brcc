@@ -10,8 +10,10 @@ import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigItem;
 import com.baidu.brcc.domain.ConfigItemExample;
 import com.baidu.brcc.domain.User;
+import com.baidu.brcc.domain.base.Pagination;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
+import com.baidu.brcc.domain.vo.ConfigItemVo;
 import com.baidu.brcc.service.base.GenericService;
 
 public interface ConfigItemService extends GenericService<ConfigItem, Long, ConfigItemExample> {
@@ -44,4 +46,7 @@ public interface ConfigItemService extends GenericService<ConfigItem, Long, Conf
     List<ApiItemVo> getAllByVersionIdInCache(Long projectId, Long versionId);
 
     List<ApiItemVo> getItemsByVersionIdAndNamesInCache(Long projectId, Long versionId, List<String> names);
+
+    Pagination<ConfigItemVo> pagination(Integer offset, Integer pageSize, Long productId, Long projectId, String key,
+                                        String val, User user);
 }

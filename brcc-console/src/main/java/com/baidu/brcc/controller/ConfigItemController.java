@@ -27,10 +27,8 @@ import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,20 +48,11 @@ import com.baidu.brcc.annotation.SaveLog;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigItem;
 import com.baidu.brcc.domain.ConfigItemExample;
-import com.baidu.brcc.domain.Environment;
-import com.baidu.brcc.domain.Product;
-import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.User;
-import com.baidu.brcc.domain.Version;
 import com.baidu.brcc.domain.base.Pagination;
 import com.baidu.brcc.domain.base.R;
 import com.baidu.brcc.domain.em.Deleted;
-import com.baidu.brcc.domain.meta.MetaConfigGroup;
 import com.baidu.brcc.domain.meta.MetaConfigItem;
-import com.baidu.brcc.domain.meta.MetaEnvironment;
-import com.baidu.brcc.domain.meta.MetaProduct;
-import com.baidu.brcc.domain.meta.MetaProject;
-import com.baidu.brcc.domain.meta.MetaVersion;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
 import com.baidu.brcc.domain.vo.ConfigItemForGroupVo;
 import com.baidu.brcc.domain.vo.ConfigItemReq;
@@ -74,7 +63,9 @@ import com.baidu.brcc.service.ConfigItemService;
 import com.baidu.brcc.service.EnvironmentService;
 import com.baidu.brcc.service.EnvironmentUserService;
 import com.baidu.brcc.service.ProductService;
+import com.baidu.brcc.service.ProductUserService;
 import com.baidu.brcc.service.ProjectService;
+import com.baidu.brcc.service.ProjectUserService;
 import com.baidu.brcc.service.RccCache;
 import com.baidu.brcc.service.VersionService;
 import com.baidu.brcc.utils.time.DateTimeUtils;
@@ -117,6 +108,12 @@ public class ConfigItemController {
 
     @Autowired
     private RccCache rccCache;
+
+    @Autowired
+    private ProductUserService productUserService;
+
+    @Autowired
+    private ProjectUserService projectUserService;
 
     /**
      * 新增或修改配置
@@ -354,8 +351,10 @@ public class ConfigItemController {
 
     /**
      * 根据分组查询配置
+     *
      * @param groupId
      * @param user
+     *
      * @return
      */
     @GetMapping("list")
@@ -401,6 +400,7 @@ public class ConfigItemController {
 
     /**
      * 配置检索，支持key， value模糊匹配查询
+     *
      * @param productId
      * @param projectId
      * @param key
@@ -408,6 +408,7 @@ public class ConfigItemController {
      * @param pageNo
      * @param pageSize
      * @param user
+     *
      * @return
      */
     @GetMapping("query")
@@ -427,107 +428,8 @@ public class ConfigItemController {
             return R.error(CONFIG_KEY_VALUE_NOT_EXISTS_STATUS, CONFIG_KEY_VALUE_NOT_EXISTS_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
-        Set<Long> groupIds = new HashSet<>();
-        Set<Long> versionIds = new HashSet<>();
-        Set<Long> environmentIds = new HashSet<>();
-        Set<Long> projectIds = new HashSet<>();
-        Set<Long> productIds = new HashSet<>();
-        Pagination<ConfigItemVo> pagination = configItemService.pagination(ConfigItemExample.newBuilder()
-                        .orderByClause(MetaConfigItem.COLUMN_NAME_VERSIONID)
-                        .start(offset)
-                        .limit(pageSize)
-                        .build()
-                        .createCriteria()
-                        .andDeletedEqualTo(Deleted.OK.getValue())
-                        .andProductIdEqualTo(productId, productId != null && productId > 0)
-                        .andProjectIdEqualTo(projectId, projectId != null && projectId > 0)
-                        .andNameLikeBoth(key, isNotBlank(key))
-                        .andValLikeBoth(val, isNotBlank(val))
-                        .toExample(),
-                item -> {
-                    ConfigItemVo vo = new ConfigItemVo();
-                    Long groupId = item.getGroupId();
-                    groupIds.add(groupId);
-                    Long versionId = item.getVersionId();
-                    versionIds.add(versionId);
-                    Long environmentId = item.getEnvironmentId();
-                    environmentIds.add(environmentId);
-                    Long _projectId = item.getProjectId();
-                    projectIds.add(_projectId);
-                    Long _productId = item.getProductId();
-                    productIds.add(_productId);
-                    vo.setId(item.getId());
-                    vo.setGroupId(groupId);
-                    vo.setVersionId(versionId);
-                    vo.setEnvironmentId(environmentId);
-                    vo.setProjectId(_projectId);
-                    vo.setProductId(_productId);
-                    vo.setName(item.getName());
-                    vo.setMemo(item.getMemo());
-                    vo.setVal(item.getVal());
-                    return vo;
-                }
-        );
-
-        if (pagination != null && !CollectionUtils.isEmpty(pagination.getDataList())) {
-            Map<Long, Product> productMap = productService.selectMapByPrimaryKeys(
-                    productIds,
-                    Product :: getId,
-                    MetaProduct.COLUMN_NAME_ID,
-                    MetaProduct.COLUMN_NAME_NAME
-            );
-
-            Map<Long, Project> projectMap = projectService.selectMapByPrimaryKeys(
-                    projectIds,
-                    Project :: getId,
-                    MetaProject.COLUMN_NAME_ID,
-                    MetaProject.COLUMN_NAME_NAME
-            );
-
-            Map<Long, Environment> environmentMap = environmentService.selectMapByPrimaryKeys(
-                    environmentIds,
-                    Environment :: getId,
-                    MetaEnvironment.COLUMN_NAME_ID,
-                    MetaEnvironment.COLUMN_NAME_NAME
-            );
-
-            Map<Long, Version> versionMap = versionService.selectMapByPrimaryKeys(
-                    versionIds,
-                    Version :: getId,
-                    MetaVersion.COLUMN_NAME_ID,
-                    MetaVersion.COLUMN_NAME_NAME
-            );
-
-            Map<Long, ConfigGroup> groupMap = configGroupService.selectMapByPrimaryKeys(
-                    groupIds,
-                    ConfigGroup :: getId,
-                    MetaConfigGroup.COLUMN_NAME_ID,
-                    MetaConfigGroup.COLUMN_NAME_NAME
-            );
-
-            pagination.each(item -> {
-                Long groupId = item.getGroupId();
-                Long versionId = item.getVersionId();
-                Long environmentId = item.getEnvironmentId();
-                Long _projectId = item.getProjectId();
-                Long _productId = item.getProductId();
-                if (groupMap != null && groupMap.get(groupId) != null) {
-                    item.setGroupName(groupMap.get(groupId).getName());
-                }
-                if (versionMap != null && versionMap.get(versionId) != null) {
-                    item.setVersionName(versionMap.get(versionId).getName());
-                }
-                if (environmentMap != null && environmentMap.get(environmentId) != null) {
-                    item.setEnvironmentName(environmentMap.get(environmentId).getName());
-                }
-                if (projectMap != null && projectMap.get(_projectId) != null) {
-                    item.setProjectName(projectMap.get(_projectId).getName());
-                }
-                if (productMap != null && productMap.get(_productId) != null) {
-                    item.setProductName(productMap.get(_productId).getName());
-                }
-            });
-        }
+        Pagination<ConfigItemVo> pagination =
+                configItemService.pagination(offset, pageSize, productId, projectId, key, val, user);
         return R.ok(pagination);
     }
 

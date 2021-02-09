@@ -1,6 +1,7 @@
 package com.baidu.brcc.domain.base;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -48,6 +49,13 @@ public class Pagination<T> implements Serializable {
                 consumer.accept(t);
             }
         }
+    }
+
+    public static <T> Pagination<T> empty() {
+        Pagination<T> pagination = new Pagination<>();
+        pagination.setTotal(0L);
+        pagination.setDataList(new ArrayList<T>(0));
+        return pagination;
     }
 
     public String toString() {

@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 public class UriCostFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(UriCostFilter.class);
-    private static final String CONTAINER_ID = System.getenv("CONTAINER_ID");
-    private static final String IDC = System.getenv("EM_LOGIC_IDC");
 
     private final static String RCC_TS = "rcc-ts";
 
@@ -45,13 +43,11 @@ public class UriCostFilter implements Filter {
                 chain.doFilter(request, response);
             } finally {
                 LOGGER.debug(
-                        "request_uri\t[{}]\tnet_cost[{}]\tserver_cost[{}]\tremote_addr[{}]\tcontainer_id[{}]\tidc=[{}]",
+                        "request_uri\t[{}]\tnet_cost[{}]\tserver_cost[{}]\tremote_addr[{}]",
                         uri,
                         rccTs > 0 ? start - rccTs : -1,
                         System.currentTimeMillis() - start,
-                        request.getRemoteAddr(),
-                        CONTAINER_ID,
-                        IDC
+                        request.getRemoteAddr()
                 );
             }
         } else {

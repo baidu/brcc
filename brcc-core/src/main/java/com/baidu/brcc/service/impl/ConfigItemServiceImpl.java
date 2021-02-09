@@ -3,13 +3,19 @@
  */
 package com.baidu.brcc.service.impl;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.utils.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,15 +28,46 @@ import com.baidu.brcc.dao.base.BaseMapper;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigItem;
 import com.baidu.brcc.domain.ConfigItemExample;
+import com.baidu.brcc.domain.Environment;
+import com.baidu.brcc.domain.EnvironmentUser;
+import com.baidu.brcc.domain.EnvironmentUserExample;
+import com.baidu.brcc.domain.Product;
+import com.baidu.brcc.domain.ProductUser;
+import com.baidu.brcc.domain.ProductUserExample;
+import com.baidu.brcc.domain.Project;
+import com.baidu.brcc.domain.ProjectUser;
+import com.baidu.brcc.domain.ProjectUserExample;
 import com.baidu.brcc.domain.User;
+import com.baidu.brcc.domain.Version;
+import com.baidu.brcc.domain.base.Pagination;
 import com.baidu.brcc.domain.em.Deleted;
+import com.baidu.brcc.domain.em.ProjectUserAdmin;
+import com.baidu.brcc.domain.em.UserRole;
+import com.baidu.brcc.domain.exception.BizException;
+import com.baidu.brcc.domain.meta.MetaConfigGroup;
 import com.baidu.brcc.domain.meta.MetaConfigItem;
+import com.baidu.brcc.domain.meta.MetaEnvironment;
+import com.baidu.brcc.domain.meta.MetaEnvironmentUser;
+import com.baidu.brcc.domain.meta.MetaProduct;
+import com.baidu.brcc.domain.meta.MetaProductUser;
+import com.baidu.brcc.domain.meta.MetaProject;
+import com.baidu.brcc.domain.meta.MetaProjectUser;
+import com.baidu.brcc.domain.meta.MetaVersion;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
+import com.baidu.brcc.domain.vo.ConfigItemVo;
 import com.baidu.brcc.domain.vo.ItemReq;
 import com.baidu.brcc.service.ConfigChangeLogService;
+import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.ConfigItemService;
+import com.baidu.brcc.service.EnvironmentService;
+import com.baidu.brcc.service.EnvironmentUserService;
+import com.baidu.brcc.service.ProductService;
+import com.baidu.brcc.service.ProductUserService;
+import com.baidu.brcc.service.ProjectService;
+import com.baidu.brcc.service.ProjectUserService;
 import com.baidu.brcc.service.RccCache;
+import com.baidu.brcc.service.VersionService;
 import com.baidu.brcc.service.base.GenericServiceImpl;
 import com.baidu.brcc.utils.collections.CollectionUtils;
 import com.baidu.brcc.utils.time.DateTimeUtils;
@@ -44,6 +81,30 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
 
     @Autowired
     private ConfigChangeLogService configChangeLogService;
+
+    @Autowired
+    private EnvironmentService environmentService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private ProductUserService productUserService;
+
+    @Autowired
+    private ProjectUserService projectUserService;
+
+    @Autowired
+    private ConfigGroupService configGroupService;
+
+    @Autowired
+    private ProjectService projectService;
+
+    @Autowired
+    private VersionService versionService;
+
+    @Autowired
+    private EnvironmentUserService environmentUserService;
 
     @Autowired
     private RccCache rccCache;
@@ -409,5 +470,204 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
             }
         }
         return result;
+    }
+
+    @Override
+    public Pagination<ConfigItemVo> pagination(Integer offset, Integer pageSize, Long productId, Long projectId,
+                                               String key, String val, User user) {
+        if (user == null) {
+            throw new BizException(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        Set<Long> productIdsByQuery = null;
+        Set<Long> projectIdsByQuery = null;
+        Set<Long> environmentIdsByQuery = null;
+        if (!UserRole.SYSADMIN.getValue().equals(user.getRole())) {
+            // 非管理员
+            Map<String, Set<Long>> accessible = accessible(user);
+            if (accessible != null) {
+                productIdsByQuery = accessible.get(MetaProductUser.COLUMN_NAME_PRODUCTID);
+                projectIdsByQuery = accessible.get(MetaProjectUser.COLUMN_NAME_PROJECTID);
+                environmentIdsByQuery = accessible.get(MetaEnvironmentUser.COLUMN_NAME_ENVIRONMENTID);
+            }
+            if (isEmpty(productIdsByQuery) && isEmpty(projectIdsByQuery) && isEmpty(environmentIdsByQuery)) {
+                return Pagination.empty();
+            }
+        }
+
+        Set<Long> groupIds = new HashSet<>();
+        Set<Long> versionIds = new HashSet<>();
+        Set<Long> environmentIds = new HashSet<>();
+        Set<Long> projectIds = new HashSet<>();
+        Set<Long> productIds = new HashSet<>();
+
+        ConfigItemExample configItemExample = ConfigItemExample.newBuilder()
+                .orderByClause(MetaConfigItem.COLUMN_NAME_VERSIONID)
+                .start(offset)
+                .limit(pageSize)
+                .build()
+                .createCriteria()
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .andProductIdEqualTo(productId, productId != null && productId > 0)
+                .andProjectIdEqualTo(projectId, projectId != null && projectId > 0)
+                .andNameLikeBoth(key, isNotBlank(key))
+                .andValLikeBoth(val, isNotBlank(val))
+                .toExample();
+
+        if (!isEmpty(productIdsByQuery) || !isEmpty(projectIdsByQuery) || !isEmpty(environmentIdsByQuery)) {
+            ConfigItemExample.CriterionGroup criterionGroup = configItemExample.and().andGroupCriterion();
+            if(!isEmpty(productIdsByQuery)) {
+                criterionGroup = criterionGroup.orProductIdIn(productIdsByQuery);
+            }
+            if(!isEmpty(projectIdsByQuery)) {
+                criterionGroup = criterionGroup.orProjectIdIn(projectIdsByQuery);
+            }
+            if(!isEmpty(environmentIdsByQuery)) {
+                criterionGroup = criterionGroup.orEnvironmentIdIn(environmentIdsByQuery);
+            }
+            configItemExample = criterionGroup.toCriteria().toExample();
+        }
+
+        Pagination<ConfigItemVo> pagination = pagination(configItemExample,
+                item -> {
+                    ConfigItemVo vo = new ConfigItemVo();
+                    Long groupId = item.getGroupId();
+                    groupIds.add(groupId);
+                    Long versionId = item.getVersionId();
+                    versionIds.add(versionId);
+                    Long environmentId = item.getEnvironmentId();
+                    environmentIds.add(environmentId);
+                    Long _projectId = item.getProjectId();
+                    projectIds.add(_projectId);
+                    Long _productId = item.getProductId();
+                    productIds.add(_productId);
+                    vo.setId(item.getId());
+                    vo.setGroupId(groupId);
+                    vo.setVersionId(versionId);
+                    vo.setEnvironmentId(environmentId);
+                    vo.setProjectId(_projectId);
+                    vo.setProductId(_productId);
+                    vo.setName(item.getName());
+                    vo.setMemo(item.getMemo());
+                    vo.setVal(item.getVal());
+                    return vo;
+                }
+        );
+
+        if (pagination != null && !org.springframework.util.CollectionUtils.isEmpty(pagination.getDataList())) {
+            Map<Long, Product> productMap = productService.selectMapByPrimaryKeys(
+                    productIds,
+                    Product :: getId,
+                    MetaProduct.COLUMN_NAME_ID,
+                    MetaProduct.COLUMN_NAME_NAME
+            );
+
+            Map<Long, Project> projectMap = projectService.selectMapByPrimaryKeys(
+                    projectIds,
+                    Project :: getId,
+                    MetaProject.COLUMN_NAME_ID,
+                    MetaProject.COLUMN_NAME_NAME
+            );
+
+            Map<Long, Environment> environmentMap = environmentService.selectMapByPrimaryKeys(
+                    environmentIds,
+                    Environment :: getId,
+                    MetaEnvironment.COLUMN_NAME_ID,
+                    MetaEnvironment.COLUMN_NAME_NAME
+            );
+
+            Map<Long, Version> versionMap = versionService.selectMapByPrimaryKeys(
+                    versionIds,
+                    Version :: getId,
+                    MetaVersion.COLUMN_NAME_ID,
+                    MetaVersion.COLUMN_NAME_NAME
+            );
+
+            Map<Long, ConfigGroup> groupMap = configGroupService.selectMapByPrimaryKeys(
+                    groupIds,
+                    ConfigGroup :: getId,
+                    MetaConfigGroup.COLUMN_NAME_ID,
+                    MetaConfigGroup.COLUMN_NAME_NAME
+            );
+
+            pagination.each(item -> {
+                Long groupId = item.getGroupId();
+                Long versionId = item.getVersionId();
+                Long environmentId = item.getEnvironmentId();
+                Long _projectId = item.getProjectId();
+                Long _productId = item.getProductId();
+                if (groupMap != null && groupMap.get(groupId) != null) {
+                    item.setGroupName(groupMap.get(groupId).getName());
+                }
+                if (versionMap != null && versionMap.get(versionId) != null) {
+                    item.setVersionName(versionMap.get(versionId).getName());
+                }
+                if (environmentMap != null && environmentMap.get(environmentId) != null) {
+                    item.setEnvironmentName(environmentMap.get(environmentId).getName());
+                }
+                if (projectMap != null && projectMap.get(_projectId) != null) {
+                    item.setProjectName(projectMap.get(_projectId).getName());
+                }
+                if (productMap != null && productMap.get(_productId) != null) {
+                    item.setProductName(productMap.get(_productId).getName());
+                }
+            });
+        }
+        return pagination;
+    }
+
+    private Map<String, Set<Long>> accessible(User user) {
+        if (user == null || UserRole.SYSADMIN.getValue().equals(user.getRole())) {
+            return new HashMap<>(0);
+        }
+        Map<String, Set<Long>> map = new HashMap<>();
+        List<ProductUser> products = productUserService.selectByExample(ProductUserExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andUserIdEqualTo(user.getId())
+                        .toExample(),
+                MetaProductUser.COLUMN_NAME_PRODUCTID
+        );
+        if (!org.springframework.util.CollectionUtils.isEmpty(products)) {
+            Set<Long> productIds = new HashSet<>();
+            for (ProductUser product : products) {
+                productIds.add(product.getProductId());
+            }
+            // 设置产品线管理员身份-产品线ID
+            map.put(MetaProductUser.COLUMN_NAME_PRODUCTID, productIds);
+        }
+        List<ProjectUser> projectUsers = projectUserService.selectByExample(ProjectUserExample.newBuilder()
+                        .distinct(true)
+                        .build()
+                        .createCriteria()
+                        .andUserIdEqualTo(user.getId())
+                        .andIsAdminEqualTo(ProjectUserAdmin.YES.getValue())
+                        .toExample(),
+                MetaProjectUser.COLUMN_NAME_PROJECTID);
+        if (!org.springframework.util.CollectionUtils.isEmpty(projectUsers)) {
+            Set<Long> projectIds = new HashSet<>();
+            for (ProjectUser projectUser : projectUsers) {
+                projectIds.add(projectUser.getProjectId());
+            }
+            // 设置工程管理员身份-工程ID
+            map.put(MetaProjectUser.COLUMN_NAME_PROJECTID, projectIds);
+        }
+
+        List<EnvironmentUser> environmentUsers =
+                environmentUserService.selectByExample(EnvironmentUserExample.newBuilder()
+                                .distinct(true)
+                                .build()
+                                .createCriteria()
+                                .andUserIdEqualTo(user.getId())
+                                .toExample(),
+                        MetaEnvironmentUser.COLUMN_NAME_ENVIRONMENTID
+                );
+        if (!org.springframework.util.CollectionUtils.isEmpty(environmentUsers)) {
+            Set<Long> environmentIds = new HashSet<>();
+            for (EnvironmentUser environmentUser : environmentUsers) {
+                environmentIds.add(environmentUser.getEnvironmentId());
+            }
+            map.put(MetaEnvironmentUser.COLUMN_NAME_ENVIRONMENTID, environmentIds);
+        }
+        return map;
     }
 }

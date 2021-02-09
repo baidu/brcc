@@ -37,11 +37,25 @@ public class ConfigItemExample extends BaseExample {
     }
 
     public void or(Criteria criteria) {
+        criteria.and = false;
         oredCriteria.add(criteria);
     }
 
     public Criteria or() {
         Criteria criteria = createCriteriaInternal();
+        criteria.and = false;
+        oredCriteria.add(criteria);
+        return criteria;
+    }
+
+    public void and(Criteria criteria) {
+        criteria.and = true;
+        oredCriteria.add(criteria);
+    }
+
+    public Criteria and() {
+        Criteria criteria = createCriteriaInternal();
+        criteria.and = true;
         oredCriteria.add(criteria);
         return criteria;
     }
@@ -2008,6 +2022,8 @@ public class ConfigItemExample extends BaseExample {
 
     public static class Criteria extends GeneratedCriteria {
 
+        private boolean and;
+
         private ConfigItemExample example;
 
         protected Criteria(ConfigItemExample example) {
@@ -2036,7 +2052,7 @@ public class ConfigItemExample extends BaseExample {
          * 举例: exists(select 1 from b where b.aid = a.id and b.id=#{criterion.value})
          */
         public Criteria addCustomerCriteria(String condition, Object value) {
-             addCriterion(condition,value,"customerCondition");
+            addCriterion(condition,value,"customerCondition");
             return this;
         }
 
@@ -2056,6 +2072,14 @@ public class ConfigItemExample extends BaseExample {
                 criteria.add(group);
             }
             return group;
+        }
+
+        public boolean isAnd() {
+            return and;
+        }
+
+        public void setAnd(boolean and) {
+            this.and = and;
         }
     }
 

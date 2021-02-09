@@ -1,6 +1,7 @@
 package com.baidu.brcc.utils.collections;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,10 +10,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.springframework.lang.Nullable;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 public class CollectionUtils {
+
+    public static boolean isEmpty(@Nullable Collection<?> collection) {
+        return (collection == null || collection.isEmpty());
+    }
+
     public static <T> List<List<T>> partition(List<T> source, int partitionSize) {
         List<List<T>> result = new ArrayList<>();
         if (source == null || source.size() <= partitionSize) {
