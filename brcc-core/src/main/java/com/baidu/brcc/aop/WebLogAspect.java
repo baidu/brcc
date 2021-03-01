@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,7 +19,9 @@
 package com.baidu.brcc.aop;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -38,11 +40,13 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.baidu.brcc.annotation.MaskLog;
 import com.baidu.brcc.annotation.SaveLog;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.service.OperationLogService;
 import com.baidu.brcc.utils.UserThreadLocal;
 import com.baidu.brcc.utils.gson.GsonUtils;
+import com.google.gson.JsonObject;
 
 @Aspect
 @Component
@@ -70,6 +74,8 @@ public class WebLogAspect {
         String remoteAddress = request.getRemoteAddr() + ":" + request.getRemotePort();
         // 获取场景值
         String scene = saveLog.scene();
+        // 掩码 saveLog
+        Map<Integer, Set<String>> masks = maskMap(saveLog.masks());
         // 获取操作用户
         User user = UserThreadLocal.currentUser();
         Long userId = user == null ? 0 : user.getId();
@@ -87,12 +93,26 @@ public class WebLogAspect {
                 int idx = indexes[i];
                 String reqName = params[i];
                 Object param = args[idx];
+                Set<String> fds = masks.get(idx);
                 if (param == null) {
                     reqMap.put(reqName, "");
                 } else if (param instanceof ServletRequest || param instanceof ServletResponse) {
                     reqMap.put(reqName, "");
-                } else {
+                } else if (masks == null || !masks.containsKey(idx)) {
                     reqMap.put(reqName, param);
+                } else if (fds == null || fds.isEmpty()) {
+                    reqMap.put(reqName, "***");
+                } else {
+                    String reqStr = GsonUtils.toJsonString(param);
+                    JsonObject jsonObject = GsonUtils.toJsonObject(reqStr);
+                    if (jsonObject == null) {
+                        reqMap.put(reqName, "");
+                        continue;
+                    }
+                    for (String fd : fds) {
+                        jsonObject.addProperty(fd, "***");
+                    }
+                    reqMap.put(reqName, GsonUtils.toJsonString(jsonObject));
                 }
             }
             requestBody = GsonUtils.toJsonString(reqMap);
@@ -107,5 +127,27 @@ public class WebLogAspect {
             throw throwable;
         }
         return result;
+    }
+
+    private Map<Integer, Set<String>> maskMap(MaskLog[] masks) {
+        if (masks == null || masks.length <= 0) {
+            return new HashMap<>(0);
+        } else {
+            Map<Integer, Set<String>> map = new HashMap<>();
+            for (MaskLog mask : masks) {
+                Set<String> fields = map.get(mask.paramsIdx());
+                if (fields == null) {
+                    fields = new HashSet<>();
+                    map.put(mask.paramsIdx(), fields);
+                }
+                String[] fds = mask.fields();
+                if (fds != null && fds.length >= 0) {
+                    for (String fd : fds) {
+                        fields.add(fd);
+                    }
+                }
+            }
+            return map;
+        }
     }
 }

@@ -18,30 +18,13 @@
  */
 package com.baidu.brcc.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+/**
+ *  用于实现日志记录注解中字段掩码实现
+ */
+public @interface MaskLog {
+    // 需要掩码的参数位置
+    int paramsIdx() default 0;
 
-import org.springframework.core.annotation.AliasFor;
-
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SaveLog {
-
-    // 需要保证和params 长度一致，并且对应上
-    int[] paramsIdxes() default {};
-
-    // 参数名称列表
-    String[] params() default {};
-
-    // 场景
-    String scene() default "";
-
-    // 掩码定义
-    MaskLog[] masks() default {};
-
-    @AliasFor("params")
-    String[] value() default {};
-
+    // 参数位置对应对象的字段， 如果字段为空，此时整个参数以掩码形式打印，否则，对应的字段以掩码形式展现
+    String[] fields() default {};
 }
