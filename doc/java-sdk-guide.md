@@ -7,7 +7,7 @@ maven 坐标
 ```xml
 <dependency>
     <groupId>com.baidu.mapp</groupId>
-    <artifactId>rcc-starter</artifactId>
+    <artifactId>brcc-sdk-starter</artifactId>
     <version>${rcc-version}</version>
 </dependency>
 ```
