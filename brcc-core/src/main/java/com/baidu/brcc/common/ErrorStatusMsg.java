@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -187,6 +187,11 @@ public class ErrorStatusMsg {
     // 配置项KEY和配置项值不能同时为空
     public static final Integer CONFIG_KEY_VALUE_NOT_EXISTS_STATUS = 100132;
     public static final String CONFIG_KEY_VALUE_NOT_EXISTS_MSG = "配置项名称和配置项值不能同时为空";
+
+    public static final Integer USERID_NOT_EXISTS_STATUS = 100133;
+    public static final String USERID_NOT_EXISTS_MSG = "userIds不能为空";
+
+
 
     // API 相关
     // 工程

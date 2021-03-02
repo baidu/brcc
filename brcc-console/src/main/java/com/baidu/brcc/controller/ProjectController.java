@@ -20,6 +20,7 @@ package com.baidu.brcc.controller;
 
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_ID_EMPTY_MSG;
@@ -30,6 +31,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_PASSWORD_NOT_EXIS
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_PASSWORD_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_MSG;
@@ -38,6 +41,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_REF_ID_NOT_EXISTS_MSG
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_REF_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_STATUS;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -143,6 +148,7 @@ public class ProjectController {
 
     @Autowired
     private RccCache rccCache;
+
     /**
      * 保存工程
      *
@@ -296,7 +302,7 @@ public class ProjectController {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
         if (null == projectId || projectId <= 0) {
-            return R.error(ErrorStatusMsg.PARAM_ERROR_STATUS, ErrorStatusMsg.PARAM_ERROR_MSG);
+            return R.error(PROJECT_ID_NOT_EXISTS_STATUS, PROJECT_ID_NOT_EXISTS_MSG);
         }
         Project project = projectService.selectByPrimaryKey(projectId);
         if (project == null || Deleted.DELETE.getValue().equals(project.getDeleted())) {
@@ -328,7 +334,7 @@ public class ProjectController {
             @LoginUser User user
     ) {
         if (null == productId || productId <= 0) {
-            return R.error();
+            return R.error(PRODUCT_ID_EMPTY_STATUS, PRODUCT_ID_EMPTY_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
         Map<Long, Boolean> adminProjectMap = new HashMap<>();
@@ -403,7 +409,7 @@ public class ProjectController {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
         if (null == projectId || projectId <= 0) {
-            return R.error(ErrorStatusMsg.PARAM_ERROR_STATUS, ErrorStatusMsg.PARAM_ERROR_MSG);
+            return R.error(PROJECT_ID_NOT_EXISTS_STATUS, PROJECT_ID_NOT_EXISTS_MSG);
         }
         Project exists = projectService.selectByPrimaryKey(projectId);
         if (exists == null || Deleted.DELETE.getValue().equals(exists.getDeleted())) {
@@ -414,7 +420,7 @@ public class ProjectController {
         }
         List<Long> refIdList = refProjectDto.getRefIds();
         if (CollectionUtils.isEmpty(refIdList)) {
-            return R.error(ErrorStatusMsg.PARAM_ERROR_STATUS, ErrorStatusMsg.PARAM_ERROR_MSG);
+            return R.error(PARAM_ERROR_STATUS, ErrorStatusMsg.PARAM_ERROR_MSG);
         }
         //提出掉当前工程自己id
         refIdList.remove(projectId);
@@ -472,7 +478,7 @@ public class ProjectController {
         }
         Map<String, User> userNameMap = new HashMap<>();
         List<Long> userIdList = new ArrayList<>();
-        Byte isAdmin = projectUserDto.getIsAdmin();
+        Byte isAdmin = projectUserDto.getIsAdmin() == null ? (byte) 0 : projectUserDto.getIsAdmin();
         Byte role = (isAdmin == 0) ? UserRole.NORMAL.getValue() : UserRole.PROJECT.getValue();
         for (String name : members) {
             name = trim(name);
@@ -574,11 +580,11 @@ public class ProjectController {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
+        if (CollectionUtils.isEmpty(userIds)) {
+            return R.error(USERID_NOT_EXISTS_STATUS, USERID_NOT_EXISTS_MSG);
+        }
         if (!projectUserService.checkAuth(productId, projectId, user)) {
             return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
-        }
-        if (CollectionUtils.isEmpty(userIds)) {
-            return R.error();
         }
         // 删除环境关系表
         envUserService.deleteByExample(
@@ -605,7 +611,7 @@ public class ProjectController {
     @GetMapping("getMemberList")
     public R getMemberList(@RequestParam("projectId") Long projectId) {
         if (projectId == null || projectId <= 0) {
-            return R.error();
+            return R.error(PROJECT_ID_NOT_EXISTS_STATUS, PROJECT_ID_NOT_EXISTS_MSG);
         }
         List<ProjectUser> projectUsers = projectUserService.selectByExample(ProjectUserExample.newBuilder()
                 .limit(10000)
