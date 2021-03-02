@@ -19,12 +19,13 @@ spring:
       max-lifetime: 1800000
     name: rcc-datasource
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://${db.host}:${db.port}/brcc?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://${db.host}:${db.port}/brcc?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false
     username: ${db.username}
     password: ${db.password}
   redis:
     host: ${redis.host}
     port: ${redis.port}
+    password: ${redis.password}
 mybatis:
   configuration:
     default-statement-timeout: 60
@@ -41,3 +42,4 @@ management:
   metrics:
     distribution:
       percentiles-histogram.http.server.requests: false
+
