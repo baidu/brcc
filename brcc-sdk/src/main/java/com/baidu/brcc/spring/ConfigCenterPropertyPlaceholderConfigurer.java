@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -82,6 +82,10 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
     protected Properties ccLoadedProps;
 
     protected Properties cachedProps = new Properties();
+
+    private boolean rccLoaded = false;
+    protected Properties rccProperties = null;
+
     /**
      * set if enable update call back
      */
@@ -267,7 +271,11 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
 
         Properties ccProperty = new Properties();
         try {
-            ccProperty.putAll(loadPropertiesFromCC(cachedProps));
+            // 避免多次加载
+            if (!rccLoaded || rccProperties == null) {
+                this.rccProperties = loadPropertiesFromCC(cachedProps);
+            }
+            ccProperty.putAll(this.rccProperties);
         } catch (IOException ex) {
             throw new RccException("load rcc fail");
         }
@@ -413,6 +421,7 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
         if (logProperties) {
             doLogLoadedProperties(rccProperties);
         }
+        this.rccLoaded = true;
         return rccProperties;
     }
 
