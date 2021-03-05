@@ -5,4 +5,5 @@ coverage:
       default:
         threshold: 0.1%
 ignore:
-  - "src/main/java/com/baidu/dto/*.java" #  provider class, ignore test coverage for them
+  - "src/main/java/com/baidu/brcc/dao/" #  provider class, ignore test coverage for them
+  - "src/main/java/com/baidu/brcc/domain/"
