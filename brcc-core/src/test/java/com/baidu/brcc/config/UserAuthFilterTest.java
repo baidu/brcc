@@ -46,7 +46,7 @@ public class UserAuthFilterTest {
     public void setUp() {
         UserCache userCache = mock(UserCache.class);
         when(userCache.getUserByToken(xtoken)).thenReturn(mock(User.class));
-        UserService userService = new UserServiceImpl();
+        UserService userService = mock(UserService.class);
         byte defaultUserType = (byte) 0;
         userAuthFilter = new UserAuthFilter(null, userCache, userService, defaultUserType);
     }
@@ -55,8 +55,8 @@ public class UserAuthFilterTest {
     public void testNoAuth() throws Exception {
         List<String> noAuths = new ArrayList<>();
         noAuths.add("/test");
-        UserCache userCache = new UserCacheImpl();
-        UserService userService = new UserServiceImpl();
+        UserCache userCache = mock(UserCache.class);
+        UserService userService = mock(UserService.class);
         byte defaultUserType = (byte) 0;
         UserAuthFilter userAuthFilter = new UserAuthFilter(noAuths, userCache, userService, defaultUserType);
         boolean result = userAuthFilter.noAuth("/test");
