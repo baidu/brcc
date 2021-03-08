@@ -26,6 +26,7 @@ SERVER_PORT=8080
 # SET YOUR REDIS ENVIRONMENT
 REDIS_HOST=10.24.5.101
 REDIS_PORT=8379
+REDIS_PASSWORD=123456
 # SET YOUR MYSQL ENVIRONMENT
 DB_HOST=lin2rd00.bcc-szth.baidu.com
 DB_PORT=8306
@@ -41,6 +42,9 @@ if [ "$REDIS_HOST" != "" ]; then
 fi
 if [ "$REDIS_PORT" != "" ]; then
     JAVA_OPT="$JAVA_OPT -Dredis.port=$REDIS_PORT"
+fi
+if [ "$REDIS_PASSWORD" != "" ]; then
+    JAVA_OPT="$JAVA_OPT -Dredis.password=$REDIS_PASSWORD"
 fi
 if [ "$DB_HOST" != "" ]; then
     JAVA_OPT="$JAVA_OPT -Ddb.host=$DB_HOST"
