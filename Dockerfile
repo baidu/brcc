@@ -1,12 +1,17 @@
 FROM openjdk:8-jre-alpine
 
-ADD start.sh start.sh
+ENV MY_HOME=/app
 
-ADD brcc-server/target/*.jar ./brcc-server/target/brcc-server.jar
+ARG JAVA_OPTS=""
+
+ENV OPTS=$JAVA_OPTS
+
+WORKDIR $MY_HOME
 
 EXPOSE 8088
 
-RUN chmod 755 start.sh
+RUN apk add --update ttf-dejavu fontconfig
 
-ENTRYPOINT ["./start.sh"]
+ADD brcc-server/target/*.jar $MY_HOME/app.jar
 
+ENTRYPOINT ["sh","-c","java $OPTS -Djava.security.egd=file:/dev/urandom -jar app.jar"]
