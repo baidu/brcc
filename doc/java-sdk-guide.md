@@ -7,8 +7,13 @@ maven 坐标
 ```xml
 <dependency>
     <groupId>com.baidu.mapp</groupId>
+    <artifactId>brcc-sdk</artifactId>
+    <version>1.0.0</version>
+</dependency>
+<dependency>
+    <groupId>com.baidu.mapp</groupId>
     <artifactId>brcc-sdk-starter</artifactId>
-    <version>${rcc-version}</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 建议引用最新版本
