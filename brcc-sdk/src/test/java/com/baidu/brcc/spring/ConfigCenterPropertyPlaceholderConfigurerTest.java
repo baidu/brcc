@@ -171,7 +171,7 @@ public class ConfigCenterPropertyPlaceholderConfigurerTest {
     }
 
     @Test
-    public void testDestory() throws Exception {
+    public void testDestory() throws Exception{
         ConfigCenterPropertyPlaceholderConfigurer configCenterPropertyPlaceholderConfigurer =
                 new ConfigCenterPropertyPlaceholderConfigurer();
         setFieldValue(configCenterPropertyPlaceholderConfigurer, "configLoader", mock(ConfigLoader.class));
