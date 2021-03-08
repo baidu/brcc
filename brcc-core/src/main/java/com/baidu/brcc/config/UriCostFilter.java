@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UriCostFilter implements Filter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UriCostFilter.class);
+    private Logger LOGGER = LoggerFactory.getLogger(UriCostFilter.class);
 
     private final static String RCC_TS = "rcc-ts";
 

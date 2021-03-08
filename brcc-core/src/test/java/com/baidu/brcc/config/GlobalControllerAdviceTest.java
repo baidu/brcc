@@ -18,6 +18,8 @@
  */
 package com.baidu.brcc.config;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.SERVER_ERROR_STATUS;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,5 +34,11 @@ public class GlobalControllerAdviceTest {
         R result = globalControllerAdvice.bizExceptionHandler(new BizException(500, "message"));
         Assert.assertEquals(500, result.getStatus());
         Assert.assertEquals("message", result.getMsg());
+    }
+
+    @Test
+    public void testExceptionHandler() {
+        R r = globalControllerAdvice.exceptionHandler(new Exception());
+        Assert.assertEquals(SERVER_ERROR_STATUS.intValue(), r.getStatus());
     }
 }

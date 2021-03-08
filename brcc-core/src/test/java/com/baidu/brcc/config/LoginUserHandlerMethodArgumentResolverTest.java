@@ -19,9 +19,11 @@
 package com.baidu.brcc.config;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.core.MethodParameter;
 
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.utils.UserThreadLocal;
@@ -36,5 +38,13 @@ public class LoginUserHandlerMethodArgumentResolverTest {
         UserThreadLocal.setUser(u);
         Object result = loginUserHandlerMethodArgumentResolver.resolveArgument(null, null, null, null);
         Assert.assertEquals(u, result);
+    }
+
+    @Test
+    public void testSupportsParameter() {
+        MethodParameter methodParameter = mock(MethodParameter.class);
+        Class type = User.class;
+        when(methodParameter.getParameterType()).thenReturn(type);
+        loginUserHandlerMethodArgumentResolver.supportsParameter(methodParameter);
     }
 }
