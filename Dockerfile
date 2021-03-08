@@ -2,7 +2,7 @@ FROM openjdk:8-jre-alpine
 
 ADD start.sh start.sh
 
-ADD brcc-server/target/*.jar app.jar
+ADD brcc-server/target/*.jar ./brcc-server/target/brcc-server.jar
 
 EXPOSE 8088
 
