@@ -5,5 +5,5 @@ coverage:
       default:
         threshold: 0.1%
 ignore:
-  - "brcc-core/src/main/java/com/baidu/brcc/dao/**/*" #  provider class, ignore test coverage for them
-  - "brcc-core/src/main/java/com/baidu/brcc/domain/**/*"
+  - "brcc-core/src/main/java/com/baidu/brcc/dao/" #  provider class, ignore test coverage for them
+  - "brcc-core/src/main/java/com/baidu/brcc/domain/"
