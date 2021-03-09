@@ -10,7 +10,7 @@ maven 坐标
     <artifactId>brcc-sdk</artifactId>
     <version>1.0.0</version>
 </dependency>
-```xml
+```
 
 spring boot starter使用方式[![brcc sdk starter](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter)
 ```xml
