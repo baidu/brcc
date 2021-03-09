@@ -58,7 +58,7 @@ public class WebLogAspect {
     OperationLogService operationLogService;
 
     // 切入点
-    @Pointcut("@annotation(com.baidu.mapp.rcc.annotation.SaveLog)")
+    @Pointcut("@annotation(com.baidu.brcc.annotation.SaveLog)")
     public void saveLogPointcut() {
     }
 

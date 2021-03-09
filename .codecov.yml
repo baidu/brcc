@@ -3,7 +3,7 @@ coverage:
     # pull-requests only
     patch:
       default:
-        threshold: 0.2%
+        threshold: null
 ignore:
   - "src/main/java/com/baidu/brcc/dao/**/*"
   - "src/main/java/com/baidu/brcc/domain/**/*"
