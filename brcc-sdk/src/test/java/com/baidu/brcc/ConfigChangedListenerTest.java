@@ -70,7 +70,7 @@ public class ConfigChangedListenerTest {
         when(configLoader.getVersion()).thenReturn(mock(VersionVo.class));
         new Thread(() -> {
             try {
-                Thread.sleep(5l);
+                Thread.sleep(1l);
                 setField(configChangedListener, "stop", true);
             } catch (InterruptedException e) {
                 LOGGER.error("-", e);
