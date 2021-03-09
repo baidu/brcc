@@ -3,13 +3,17 @@
 ## 概述
 
 maven 坐标
-
+普通 SDK使用方式[![brcc sdk](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk)
 ```xml
 <dependency>
     <groupId>com.baidu.mapp</groupId>
     <artifactId>brcc-sdk</artifactId>
     <version>1.0.0</version>
 </dependency>
+```xml
+
+spring boot starter使用方式[![brcc sdk starter](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter)
+```xml
 <dependency>
     <groupId>com.baidu.mapp</groupId>
     <artifactId>brcc-sdk-starter</artifactId>
