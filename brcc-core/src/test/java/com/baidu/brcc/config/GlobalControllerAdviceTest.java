@@ -35,10 +35,4 @@ public class GlobalControllerAdviceTest {
         Assert.assertEquals(500, result.getStatus());
         Assert.assertEquals("message", result.getMsg());
     }
-
-    @Test
-    public void testExceptionHandler() {
-        R r = globalControllerAdvice.exceptionHandler(new Exception());
-        Assert.assertEquals(SERVER_ERROR_STATUS.intValue(), r.getStatus());
-    }
 }
