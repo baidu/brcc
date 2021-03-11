@@ -18,8 +18,6 @@
  */
 package com.baidu.brcc.config;
 
-import static com.baidu.brcc.common.ErrorStatusMsg.SERVER_ERROR_STATUS;
-
 import org.junit.Assert;
 import org.junit.Test;
 
