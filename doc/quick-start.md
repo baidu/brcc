@@ -17,7 +17,7 @@
       * [使用配置](#使用配置)
 ## 快速开始
 ### 部署brcc
-&ensp;&ensp;&ensp;&ensp;请点击《[部署手册](./doc/deploy-guide.md)》查看如何部署brcc server端。假设管理端的地址是http://127.0.0.1:8080
+&ensp;&ensp;&ensp;&ensp;请点击《[部署手册](./deploy-guide.md)》查看如何部署brcc server端。假设管理端的地址是http://127.0.0.1:8080
 ### 登录管理端增加配置
 #### 登录管理端
 访问 http://127.0.0.1:8080/#/login
