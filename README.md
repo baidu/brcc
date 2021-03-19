@@ -86,4 +86,5 @@ issues贡献： 如在使用中遇到问题，请在 https://github.com/baidu/br
 ## 版本更新
 - 1.0.0 brcc第一版发布，具备六个维度管理K-V的配置能力、五级权限控制能力、操作轨迹追踪、变更推送、支持spring原生配置注解等功能；
 
+更多内容请参见：[历史发版更新](https://github.com/baidu/brcc/releases)
 
