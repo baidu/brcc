@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -147,6 +147,7 @@ public class EnvironmentController {
                                 .andIdNotEqualTo(id)
                                 .andNameEqualTo(name)
                                 .andProjectIdEqualTo(environment.getProjectId())
+                                .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
                         MetaEnvironment.COLUMN_NAME_ID
                 );

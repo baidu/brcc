@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -171,6 +171,7 @@ public class ConfigItemController {
                                 .andIdNotEqualTo(id)
                                 .andNameEqualTo(name)
                                 .andVersionIdEqualTo(configItem.getVersionId())
+                                .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
                         MetaConfigItem.COLUMN_NAME_ID
                 );

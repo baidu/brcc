@@ -200,6 +200,7 @@ public class ProjectController {
                                 .createCriteria()
                                 .andIdNotEqualTo(id)
                                 .andNameEqualTo(name)
+                                .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
                         MetaProject.COLUMN_NAME_ID
                 );
@@ -252,7 +253,8 @@ public class ProjectController {
                             .build()
                             .createCriteria()
                             .andDeletedEqualTo(Deleted.OK.getValue())
-                            .andProductIdEqualTo(productId)
+                            // 工程名全局唯一
+                            // .andProductIdEqualTo(productId)
                             .andNameEqualTo(name)
                             .toExample(),
                     MetaProject.COLUMN_NAME_ID

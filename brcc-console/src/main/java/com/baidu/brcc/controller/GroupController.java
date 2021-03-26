@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -125,6 +125,7 @@ public class GroupController {
                                 .andIdNotEqualTo(id)
                                 .andNameEqualTo(name)
                                 .andVersionIdEqualTo(configGroup.getVersionId())
+                                .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
                         MetaConfigGroup.COLUMN_NAME_ID
                 );
