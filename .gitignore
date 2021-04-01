@@ -4,6 +4,7 @@
 # Log file
 *.log
 logs
+start.sh
 
 # BlueJ files
 *.ctxt
