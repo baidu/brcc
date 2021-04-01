@@ -25,7 +25,6 @@ spring:
   redis:
     host: ${redis.host}
     port: ${redis.port}
-    password: ${redis.password}
 mybatis:
   configuration:
     default-statement-timeout: 60

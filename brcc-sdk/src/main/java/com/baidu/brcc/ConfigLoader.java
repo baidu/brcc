@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -40,12 +39,30 @@ import com.baidu.brcc.model.ItemVo;
 import com.baidu.brcc.model.R;
 import com.baidu.brcc.model.RList;
 import com.baidu.brcc.model.VersionVo;
+import com.baidu.brcc.utils.NetUtils;
 import com.baidu.brcc.utils.OkHttpClientUtils;
+import com.baidu.brcc.utils.StringUtils;
 import com.baidu.brcc.utils.gson.GsonUtils;
 
 public class ConfigLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigLoader.class);
+
+    // 版本ID
+    private static final String HEADER_VERSION_ID = "Rcc-Version-Id";
+    private static final String HEADER_IDC = "Rcc-Idc";
+    private static final String HEADER_CONTAINER_ID = "Rcc-Container-Id";
+    private static final String HEADER_CLIENT_IP = "Rcc-Client-Ip";
+    private static final String HEADER_APP_NAME = "Rcc-App-Name";
+    private static final String HEADER_SDK_VERSION = "Rcc-Sdk-Version";
+    private static final String HEADER_ENABLE_UPDATE_CALLBACK = "Rcc-Enable-Update-Callback";
+    private static final String HEADER_CHECKSUM = "Rcc-Checksum";
+    // 上次请求网络延迟
+    private static final String HEADER_NET_COST = "Rcc-Net-Cost";
+    // 客服端发起请求时时间戳
+    private static final String HEADER_RCC_TS = "Rcc-Ts";
+    private static final String HEADER_RCC_SERVER_IN_TS = "Rcc-Server-In-Ts";
+    private static final String HEADER_RCC_OUT_TS = "Rcc-Out-Ts";
 
     private static final String AUTH_API = "/api/auth";
     private static final String ENV_API = "/api/environment/{0}";
@@ -66,6 +83,7 @@ public class ConfigLoader {
     private Long versionId;
     private String lastCheckSum;
     private OkHttpClientUtils okHttpClientUtils;
+    private Long netCost;
 
     private Collection<ConfigItemChangedCallable> changedCallable;
     private ConfigChangedListener configChangedListener;
@@ -140,7 +158,14 @@ public class ConfigLoader {
         return envId;
     }
 
-    // 根据版本名称获取版本
+    /**
+     * 心跳接口
+     * 根据版本名称获取版本
+     *
+     * @return
+     *
+     * @throws IOException
+     */
     public VersionVo getVersion() throws IOException {
         if (StringUtils.isBlank(currentToken)) {
             login();
@@ -152,7 +177,10 @@ public class ConfigLoader {
         Map<String, Object> param = new HashMap<>();
         param.put("token", currentToken);
         param.put("environmentId", envId);
-        R<VersionVo> result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, null);
+
+        // 获取头部信息
+        Map<String, String> header = getHeaderInfo();
+        R<VersionVo> result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, header);
         if (result == null || result.getData() == null || result.getStatus() != 0) {
             String msg = null;
             if (result == null) {
@@ -163,9 +191,32 @@ public class ConfigLoader {
             throw new RccException(msg);
         }
         versionId = result.getData().getVersionId();
+        // 计算netCost
+        netCost(result);
         return result.getData();
     }
 
+    private void netCost(R<?> r) {
+        if (r == null || r.getHeader() == null) {
+            return;
+        }
+        Long t1 = r.getHeader().get(HEADER_RCC_TS);
+        Long t2 = r.getHeader().get(HEADER_RCC_SERVER_IN_TS);
+        Long t3 = r.getSts();
+        Long t4 = r.getHeader().get(HEADER_RCC_OUT_TS);
+        if (t1 == null || t2 == null || t3 == null || t4 == null) {
+            return;
+        }
+        this.netCost = (t2 - t1 + t4 - t3) / 2;
+    }
+
+    /**
+     * 拉取得配置
+     *
+     * @return
+     *
+     * @throws IOException
+     */
     public Map<String, String> getFromCC() throws IOException {
         if (StringUtils.isBlank(currentToken)) {
             login();
@@ -174,7 +225,13 @@ public class ConfigLoader {
         Map<String, Object> param = new HashMap<>();
         param.put("token", currentToken);
         param.put("versionId", versionId);
-        RList<ItemVo> r = okHttpClientUtils.getList(itemUrl, ItemVo.class, param, null);
+
+        // 获取头部信息
+        Map<String, String> header = getHeaderInfo();
+
+        RList<ItemVo> r = okHttpClientUtils.getList(itemUrl, ItemVo.class, param, header);
+        // 计算netCost
+        netCost(r);
         Map<String, String> map = new HashMap<>();
         if (!CollectionUtils.isEmpty(r.getData())) {
             for (ItemVo itemVo : r.getData()) {
@@ -182,6 +239,22 @@ public class ConfigLoader {
             }
         }
         return map;
+    }
+
+    private Map<String, String> getHeaderInfo() {
+        Map<String, String> header = new HashMap<>();
+        header.put(HEADER_RCC_TS, System.currentTimeMillis() + "");
+        header.put(HEADER_APP_NAME, NetUtils.getAppName());
+        header.put(HEADER_CHECKSUM, lastCheckSum == null ? "-" : lastCheckSum);
+        header.put(HEADER_CLIENT_IP, NetUtils.getLocalIp());
+        header.put(HEADER_IDC, NetUtils.getIdc());
+        header.put(HEADER_CONTAINER_ID, NetUtils.getContainerId());
+        header.put(HEADER_VERSION_ID, versionId == null ? "" : versionId.toString());
+        header.put(HEADER_SDK_VERSION, NetUtils.SDK_VERSION);
+        header.put(HEADER_ENABLE_UPDATE_CALLBACK, enableUpdateCallback ? "1" : "0");
+        header.put(HEADER_NET_COST, netCost == null ? "-1" : netCost.toString());
+
+        return header;
     }
 
     public synchronized void startListening(Properties props) {

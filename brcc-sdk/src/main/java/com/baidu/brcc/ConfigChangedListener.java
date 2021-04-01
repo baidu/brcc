@@ -31,13 +31,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.brcc.model.ChangedConfigItem;
 import com.baidu.brcc.model.VersionVo;
+import com.baidu.brcc.utils.StringUtils;
 
 /**
  * Configuration changed listener.
@@ -195,6 +195,7 @@ public class ConfigChangedListener implements Runnable {
     }
 
     /**
+     * 心跳探测
      * do start listener thread.
      */
     public void run() {
@@ -216,10 +217,11 @@ public class ConfigChangedListener implements Runnable {
 
                 // check tag
                 VersionVo isLastTag = configLoader.getVersion();
-
-                if (!StringUtils.equals(isLastTag == null ? "" : isLastTag.getCheckSum(), versionTag)) {
+                String checkSum = isLastTag == null ? "" : isLastTag.getCheckSum();
+                if (!StringUtils.equals(checkSum, versionTag)) {
                     List<ChangedConfigItem> changedItems = checkChangedItems();
                     configLoader.doCallback(changedItems);
+                    configLoader.setLastCheckSum(checkSum);
                 }
             } catch (Exception e) {
                 LOGGER.warn(

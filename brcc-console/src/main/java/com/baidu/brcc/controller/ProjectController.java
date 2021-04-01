@@ -70,6 +70,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.brcc.annotation.LoginUser;
+import com.baidu.brcc.annotation.MaskLog;
 import com.baidu.brcc.annotation.SaveLog;
 import com.baidu.brcc.common.Constants;
 import com.baidu.brcc.common.ErrorStatusMsg;
@@ -158,7 +159,11 @@ public class ProjectController {
      */
     @SaveLog(scene = "修改工程",
             paramsIdxes = {0},
-            params = {"req"})
+            params = {"req"},
+            masks = @MaskLog(paramsIdx = 0,
+                    fields = "apiPassword"
+            )
+    )
     @PostMapping("save")
     public R addProject(@RequestBody ProjectReq req, @LoginUser User user) {
         if (user == null) {

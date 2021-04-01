@@ -41,6 +41,13 @@ public class RccProperties {
     private static final String LOG_PROPERTIES = "rcc.logProperties";
     private static final String PROJECT_NAME = "rcc.projectName";
     private static final String ENV_NAME = "rcc.envName";
+    // 以下信息用于统计实例信息
+    private static final String CONTAINER_ID_ENV_NAME = "rcc.containerIdEnvName";
+    private static final String IDC_ENV_NAME = "rcc.idcEnvName";
+    private static final String APP_NAME = "rcc.appName";
+    private static final String USE_ONLY_SITE_LOCAL_INTERFACES = "rcc.useOnlySiteLocalInterfaces";
+    private static final String PREFERRED_NETWORKS = "rcc.preferredNetworks";
+    private static final String IGNORED_INTERFACES = "rcc.ignoredInterfaces";
 
     private Environment env;
 
@@ -128,6 +135,41 @@ public class RccProperties {
         this.projectName = getValueFromEnv(PROJECT_NAME, String.class);
 
         this.envName = getValueFromEnv(ENV_NAME, String.class);
+
+        String idc = getValueFromEnv(IDC_ENV_NAME, String.class);
+        if (idc != null) {
+            this.idcEnvName = idc;
+            System.setProperty(IDC_ENV_NAME, idc);
+        }
+        String containerId = getValueFromEnv(CONTAINER_ID_ENV_NAME, String.class);
+        if (containerId != null) {
+            this.containerIdEnvName = containerId;
+            System.setProperty(CONTAINER_ID_ENV_NAME, containerId);
+        }
+
+        String appName = getValueFromEnv(APP_NAME, String.class);
+        if (appName != null) {
+            this.appName = appName;
+            System.setProperty(APP_NAME, appName);
+        }
+
+        Boolean useOnlySiteLocalInterfaces = getValueFromEnv(USE_ONLY_SITE_LOCAL_INTERFACES, Boolean.class);
+        if (useOnlySiteLocalInterfaces != null) {
+            this.useOnlySiteLocalInterfaces = useOnlySiteLocalInterfaces;
+            System.setProperty(USE_ONLY_SITE_LOCAL_INTERFACES, useOnlySiteLocalInterfaces ? "true" : "false");
+        }
+
+        String preferredNetworks = getValueFromEnv(PREFERRED_NETWORKS, String.class);
+        if (preferredNetworks != null) {
+            this.preferredNetworks = preferredNetworks;
+            System.setProperty(PREFERRED_NETWORKS, preferredNetworks);
+        }
+
+        String ignoredInterfaces = getValueFromEnv(IGNORED_INTERFACES, String.class);
+        if (ignoredInterfaces != null) {
+            this.ignoredInterfaces = ignoredInterfaces;
+            System.setProperty(IGNORED_INTERFACES, ignoredInterfaces);
+        }
     }
 
     private <T> T getValueFromEnv(String key, Class<T> cls) {
@@ -239,6 +281,36 @@ public class RccProperties {
      * see org.springframework.util.PropertiesPersister.load
      */
     private String fileEncoding;
+
+    /**
+     * 容器ID对应的环境变量名称
+     */
+    private String containerIdEnvName;
+
+    /**
+     * 机房ID对应的环境变量名称
+     */
+    private String idcEnvName;
+
+    /**
+     * 应用名称
+     */
+    private String appName;
+
+    /**
+     * 上报IP只读局域网卡
+     */
+    private Boolean useOnlySiteLocalInterfaces;
+
+    /**
+     * 上报IP来源网卡列表，英文逗号分隔
+     */
+    private String preferredNetworks;
+
+    /**
+     * 上报IP来源忽略网卡列表，英文逗号分隔
+     */
+    private String ignoredInterfaces;
 
     public boolean isEnableUpdateCallback() {
         return enableUpdateCallback;
@@ -386,5 +458,53 @@ public class RccProperties {
 
     public Environment getEnv() {
         return env;
+    }
+
+    public String getContainerIdEnvName() {
+        return containerIdEnvName;
+    }
+
+    public void setContainerIdEnvName(String containerIdEnvName) {
+        this.containerIdEnvName = containerIdEnvName;
+    }
+
+    public String getIdcEnvName() {
+        return idcEnvName;
+    }
+
+    public void setIdcEnvName(String idcEnvName) {
+        this.idcEnvName = idcEnvName;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public Boolean getUseOnlySiteLocalInterfaces() {
+        return useOnlySiteLocalInterfaces;
+    }
+
+    public void setUseOnlySiteLocalInterfaces(Boolean useOnlySiteLocalInterfaces) {
+        this.useOnlySiteLocalInterfaces = useOnlySiteLocalInterfaces;
+    }
+
+    public String getPreferredNetworks() {
+        return preferredNetworks;
+    }
+
+    public void setPreferredNetworks(String preferredNetworks) {
+        this.preferredNetworks = preferredNetworks;
+    }
+
+    public String getIgnoredInterfaces() {
+        return ignoredInterfaces;
+    }
+
+    public void setIgnoredInterfaces(String ignoredInterfaces) {
+        this.ignoredInterfaces = ignoredInterfaces;
     }
 }

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -52,6 +51,7 @@ import org.springframework.util.SystemPropertyUtils;
 import com.baidu.brcc.ConfigItemChangedCallable;
 import com.baidu.brcc.ConfigLoader;
 import com.baidu.brcc.exception.RccException;
+import com.baidu.brcc.utils.StringUtils;
 
 /**
  * A extend utility class for spring property configuration resolve from configuration center server.<br>
@@ -486,7 +486,7 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
 
     public static <T> T getFieldValue(Object target, String fieldName, Class<T> returnType)
             throws IllegalAccessException {
-        if (target == null || !org.springframework.util.StringUtils.hasText(fieldName)) {
+        if (target == null || !StringUtils.hasText(fieldName)) {
             return null;
         }
         Class<?> targetClass = target.getClass();

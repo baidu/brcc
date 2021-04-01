@@ -19,6 +19,7 @@
 package com.baidu.brcc.utils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,11 @@ import okhttp3.ResponseBody;
 @Service
 public class OkHttpClientUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientUtils.class);
+    private static final String HEADER_RCC_TS = "Rcc-Ts";
+    private static final String HEADER_RCC_SERVER_IN_TS = "Rcc-Server-In-Ts";
+    private static final String HEADER_RCC_SERVER_OUT_TS = "Rcc-Server-Out-Ts";
+    private static final String HEADER_RCC_OUT_TS = "Rcc-Out-Ts";
+
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
     private OkHttpClient okHttpClient = null;
@@ -77,7 +83,9 @@ public class OkHttpClientUtils {
             }
             ResponseBody body = response.body();
             String result = body.string();
-            return GsonUtils.toRObject(result, type);
+            R<T> tr = GsonUtils.toRObject(result, type);
+            tr.setHeader(header(response));
+            return tr;
         }
     }
 
@@ -105,8 +113,32 @@ public class OkHttpClientUtils {
             }
             ResponseBody body = response.body();
             String result = body.string();
-            return GsonUtils.toRList(result, type);
+            RList<T> tr = GsonUtils.toRList(result, type);
+            tr.setHeader(header(response));
+            return tr;
         }
+    }
+
+    private Map<String, Long> header(Response response) {
+        Map<String, Long> header = new HashMap<>();
+        String rccTs = response.header(HEADER_RCC_TS);
+        String serverInTs = response.header(HEADER_RCC_SERVER_IN_TS);
+        String serverOutTs = response.header(HEADER_RCC_SERVER_OUT_TS);
+        try {
+            if (!StringUtils.isBlank(rccTs)) {
+                header.put(HEADER_RCC_TS, Long.valueOf(rccTs));
+            }
+            if (!StringUtils.isBlank(serverInTs)) {
+                header.put(HEADER_RCC_SERVER_IN_TS, Long.valueOf(serverInTs));
+            }
+            if (!StringUtils.isBlank(serverOutTs)) {
+                header.put(HEADER_RCC_SERVER_OUT_TS, Long.valueOf(serverOutTs));
+            }
+        } catch (Exception ex) {
+            // ignore
+        }
+        header.put(HEADER_RCC_OUT_TS, System.currentTimeMillis());
+        return header;
     }
 
     public <T> R<T> postJson(String url,
@@ -134,7 +166,9 @@ public class OkHttpClientUtils {
             }
             ResponseBody responseBody = response.body();
             String result = responseBody.string();
-            return GsonUtils.toRObject(result, type);
+            R<T> tr = GsonUtils.toRObject(result, type);
+            tr.setHeader(header(response));
+            return tr;
         }
     }
 

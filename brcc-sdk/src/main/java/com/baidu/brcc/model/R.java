@@ -1,6 +1,7 @@
 package com.baidu.brcc.model;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class R<T> implements Serializable {
 
@@ -23,6 +24,8 @@ public class R<T> implements Serializable {
      * 返回扩展数据
      */
     private Object ext;
+
+    private Map<String, Long> header;
 
     private long sts = System.currentTimeMillis();
 
@@ -95,5 +98,21 @@ public class R<T> implements Serializable {
 
     public void setExt(Object ext) {
         this.ext = ext;
+    }
+
+    public Map<String, Long> getHeader() {
+        return header;
+    }
+
+    public void setHeader(Map<String, Long> header) {
+        this.header = header;
+    }
+
+    public long getSts() {
+        return sts;
+    }
+
+    public void setSts(long sts) {
+        this.sts = sts;
     }
 }

@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.UserCache;
 import com.baidu.brcc.service.UserService;
 
@@ -47,6 +48,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    BrccInstanceService brccInstanceService;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -80,7 +84,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean uriCostFilterRegistration() {
         FilterRegistrationBean uriCostFilterBean = new FilterRegistrationBean();
-        uriCostFilterBean.setFilter(new UriCostFilter());
+        uriCostFilterBean.setFilter(new UriCostFilter(brccInstanceService));
         uriCostFilterBean.setOrder(99);
         uriCostFilterBean.addUrlPatterns("/*");
         return uriCostFilterBean;

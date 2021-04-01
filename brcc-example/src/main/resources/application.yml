@@ -6,3 +6,5 @@ rcc:
   env-name: dev
   cc-version-name: 1.0.0
   enableUpdateCallback: true
+  appName: example
+

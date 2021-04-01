@@ -141,7 +141,7 @@ public class WebLogAspect {
                     map.put(mask.paramsIdx(), fields);
                 }
                 String[] fds = mask.fields();
-                if (fds != null && fds.length >= 0) {
+                if (fds != null && fds.length > 0) {
                     for (String fd : fds) {
                         fields.add(fd);
                     }

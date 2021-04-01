@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,12 +20,12 @@ package com.baidu.brcc.utils.gson;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.brcc.model.R;
 import com.baidu.brcc.model.RList;
+import com.baidu.brcc.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -305,6 +305,7 @@ public class GsonUtils {
         }
         return s.getBytes();
     }
+
     /**
      * @param json list的序列化字符串
      * @param <T>  T类型

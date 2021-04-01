@@ -22,6 +22,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
@@ -34,6 +37,7 @@ import org.slf4j.Logger;
 import org.springframework.util.ReflectionUtils;
 
 import com.baidu.brcc.model.VersionVo;
+import com.baidu.brcc.utils.NetUtils;
 
 public class ConfigChangedListenerTest {
     @Mock
@@ -93,5 +97,14 @@ public class ConfigChangedListenerTest {
         f.setAccessible(true);
         ReflectionUtils.setField(f, target, value);
         f.setAccessible(accessible);
+    }
+
+    @Test
+    public void testNet() throws SocketException, UnknownHostException {
+        System.out.println("/api/version/".length());
+        System.out.println("/api/version/abc".substring(13));
+        System.out.println(InetAddress.getLocalHost().getHostAddress());
+        System.out.println(NetUtils.getLocalIp());
+        System.out.println(NetUtils.getContainerId());
     }
 }
