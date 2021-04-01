@@ -18,7 +18,7 @@ CREATE TABLE `rcc_api_token` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_token` (`token`) USING BTREE,
   KEY `idx_project_id` (`project_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='api token信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='api token信息表';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -40,7 +40,7 @@ CREATE TABLE `rcc_config_change_log` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`) USING BTREE,
   KEY `version_id` (`version_id`,`create_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8 COMMENT='配置变更记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置变更记录';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -62,7 +62,7 @@ CREATE TABLE `rcc_config_group` (
   KEY `idx_version_id` (`version_id`) USING BTREE,
   KEY `idx_name` (`name`) USING BTREE,
   KEY `idx_project_id` (`project_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=477 DEFAULT CHARSET=utf8 COMMENT='分组';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='分组';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -89,7 +89,7 @@ CREATE TABLE `rcc_config_item` (
   KEY `idx_group_id` (`group_id`),
   KEY `idx_project_id` (`project_id`,`environment_id`) USING BTREE,
   KEY `idx_version_id` (`version_id`,`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7147 DEFAULT CHARSET=utf8 COMMENT='配置项';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置项';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -107,7 +107,7 @@ CREATE TABLE `rcc_environment` (
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name`) USING BTREE,
   KEY `idx_project_id` (`project_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8 COMMENT='环境';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='环境';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -126,7 +126,7 @@ CREATE TABLE `rcc_environment_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_pid_env` (`user_id`,`project_id`,`environment_id`) USING BTREE,
   KEY `idx_product_id` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8 COMMENT='环境用户关系';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='环境用户关系';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -158,7 +158,7 @@ CREATE TABLE `rcc_operation_log` (
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `create_time` (`create_time`,`operator`,`scene`)
-) ENGINE=InnoDB AUTO_INCREMENT=446 DEFAULT CHARSET=utf8 COMMENT='操作日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='操作日志表';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -172,7 +172,7 @@ CREATE TABLE `rcc_product` (
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='产品线';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产品线';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -188,7 +188,7 @@ CREATE TABLE `rcc_product_user` (
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_user_product` (`product_id`,`user_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COMMENT='产品线用户关系';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产品线用户关系';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -211,7 +211,7 @@ CREATE TABLE `rcc_project` (
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name`) USING BTREE,
   KEY `idx_product_id` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='工程信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工程信息表';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -228,7 +228,7 @@ CREATE TABLE `rcc_project_user` (
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_project` (`user_id`,`product_id`,`project_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='工程用户关系';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工程用户关系';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -247,7 +247,7 @@ CREATE TABLE `rcc_user` (
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8 COMMENT='用户';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -270,7 +270,7 @@ CREATE TABLE `rcc_version` (
   KEY `idx_name` (`name`) USING BTREE,
   KEY `idx_envid` (`environment_id`) USING BTREE,
   KEY `idx_project_id` (`project_id`,`environment_id`,`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8 COMMENT='版本';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='版本';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
@@ -284,3 +284,27 @@ CREATE TABLE `rcc_operation_config` (
   PRIMARY KEY (`id`),
   KEY `idx_key` (`config_key`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='运营配置';
+
+-- /******************************************/
+-- /*   数据库全名 = brcc   */
+-- /*   表名称 = rcc_instance   */
+-- /******************************************/
+CREATE TABLE `rcc_instance` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `idc` varchar(120) NOT NULL DEFAULT '' COMMENT '机房名称',
+  `container_id` varchar(120) NOT NULL DEFAULT '' COMMENT '容器ID',
+  `app_name` varchar(120) NOT NULL DEFAULT '' COMMENT '应用名',
+  `ip` varchar(16) NOT NULL DEFAULT '' COMMENT 'ip地址',
+  `client_version` varchar(32) NOT NULL DEFAULT '' COMMENT '客户端版本',
+  `enable_update_callback` tinyint(3) NOT NULL DEFAULT '0' COMMENT '是否开启心跳功能',
+  `last_checksum` varchar(64) NOT NULL DEFAULT '' COMMENT '上一次checksum值',
+  `last_checksum_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '上次生效时间',
+  `current_checksum` varchar(64) NOT NULL DEFAULT '' COMMENT '当前checksum值',
+  `current_checksum_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '当前生效时间',
+  `version_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '版本id',
+  `net_cost` int(11) NOT NULL DEFAULT '-1' COMMENT '上一次网络开销',
+  `heartbeat_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '最后心跳时间',
+  `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_version_id` (`version_id`,`ip`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='实例信息'
