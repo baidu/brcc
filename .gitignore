@@ -5,6 +5,7 @@
 *.log
 logs
 start.sh
+local-start.sh
 
 # BlueJ files
 *.ctxt
