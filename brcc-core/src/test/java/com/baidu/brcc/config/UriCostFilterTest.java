@@ -49,7 +49,7 @@ public class UriCostFilterTest {
         MockHttpServletRequest request = mock(MockHttpServletRequest.class);
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
-        when(request.getHeader("rcc-ts")).thenReturn("13423");
+        when(request.getHeader("Rcc-Ts")).thenReturn("13423");
         uriCostFilter.doFilter(request, response, chain);
     }
 
