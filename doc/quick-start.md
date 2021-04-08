@@ -15,6 +15,7 @@
       * [增加brcc的配置](#增加brcc的配置)
       * [检查配置](#检查配置)
       * [使用配置](#使用配置)
+      * [使用go-sdk](#使用go-sdk)
 ## 快速开始
 ### 部署brcc
 &ensp;&ensp;&ensp;&ensp;请点击《[部署手册](./deploy-guide.md)》查看如何部署brcc server端。假设管理端的地址是http://127.0.0.1:8080
@@ -99,3 +100,84 @@ long b = 0;
 @Value("${c}")
 String c;
 ```
+
+#### 使用go-sdk
+##### brcc-go-sdk代码库地址
+TODO
+##### brcc初始化
+###### 1) 通过toml文件初始化brcc客户端
+配置示例
+```toml
+serverUrl = "brcc.baidu-int.com"
+projectName = "brcc-go-client"
+envName = "debug"
+versionName = "1.0"
+apiPassword = "123456"
+enableCallback = true
+callbackInterval = 300
+requestTimeout = 5
+enableCache = true
+cacheDir = "/tmp/brcc"
+```
+参数说明
+| 配置参数         | 类型   | 是否必填 | 配置说明                                                     |
+| ---------------- | ------ | -------- | ------------------------------------------------------------ |
+| serverUrl        | string | 是       | brcc服务域名                                                 |
+| projectName      | string | 是       | brcc工程名                                                   |
+| envName          | string | 是       | brcc环境名                                                   |
+| versionName      | string | 是       | 版本号                                                       |
+| apiPassword      | string | 是       | 工程API密码                                                  |
+| enableCallback   | bool   | 否       | 是否开启配置更新回调, 默认值false关闭                        |
+| callbackInterval | int    | 否       | 配置更新回调时间间隔, 单位秒, 默认值300秒                    |
+| requestTimeout   | int    | 否       | brcc服务接口访问超时时间, 单位秒, 默认值5秒                  |
+| enableCache      | bool   | 否       | 是否开启文件缓存, 在远程获取配置失败时从本地缓存中读取配置, 默认值false关闭 |
+| cacheDir         | string | 否       | 文件缓存位置, 默认值 /tmp/brcc                               |
+初始化
+```go
+// 使用toml配置文件初始化brcc客户端, name为配置文件路径
+err := brcc.StartWithConfFile(name)
+if err != nil {
+	panic(fmt.Sprintf("init brcc error: %v", err.Error()))
+}
+```
+###### 2) 通过代码配置初始化brcc客户端
+初始化示例
+```go
+brccConf := &rcc.Conf{
+	ProjectName:         "brcc-go-client",
+	EnvName:             "debug",
+	ServerUrl:           "brcc.baidu-int.com",
+	ApiPassword:         "123456",
+	VersionName:         "1.0",
+	EnableCallback:      true,
+	CallbackIntervalInt: 300,
+	RequestTimeoutInt:   5,
+	EnableCache:         true,
+	CacheDir:            "/tmp/brcc",
+}
+
+err := brcc.StartWithConf(ctx, brccConf)
+if err != nil {
+	panic(fmt.Sprintf("init brcc error: %v", err.Error()))
+}
+```
+##### brcc获取远程配置
+```go
+// 获取远程配置
+brcc.GetValue(key, defaultValue)
+// 读取所有的key
+brcc.GetAllKeys()
+```
+##### brcc注入
+```go
+type Test struct {
+	A bool   `brcc:"test.a"`
+	B int    `brcc:"test.b"`
+	C string `brcc:"test.c"`
+}
+
+tv := &Test{}
+// 注入
+brcc.Bind(tv)
+```
+
