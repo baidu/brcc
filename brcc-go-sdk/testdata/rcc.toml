@@ -1,0 +1,9 @@
+projectName = "rcc-go-client"
+envName = "dev"
+versionName = "1.0"
+apiPassword = "123456"
+serverUrl = "rcc2.baidu-int.com"
+enableCallback = true
+callbackInterval = 1
+requestTimeout = 2
+enableCache = true
