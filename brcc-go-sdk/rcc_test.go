@@ -125,11 +125,11 @@ func TestRcc(t *testing.T) {
 	assert.Equal(t, "555", d.data["a2"])
 
 	// 检验配置替换函数
-	content := []byte(`{"a1":"{rcc.a1|999}","a2":"{rcc.a2|999}","z3":"{rcc.z3|999}"}`)
-	want := []byte(`{"a1":"444","a2":"555","z3":"999"}`)
-	res, err := HelperConfVars(content)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, want, res)
+	//content := []byte(`{"a1":"{rcc.a1|999}","a2":"{rcc.a2|999}","z3":"{rcc.z3|999}"}`)
+	//want := []byte(`{"a1":"444","a2":"555","z3":"999"}`)
+	//res, err := HelperConfVars(content)
+	//assert.Equal(t, nil, err)
+	//assert.Equal(t, want, res)
 
 	if err := Stop(); err != nil {
 		t.Errorf("Stop should return nil, got :%v", err)
