@@ -1,14 +1,22 @@
-language: java
-jdk:
-  - openjdk8
-cache:
-  directories:
-    - $HOME/.m2
-sudo: false
-install: "mvn clean cobertura:cobertura -Dmaven.javadoc.skip=true test"
+matrix:
+  include:
+    - language: java
+      jdk:
+        - openjdk8
+      cache:
+      directories:
+        - $HOME/.m2
+      sudo: false
+      install: "mvn clean cobertura:cobertura -Dmaven.javadoc.skip=true test"
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 
-after_failure:
-  - echo "build failed!"
+      after_failure:
+        - echo "build failed!"
+
+    - language: go
+      before_script:
+        - cd brcc-go-sdk
+      script:
+        - go test -v ./...
