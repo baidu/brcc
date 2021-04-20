@@ -10,12 +10,17 @@
       * [增加版本](#增加版本)
       * [增加分组](#增加分组)
       * [增加配置](#增加配置)
-   * [使用sdk](#使用sdk)
+   * [使用java-sdk](#使用sdk)
       * [增加brcc依赖](#增加brcc依赖)
       * [增加brcc的配置](#增加brcc的配置)
       * [检查配置](#检查配置)
       * [使用配置](#使用配置)
-      * [使用go-sdk](#使用go-sdk)
+   * [使用go-sdk](#使用go-sdk)
+      * [brcc-go-sdk代码库地址](#brcc-go-sdk代码库地址)
+      * [brcc初始化](#brcc初始化)
+      * [brcc获取远程配置](#brcc获取远程配置)
+      * [brcc注入](#brcc注入)
+      * [brcc监听配置变更](#brcc监听配置变更)
 ## 快速开始
 ### 部署brcc
 &ensp;&ensp;&ensp;&ensp;请点击《[部署手册](./deploy-guide.md)》查看如何部署brcc server端。假设管理端的地址是http://127.0.0.1:8080
@@ -58,7 +63,7 @@ b=34
 c=xx13
 ```
 ![配置管理](./img/config-batch.png)
-### 使用sdk
+### 使用java-sdk
 #### 增加brcc依赖
 创建一个通用的springboot应用，在pom文件中增加如下依赖：
 ```xml
@@ -101,11 +106,17 @@ long b = 0;
 String c;
 ```
 
-#### 使用go-sdk
-##### brcc-go-sdk代码库地址
-TODO
-##### brcc初始化
-###### 1) 通过toml文件初始化brcc客户端
+### 使用go-sdk
+#### brcc-go-sdk代码库地址
+https://github.com/baidu/brcc/tree/main/brcc-go-sdk
+#### brcc初始化
+使用
+```go
+import (
+    brcc github.com/baidu/brcc/brcc-go-sdk
+)
+```
+##### 1) 通过toml文件初始化brcc客户端
 配置示例
 ```toml
 serverUrl = "brcc.baidu-int.com"
@@ -140,10 +151,10 @@ if err != nil {
 	panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
 ```
-###### 2) 通过代码配置初始化brcc客户端
+##### 2) 通过代码配置初始化brcc客户端
 初始化示例
 ```go
-brccConf := &rcc.Conf{
+brccConf := &brcc.Conf{
     ProjectName:         "brcc-go-client",
     EnvName:             "debug",
     ServerUrl:           "brcc.baidu-int.com",
@@ -161,14 +172,14 @@ if err != nil {
     panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
 ```
-##### brcc获取远程配置
+#### brcc获取远程配置
 ```go
 // 获取远程配置
 brcc.GetValue(key, defaultValue)
 // 读取所有的key
 brcc.GetAllKeys()
 ```
-##### brcc注入
+#### brcc注入
 ```go
 type Test struct {
     A bool   `brcc:"test.a"`
@@ -180,4 +191,30 @@ tv := &Test{}
 // 注入
 brcc.Bind(tv)
 ```
+#### brcc监听配置变更
+使用示例
+```go
+type DemoSet struct {
+    data map[string]string
+}
 
+func (d *DemoSet) Update(ce *brcc.ChangeEvent) {
+    //建议defer捕获协程panic处理
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("watch update callback panic")
+        }
+    }()
+    for key, change := range ce.Changes {
+        if change.ChangeType == brcc.ADD || change.ChangeType == brcc.MODIFY {
+            d.data[key] = change.NewValue
+        }
+        if change.ChangeType == brcc.DELETE {
+            delete(d.data, key)
+        }
+    }
+}
+
+d = DemoSet{data: map[string]string{}}
+brcc.Watch(d.Update)
+```
