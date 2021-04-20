@@ -66,6 +66,8 @@
 
 [JAVA SDK 使用手册](./doc/java-sdk-guide.md)
 
+[Go SDK 使用手册](./doc/go-sdk-guide.md)
+
 ## 维护者
 - [shinansheng](https://github.com/sns1988)
 - [zengqingyong](https://github.com/ghzengqy568)
