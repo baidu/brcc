@@ -6,7 +6,7 @@
 
 ### Installing
 
-To start using Bolt, install Go and run `go get`:
+To start using brcc sdk, install Go and run `go get`:
 
 ```sh
 $ go get https://github.com/baidu/brcc/brcc-go-sdk
