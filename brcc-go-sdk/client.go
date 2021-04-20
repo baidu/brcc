@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/BurntSushi/toml"
 	"github.com/baidu/brcc/brcc-go-sdk/logutil"
 	"go.uber.org/zap"
 )
@@ -32,6 +33,21 @@ type Client struct {
 type Item struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+}
+
+// NewClientWithConfFile create client from conf file
+func NewClientWithConfFile(confFile string) (*Client, error) {
+	var conf = &Conf{}
+
+	if _, err := toml.DecodeFile(confFile, conf); err != nil {
+		return nil, err
+	}
+	return NewClient(context.Background(), conf)
+}
+
+// NewClientWithConf create client from conf
+func NewClientWithConf(conf *Conf) (*Client, error) {
+	return NewClient(context.Background(), conf)
 }
 
 // NewClient create client from conf
@@ -292,4 +308,9 @@ func (c *Client) getDumpFileName() string {
 	cacheDir := c.conf.CacheDir
 	fileName := fmt.Sprintf(".%s_%s", c.conf.ProjectName, c.conf.EnvName)
 	return path.Join(cacheDir, fileName)
+}
+
+// Bind
+func (c *Client) Bind(s interface{}) error {
+	return binding(s, c)
 }

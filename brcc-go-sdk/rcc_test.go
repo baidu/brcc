@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/baidu/brcc/brcc-go-sdk/logutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,6 +43,9 @@ func (d *DemoSet) Update(ce *ChangeEvent) {
 }
 
 func TestRcc(t *testing.T) {
+
+	// initial log
+	logutil.InitLog()
 
 	if err := StartWithConfFile(context.Background(), "fake.properties"); err == nil {
 		t.Errorf("Start with fake.properties should return err, got :%v", err)

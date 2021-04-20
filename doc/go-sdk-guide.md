@@ -44,7 +44,7 @@ save above configuration to local file. eg. "brcc.toml"
 ```go
 // 使用toml配置文件初始化brcc客户端, name为配置文件路径
 name := "brcc.toml"
-err := brcc.StartWithConfFile(name)
+client, err := brcc.NewClientWithConf(name)
 if err != nil {
 	panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
@@ -65,7 +65,7 @@ brccConf := &rcc.Conf{
     CacheDir:            "/tmp/brcc",
 }
 
-err := brcc.StartWithConf(ctx, brccConf)
+client, err := brcc.NewClientWithConf(brccConf)
 if err != nil {
     panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
@@ -75,9 +75,9 @@ if err != nil {
 #### get configuration items from brcc server. 
 ```go
 // 获取远程配置
-brcc.GetValue(key, defaultValue)
+client.GetValue(key, defaultValue)
 // 读取所有的key
-brcc.GetAllKeys()
+client.GetAllKeys()
 ```
 
 #### bind with configuration items for struct type.
@@ -88,9 +88,9 @@ type Test struct {
     C string `brcc:"test.c"`
 }
 
-tv := &Test{}
+v := &Test{}
 // 注入
-brcc.Bind(tv)
+client.Bind(v)
 ```
 
 

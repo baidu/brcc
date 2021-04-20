@@ -54,7 +54,7 @@ func GetValue(key, defaultValue string) string {
 
 // Bind
 func Bind(s interface{}) error {
-	return binding(s, defaultClient)
+	return defaultClient.Bind(s)
 }
 
 // GetAllKeys return all config keys in given namespace
