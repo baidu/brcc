@@ -16,6 +16,8 @@ matrix:
         - echo "build failed!"
 
     - language: go
+      go:
+        - 1.14.x
       before_script:
         - cd brcc-go-sdk
       script:
