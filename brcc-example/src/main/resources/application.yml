@@ -1,5 +1,5 @@
 rcc:
-  cc-server-url: http://rcc2.baidu-int.com
+  cc-server-url: http://180.76.36.149
   cc-password: 123456
   logProperties: true
   projectName: test-rcc

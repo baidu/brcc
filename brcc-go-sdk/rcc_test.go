@@ -15,9 +15,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const VersionId = 27
-const GroupId = 379
-const Token = "bb50de80-4a3e-40c5-b72a-b4fab0aef872"
+const VersionId = 53
+const GroupId = 481
+const Token = "453754e1-93b7-4dc4-8717-fada00ec201c"
 
 const TestConfFile = "./testdata/rcc.toml"
 

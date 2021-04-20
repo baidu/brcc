@@ -1,8 +1,8 @@
-projectName = "rcc-go-client"
+projectName = "brcc-go-sdk"
 envName = "dev"
 versionName = "1.0"
 apiPassword = "123456"
-serverUrl = "rcc2.baidu-int.com"
+serverUrl = "180.76.36.149"
 enableCallback = true
 callbackInterval = 1
 requestTimeout = 2
