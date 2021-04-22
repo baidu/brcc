@@ -100,6 +100,12 @@ b. 用户管理界面 (管理员用户，重置指定用户的密码)
 
 ![版本管理](img/version-change-log.png)
 
+- 实例管理
+
+![版本管理](img/brcc-install-manage-enter.png)
+
+![版本管理](img/brcc-instance.png)
+
 ## 2.4 分组管理
 
 ![分组管理](img/group-list.png)

@@ -37,4 +37,29 @@ public class ExampleConfigurationTest {
         ConfigItemChangedCallable result = exampleConfiguration.configItemChangedCallable();
         Assert.assertEquals(DefaultConfigItemChangedCallable.class, result.getClass());
     }
+
+    public static enum AA {
+        a, b, c
+    }
+
+    @Test
+    public void test1() {
+        AA e = AA.a;
+        switch (e) {
+            case a: {
+                System.out.println("a");
+                break;
+            }
+            case b: {
+                System.out.println("b");
+                break;
+            }
+            case c: {
+                System.out.println("c");
+                break;
+            }
+            default:
+                System.out.println("default");
+        }
+    }
 }

@@ -425,6 +425,18 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
         return rccProperties;
     }
 
+    @Override
+    protected void loadProperties(Properties props) throws IOException {
+        if (cachedProps != null) {
+            props.putAll(cachedProps);
+            return;
+        } else {
+            cachedProps = new Properties(props);
+        }
+
+        super.loadProperties(props);
+    }
+
     /**
      * set {@link ApplicationContext} instance after it created in spring container.<br>
      * this method is call back by {@link ApplicationContextAware} interface.<br>

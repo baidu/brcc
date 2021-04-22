@@ -34,13 +34,24 @@ rcc:
   log-properties: true
   enable-update-callback: true
 ```
-- rcc.cc-server-url: 配置中心服务地址
-- rcc.project-name: 请求的工程名称
-- rcc.cc-password: 请求的工程ApiPassword
-- rcc.env-name: 请求的环境名称
-- rcc.cc-version-name: 请求的版本名称
-- rcc.log-properties: 是否打印配置
-- rcc.enable-update-callback: 是否启用自动更新
+| 配置属性名称 | 默认值 | 必填 | 描述 |
+| :-----| :----: | :----: | :---- |
+| rcc.cc-server-url | null | 是 | 配置中心服务地址 |
+| rcc.project-name | null | 是 | 工程名称 |
+| rcc.cc-password | null | 是 | 工程的api密码， 创建工程时指定 |
+| rcc.env-name | null | 是 | 请求的环境名称 |
+| rcc.cc-version-name | null | 是 | 版本名称 |
+| rcc.log-properties | false | 否 | 是否在日志中打印配置 |
+| rcc.enable-update-callback | false | 是 | 否启用自动更新 |
+| rcc.callback-interval | 2000 | 否 | 心跳探测频率（ms） | 
+| rcc.connection-timeout | 3000 | 否 | 链接超时时间（ms） |
+| rcc.read-timeout | 10000 | 否 | 读超时时间（ms） |
+| rcc.app-name | null | 否 | 实例上报，采集应用名称 |
+| rcc.container-id-env-name | hostname | 否 | 实例容器ID上报，容器ID对应的环境变量 |
+| rcc.idc-env-name | null | 否 | 实例机房信息上报，机房名称对应的环境变量 |
+| rcc.use-only-site-local-interfaces | false | 否 | 实例IP上报，是否只允许上报局域网IP |
+| rcc.preferred-networks | null | 否 | 上报IP来源网卡(如en0)列表，英文逗号分隔 |
+| rcc.ignored-interfaces | null | 否 | 实例IP上报，上报IP来源忽略网卡列表，英文逗号分隔 |
 
 ## 自动更新配置
 

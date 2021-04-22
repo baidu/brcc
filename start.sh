@@ -3,7 +3,7 @@
 JAVA_FILE=./brcc-server/target/brcc-server.jar
 PID=$(jps -ml | grep "$JAVA_FILE" | awk '{print $1}')
 if [ "$PID" != "" ] ; then
-        echo 'will kill the pid $PID'
+        echo "will kill the pid $PID"
         kill -9 $PID;
 fi
 sleep 5
