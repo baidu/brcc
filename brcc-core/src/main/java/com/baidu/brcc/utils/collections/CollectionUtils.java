@@ -21,6 +21,10 @@ public class CollectionUtils {
         return (collection == null || collection.isEmpty());
     }
 
+    public static boolean isEmpty(@Nullable Map<?, ?> map) {
+        return (map == null || map.isEmpty());
+    }
+
     public static <T> List<List<T>> partition(List<T> source, int partitionSize) {
         List<List<T>> result = new ArrayList<>();
         if (source == null || source.size() <= partitionSize) {

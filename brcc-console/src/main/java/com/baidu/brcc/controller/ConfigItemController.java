@@ -72,6 +72,7 @@ import com.baidu.brcc.domain.vo.BatchConfigItemReq;
 import com.baidu.brcc.domain.vo.ConfigItemForGroupVo;
 import com.baidu.brcc.domain.vo.ConfigItemReq;
 import com.baidu.brcc.domain.vo.ConfigItemVo;
+import com.baidu.brcc.domain.vo.ItemReq;
 import com.baidu.brcc.service.ConfigChangeLogService;
 import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.ConfigItemService;
@@ -287,6 +288,14 @@ public class ConfigItemController {
         Long groupId = itemReq.getGroupId();
         if (groupId == null || groupId <= 0) {
             return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
+        }
+        if (!CollectionUtils.isEmpty(itemReq.getItems())) {
+            for (ItemReq req : itemReq.getItems()) {
+                String name = req.getName();
+                if (StringUtils.isBlank(name)) {
+                    return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
+                }
+            }
         }
         ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
         if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {

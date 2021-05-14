@@ -172,7 +172,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 .andDeletedEqualTo(Deleted.OK.getValue())
                 .andProjectIdEqualTo(projectId)
                 .andVersionIdEqualTo(versionId)
-                .andNameIn(names, !org.springframework.util.CollectionUtils.isEmpty(names))
+                .andNameIn(names, !CollectionUtils.isEmpty(names))
                 .toExample()
         );
     }
@@ -200,8 +200,8 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         Map<String, ItemReq> itemReqMap = CollectionUtils.toMap(items, ItemReq :: getName);
 
         Date now = DateTimeUtils.now();
-        if (!org.springframework.util.CollectionUtils.isEmpty(items)) {
-            boolean itemMapEmpty = org.springframework.util.CollectionUtils.isEmpty(itemMap);
+        if (!CollectionUtils.isEmpty(items)) {
+            boolean itemMapEmpty = CollectionUtils.isEmpty(itemMap);
             for (ItemReq req : items) {
                 String name = trim(req.getName());
                 if (itemMapEmpty || itemMap.get(name) == null) {
@@ -235,8 +235,8 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 }
             }
         }
-        if (!org.springframework.util.CollectionUtils.isEmpty(itemMap)) {
-            boolean isItemsMapEmpty = org.springframework.util.CollectionUtils.isEmpty(itemReqMap);
+        if (!CollectionUtils.isEmpty(itemMap)) {
+            boolean isItemsMapEmpty = CollectionUtils.isEmpty(itemReqMap);
             for (ConfigItem item : itemMap.values()) {
                 Long id = item.getId();
                 String name = trim(item.getName());
@@ -255,13 +255,13 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
 
         // 记录changeLog
         Map<String, String> oldConfigMap = new HashMap<>();
-        if (!org.springframework.util.CollectionUtils.isEmpty(itemMap)) {
+        if (!CollectionUtils.isEmpty(itemMap)) {
             for (ConfigItem item : itemMap.values()) {
                 oldConfigMap.put(item.getName(), item.getVal());
             }
         }
         Map<String, String> newConfigMap = new HashMap<>();
-        if (!org.springframework.util.CollectionUtils.isEmpty(items)) {
+        if (!CollectionUtils.isEmpty(items)) {
             for (ItemReq item : items) {
                 newConfigMap.put(item.getName(), item.getVal());
             }
@@ -353,7 +353,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
             List<ConfigItem> updateConfigItemList,
             List<Long> delConfigItemIds
     ) {
-        if (!org.springframework.util.CollectionUtils.isEmpty(delConfigItemIds)) {
+        if (!CollectionUtils.isEmpty(delConfigItemIds)) {
             this.deleteByExample(ConfigItemExample.newBuilder()
                     .build()
                     .createCriteria()
@@ -361,13 +361,13 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                     .toExample()
             );
         }
-        if (!org.springframework.util.CollectionUtils.isEmpty(insertConfigItemList)) {
+        if (!CollectionUtils.isEmpty(insertConfigItemList)) {
             for (ConfigItem configItem : insertConfigItemList) {
                 this.insertSelective(configItem);
             }
         }
 
-        if (!org.springframework.util.CollectionUtils.isEmpty(updateConfigItemList)) {
+        if (!CollectionUtils.isEmpty(updateConfigItemList)) {
             for (ConfigItem configItem : updateConfigItemList) {
                 this.updateByPrimaryKeySelective(configItem);
             }
@@ -398,7 +398,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 List<ConfigItem> items = selectByProjectIdAndVersionId(
                         projectId,
                         versionId);
-                if (!org.springframework.util.CollectionUtils.isEmpty(items)) {
+                if (!CollectionUtils.isEmpty(items)) {
                     List<ApiItemVo> itemsVos = new ArrayList<>(items.size());
                     for (ConfigItem item : items) {
                         ApiItemVo v = new ApiItemVo().copyFrom(item);
@@ -427,9 +427,9 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Override
     public List<ApiItemVo> getAllByVersionIdInCache(Long projectId, Long versionId) {
         List<ApiItemVo> itemsVos = rccCache.getItems(versionId);
-        if (org.springframework.util.CollectionUtils.isEmpty(itemsVos)) {
+        if (CollectionUtils.isEmpty(itemsVos)) {
             List<ConfigItem> items = selectByProjectIdAndVersionId(projectId, versionId);
-            if (!org.springframework.util.CollectionUtils.isEmpty(items)) {
+            if (!CollectionUtils.isEmpty(items)) {
                 itemsVos = new ArrayList<>(items.size());
                 for (ConfigItem item : items) {
                     ApiItemVo vo = new ApiItemVo().copyFrom(item);
@@ -444,25 +444,25 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Override
     public List<ApiItemVo> getItemsByVersionIdAndNamesInCache(Long projectId, Long versionId, List<String> names) {
         List<ApiItemVo> result = null;
-        if (org.springframework.util.CollectionUtils.isEmpty(names)) {
+        if (CollectionUtils.isEmpty(names)) {
             result = rccCache.getItems(versionId);
         } else {
             result = rccCache.getItems(versionId, names);
         }
-        if (org.springframework.util.CollectionUtils.isEmpty(result)) {
+        if (CollectionUtils.isEmpty(result)) {
             // 缓存可用且配置项的HKEY不存在，加载所有版本
             if (rccCache.cacheEnable() && !rccCache.existsItemHKey(versionId)) {
                 result = new ArrayList<>();
                 List<ConfigItem> items = selectByProjectIdAndVersionId(
                         projectId,
                         versionId);
-                if (!org.springframework.util.CollectionUtils.isEmpty(items)) {
+                if (!CollectionUtils.isEmpty(items)) {
                     List<ApiItemVo> itemsVos = new ArrayList<>(items.size());
                     for (ConfigItem item : items) {
                         ApiItemVo vo = new ApiItemVo().copyFrom(item);
                         itemsVos.add(vo);
 
-                        if (org.springframework.util.CollectionUtils.isEmpty(names) || names.contains(item.getName())) {
+                        if (CollectionUtils.isEmpty(names) || names.contains(item.getName())) {
                             result.add(vo);
                         }
                     }
@@ -474,7 +474,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         versionId,
                         names
                 );
-                if (!org.springframework.util.CollectionUtils.isEmpty(items)) {
+                if (!CollectionUtils.isEmpty(items)) {
                     result = new ArrayList<>(items.size());
                     for (ConfigItem item : items) {
                         ApiItemVo vo = new ApiItemVo().copyFrom(item);
@@ -530,13 +530,13 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
 
         if (!isEmpty(productIdsByQuery) || !isEmpty(projectIdsByQuery) || !isEmpty(environmentIdsByQuery)) {
             ConfigItemExample.CriterionGroup criterionGroup = configItemExample.and().andGroupCriterion();
-            if(!isEmpty(productIdsByQuery)) {
+            if (!isEmpty(productIdsByQuery)) {
                 criterionGroup = criterionGroup.orProductIdIn(productIdsByQuery);
             }
-            if(!isEmpty(projectIdsByQuery)) {
+            if (!isEmpty(projectIdsByQuery)) {
                 criterionGroup = criterionGroup.orProjectIdIn(projectIdsByQuery);
             }
-            if(!isEmpty(environmentIdsByQuery)) {
+            if (!isEmpty(environmentIdsByQuery)) {
                 criterionGroup = criterionGroup.orEnvironmentIdIn(environmentIdsByQuery);
             }
             configItemExample = criterionGroup.toCriteria().toExample();
@@ -568,7 +568,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 }
         );
 
-        if (pagination != null && !org.springframework.util.CollectionUtils.isEmpty(pagination.getDataList())) {
+        if (pagination != null && !CollectionUtils.isEmpty(pagination.getDataList())) {
             Map<Long, Product> productMap = productService.selectMapByPrimaryKeys(
                     productIds,
                     Product :: getId,
@@ -642,7 +642,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         .toExample(),
                 MetaProductUser.COLUMN_NAME_PRODUCTID
         );
-        if (!org.springframework.util.CollectionUtils.isEmpty(products)) {
+        if (!CollectionUtils.isEmpty(products)) {
             Set<Long> productIds = new HashSet<>();
             for (ProductUser product : products) {
                 productIds.add(product.getProductId());
@@ -658,7 +658,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         .andIsAdminEqualTo(ProjectUserAdmin.YES.getValue())
                         .toExample(),
                 MetaProjectUser.COLUMN_NAME_PROJECTID);
-        if (!org.springframework.util.CollectionUtils.isEmpty(projectUsers)) {
+        if (!CollectionUtils.isEmpty(projectUsers)) {
             Set<Long> projectIds = new HashSet<>();
             for (ProjectUser projectUser : projectUsers) {
                 projectIds.add(projectUser.getProjectId());
@@ -676,7 +676,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                                 .toExample(),
                         MetaEnvironmentUser.COLUMN_NAME_ENVIRONMENTID
                 );
-        if (!org.springframework.util.CollectionUtils.isEmpty(environmentUsers)) {
+        if (!CollectionUtils.isEmpty(environmentUsers)) {
             Set<Long> environmentIds = new HashSet<>();
             for (EnvironmentUser environmentUser : environmentUsers) {
                 environmentIds.add(environmentUser.getEnvironmentId());
