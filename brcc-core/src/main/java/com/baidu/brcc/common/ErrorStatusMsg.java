@@ -83,7 +83,7 @@ public class ErrorStatusMsg {
 
     // 登录密码不能为空
     public static final Integer USER_LOGIN_PASSWORD_ERROR_STATUS = 100106;
-    public static final String USER_LOGIN_PASSWORD_ERROR_MSG = "登录密码不能为空";
+    public static final String USER_LOGIN_PASSWORD_ERROR_MSG = "登录密码不正确";
 
     public static final Integer PRODUCT_NOT_EXISTS_STATUS = 100107;
     public static final String PRODUCT_NOT_EXISTS_MSG = "产品线不存在";
