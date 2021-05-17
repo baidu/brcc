@@ -244,7 +244,8 @@ public class VersionController {
 
         // 权限
         Map<String, Object> ext = new HashMap<>();
-        boolean canManage = projectUserService.checkAuth(environment.getProductId(), environment.getProjectId(), user);
+        boolean canManage = environmentUserService
+                .checkAuth(environment.getProductId(), environment.getProjectId(), environmentId, user);
         ext.put("canManage", canManage);
 
         return R.ok(pagination, ext);

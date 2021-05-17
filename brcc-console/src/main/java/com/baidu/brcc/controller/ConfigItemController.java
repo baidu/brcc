@@ -417,7 +417,7 @@ public class ConfigItemController {
         // 权限
         Map<String, Object> ext = new HashMap<>();
         boolean canManage = environmentUserService.checkAuth(configGroup.getProductId(), configGroup.getProjectId(),
-                configGroup.getVersionId(), user);
+                configGroup.getEnvironmentId(), user);
         ext.put("canManage", canManage);
 
         return R.ok(items, ext);

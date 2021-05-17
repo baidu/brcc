@@ -266,7 +266,7 @@ public class GroupController {
         // 权限
         Map<String, Object> ext = new HashMap<>();
         boolean canManage = environmentUserService.checkAuth(version.getProductId(), version.getProjectId(),
-                versionId, user);
+                version.getEnvironmentId(), user);
         ext.put("canManage", canManage);
 
         return R.ok(pagination, ext);
