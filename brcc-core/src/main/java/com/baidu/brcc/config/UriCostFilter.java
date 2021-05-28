@@ -66,6 +66,9 @@ public class UriCostFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         String uri = httpServletRequest.getRequestURI();
+        if (StringUtils.startsWith(uri, "//")) {
+            uri = uri.substring(1);
+        }
         httpServletResponse.setHeader("Access-Control-Expose-Headers", ACCESS_CONTROL_EXPOSE_HEADERS);
         collectionHeaderInfo(uri, httpServletRequest);
         long start = System.currentTimeMillis();
