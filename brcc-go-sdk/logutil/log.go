@@ -8,8 +8,10 @@ var defaultLogger *zap.Logger
 
 // initial logger struct
 func InitLog() {
-	defaultLogger, _ = zap.NewProduction()
-	defer defaultLogger.Sync()
+	if defaultLogger == nil {
+		defaultLogger, _ = zap.NewProduction()
+		defer defaultLogger.Sync()
+	}
 }
 
 // DefaultLogger

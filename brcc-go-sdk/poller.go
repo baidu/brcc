@@ -84,7 +84,10 @@ func (p *pollerRcc) preload() error {
 }
 
 func (p *pollerRcc) stop() {
-	p.cancel()
+	// to check cacel func is not nil
+	if p.cancel != nil {
+		p.cancel()
+	}
 }
 
 func (p *pollerRcc) watchUpdate() {

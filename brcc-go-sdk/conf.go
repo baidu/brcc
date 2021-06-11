@@ -8,6 +8,13 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/baidu/brcc/brcc-go-sdk/logutil"
+)
+
+const (
+	DefaultCallbackIntervalInt = 300 // 默认300s触发一次更新拉取
+	DefaultRequestTimeoutInt   = 5   // 默认5秒钟接口调用超时时间
+	DefaultFilePath            = "/tmp/rcc"
 )
 
 // Conf
@@ -33,6 +40,10 @@ type Conf struct {
 
 // NewConf create Conf from file
 func NewConf(name string) (*Conf, error) {
+
+	// initial log
+	logutil.InitLog()
+
 	f, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -46,6 +57,9 @@ func NewConf(name string) (*Conf, error) {
 		return nil, err
 	}
 
+	ret.CallbackInterval = time.Duration(ret.CallbackIntervalInt) * time.Second
+	ret.RequestTimeout = time.Duration(ret.RequestTimeoutInt) * time.Second
+
 	return &ret, nil
 }
 
@@ -56,17 +70,17 @@ func (c *Conf) normalize(ctx context.Context) error {
 	}
 
 	if c.CacheDir == "" {
-		c.CacheDir = "/tmp/rcc"
+		c.CacheDir = DefaultFilePath
 	}
 
 	if c.RequestTimeoutInt == 0 {
-		c.RequestTimeoutInt = 5 // 默认5秒钟接口调用超时时间
+		c.RequestTimeoutInt = DefaultRequestTimeoutInt
 	}
 	c.RequestTimeout = time.Second * time.Duration(c.RequestTimeoutInt)
 
 	if c.EnableCallback {
 		if c.CallbackIntervalInt == 0 {
-			c.CallbackIntervalInt = 300 // 默认300s触发一次更新拉取
+			c.CallbackIntervalInt = DefaultCallbackIntervalInt
 		}
 		c.CallbackInterval = time.Second * time.Duration(c.CallbackIntervalInt)
 	}

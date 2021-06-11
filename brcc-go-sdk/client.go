@@ -113,7 +113,9 @@ func (c *Client) Start() error {
 
 // Stop sync config
 func (c *Client) Stop() error {
-	c.poller.stop()
+	if c.poller != nil {
+		c.poller.stop()
+	}
 	c.cancel()
 	return nil
 }
@@ -155,6 +157,9 @@ func (c *Client) Watch(callback func(ce *ChangeEvent)) {
 
 // GetValue
 func (c *Client) GetValue(key, defaultValue string) string {
+	if c.cache == nil {
+		return defaultValue
+	}
 	if ret, ok := c.cache.get(key); ok && ret != "" {
 		return ret
 	}
@@ -164,6 +169,9 @@ func (c *Client) GetValue(key, defaultValue string) string {
 // GetAllKeys return all config keys in given namespace
 func (c *Client) GetAllKeys() []string {
 	var keys []string
+	if c.cache == nil {
+		return nil
+	}
 	c.cache.kv.Range(func(key, value interface{}) bool {
 		str, ok := key.(string)
 		if ok {
