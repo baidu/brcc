@@ -53,11 +53,6 @@ func TestNewClient(t *testing.T) {
 
 }
 
-func newclient() *Client {
-	client, _ := NewClientWithConfFile(TestConfFile)
-	return client
-}
-
 // TestClientGet test client get action with mock way
 func TestClientGet(t *testing.T) {
 
