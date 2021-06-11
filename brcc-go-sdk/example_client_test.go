@@ -25,6 +25,11 @@ func ExampleClient() {
 		client.GetValue(v, "DefaultValue")
 	}
 
+	s := struct {
+		Key string `rcc:"mykey"`
+	}{}
+	client.Bind(&s)
+
 }
 
 // ExampleClient_Watch he example to show use Watch function

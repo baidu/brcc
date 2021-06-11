@@ -56,11 +56,6 @@ func NewClient(ctx context.Context, conf *Conf) (*Client, error) {
 	logutil.InitLog()
 	ctx, cancel := context.WithCancel(ctx)
 
-	err := conf.normalize(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	client := &Client{
 		conf:      conf,
 		cache:     newCache(),
@@ -68,6 +63,11 @@ func NewClient(ctx context.Context, conf *Conf) (*Client, error) {
 		isRunning: make(chan bool, 1),
 	}
 	client.ctx, client.cancel = ctx, cancel
+
+	err := conf.normalize(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	client.poller = newPollerRcc(ctx, conf, client.handleUpdate)
 	return client, nil
@@ -128,6 +128,18 @@ func (c *Client) WatchUpdate() <-chan *ChangeEvent {
 	return c.updateChan
 }
 
+func (c *Client) doCallback(callback func(ce *ChangeEvent), ce *ChangeEvent) {
+	// 捕获callback函数抛出的panic
+	defer func() {
+		if r := recover(); r != nil {
+			logutil.DefaultLogger().Error("[rcc-go-client]watch callback function panic",
+				zap.String("projectName", c.conf.ProjectName),
+				zap.String("envName", c.conf.EnvName))
+		}
+	}()
+	callback(ce)
+}
+
 // Watch
 func (c *Client) Watch(callback func(ce *ChangeEvent)) {
 	ch := c.WatchUpdate()
@@ -136,18 +148,9 @@ func (c *Client) Watch(callback func(ce *ChangeEvent)) {
 			select {
 			case ce, ok := <-ch:
 				if ok {
-					func(ce *ChangeEvent) {
-						// 捕获callback函数抛出的panic
-						defer func() {
-							if r := recover(); r != nil {
-								logutil.DefaultLogger().Error("[rcc-go-client]watch callback function panic",
-									zap.String("projectName", c.conf.ProjectName),
-									zap.String("envName", c.conf.EnvName))
-							}
-						}()
-						callback(ce)
-					}(ce)
+					c.doCallback(callback, ce)
 				} else {
+					logutil.DefaultLogger().Warn("Watch returned chan is closed.")
 					return
 				}
 			}

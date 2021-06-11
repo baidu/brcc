@@ -10,10 +10,12 @@ import (
 	"fmt"
 )
 
+// DemoSet demo set
 type DemoSet struct {
 	data map[string]string
 }
 
+// Update callback function while regitered in Watch method.
 func (d *DemoSet) Update(ce *ChangeEvent) {
 
 	// 建议defer捕获协程panic
@@ -31,7 +33,7 @@ func (d *DemoSet) Update(ce *ChangeEvent) {
 }
 
 // Example_RCC example code to show how to use by default rcc client
-func Example_RCC() {
+func Example_rcc() {
 
 	conf, err := NewConf(TestConfFile)
 	if err != nil {

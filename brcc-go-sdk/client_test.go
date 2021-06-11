@@ -158,7 +158,7 @@ func TestClientGet(t *testing.T) {
 			changeableCheckSum = "thisnewchecksum"
 			changeableItemJson = `[{"key":"mykey", "value":"matthew"}]`
 
-			// wait for seconds for update arrive
+			// wait seconds for update loop arrived
 			time.Sleep(3 * time.Second)
 		})
 	})
