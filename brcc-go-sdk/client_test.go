@@ -101,13 +101,13 @@ func TestClientGet(t *testing.T) {
 		})
 		defer patches2.Reset()
 
-		client := newclient()
-		client.Start()
-		defer client.Stop()
+		err := StartWithConfFile(context.Background(), TestConfFile)
+		So(err, ShouldBeNil)
+		defer Stop()
 
 		Convey("test client GetAllKeys", func() {
 
-			keys := client.GetAllKeys()
+			keys := GetAllKeys()
 			So(len(keys), ShouldEqual, 1)
 			So(keys[0], ShouldEqual, C_Key1)
 		})
@@ -115,11 +115,11 @@ func TestClientGet(t *testing.T) {
 		Convey("test client GetValue", func() {
 			defaultValue := "default_value"
 			// exist key
-			key := client.GetValue(C_Key1, defaultValue)
+			key := GetValue(C_Key1, defaultValue)
 			So(key, ShouldEqual, C_Value1)
 
 			// fake key
-			key = client.GetValue("fake_key_from_matthew", defaultValue)
+			key = GetValue("fake_key_from_matthew", defaultValue)
 			So(key, ShouldEqual, defaultValue)
 
 		})
@@ -128,7 +128,7 @@ func TestClientGet(t *testing.T) {
 			s := struct {
 				Key string `rcc:"mykey"`
 			}{}
-			client.Bind(&s)
+			Bind(&s)
 
 			So(s.Key, ShouldEqual, C_Value1)
 		})
@@ -152,7 +152,7 @@ func TestClientGet(t *testing.T) {
 					}
 				}
 			}
-			client.Watch(callback)
+			Watch(callback)
 
 			// update check sum
 			changeableCheckSum = "thisnewchecksum"
