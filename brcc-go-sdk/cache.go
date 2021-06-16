@@ -48,16 +48,14 @@ func (c *Cache) dump() map[string]string {
 
 func (c *Cache) store(name string) error {
 
-	var dumps = map[string]string{}
-
-	dumps = c.dump()
-
 	f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
+	var dumps = map[string]string{}
+	dumps = c.dump()
 	return gob.NewEncoder(f).Encode(&dumps)
 }
 

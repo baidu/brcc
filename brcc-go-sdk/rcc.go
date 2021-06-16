@@ -7,7 +7,6 @@ package rcc
 
 import (
 	"context"
-	"regexp"
 
 	"github.com/BurntSushi/toml"
 )
@@ -63,7 +62,7 @@ func GetAllKeys() []string {
 }
 
 // 模板变量格式：{env.变量名} 或者 {env.变量名|默认值}
-var osEnvVarReg = regexp.MustCompile(`\{rcc\.([A-Za-z0-9_\.]+)(\|[^}]+)?\}`)
+// var osEnvVarReg = regexp.MustCompile(`\{rcc\.([A-Za-z0-9_\.]+)(\|[^}]+)?\}`)
 
 // HelperConfVars 将配置文件中的 {rcc.xxx} 的内容，从rcc变量中读取并替换
 //func HelperConfVars(content []byte) ([]byte, error) {

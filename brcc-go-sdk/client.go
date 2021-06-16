@@ -256,7 +256,7 @@ func (c *Client) deliveryChangeEvent(change *ChangeEvent) {
 	}
 	select {
 	case <-c.ctx.Done():
-		close(c.updateChan)
+		safeCloseChangeEventChan(c.updateChan)
 	case c.updateChan <- change:
 	}
 }
@@ -324,4 +324,19 @@ func (c *Client) getDumpFileName() string {
 // Bind
 func (c *Client) Bind(s interface{}) error {
 	return binding(s, c)
+}
+
+// safeCloseChangeEventChan to close channel safty
+func safeCloseChangeEventChan(ch chan *ChangeEvent) {
+	defer func() {
+		if err := recover(); err != nil {
+			// close(ch) panic occur
+			e, ok := err.(error)
+			if ok {
+				logutil.DefaultLogger().Warn(e.Error())
+			}
+		}
+	}()
+
+	close(ch) // panic if ch is closed
 }
