@@ -95,23 +95,21 @@ client.Bind(v)
 
 #### dynamic watch configuration items update
 ```go
-			// define update callback for Watch function
-			callback := func(ce *rcc.ChangeEvent) {
-				// 建议defer捕获协程panic
-				defer func() {
-					if r := recover(); r != nil {
-						fmt.Println("watch update callback panic")
-					}
-				}()
+// define update callback for Watch function
+	callback := func(ce *rcc.ChangeEvent) {
+	// 建议defer捕获协程panic
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("watch update callback panic")
+		}
+	}()
 
-				for key, change := range ce.Changes {
-					if change.ChangeType == rcc.MODIFY change.ChangeType.rcc.ADD||  {
-						So(key, ShouldEqual, C_Key1)
-						So(change.ChangeType, ShouldEqual, change.ChangeType == rcc.MODIFY)
-						So(change.NewValue, ShouldEqual, newvalue)
-					}
-				}
-			}
-			client.Watch(callback)
+	for key, change := range ce.Changes {
+		if change.ChangeType == rcc.MODIFY || change.ChangeType.rcc.ADD  {
+		// key, change.NewValue,  change.OldValue , change.ChangeType
+		}
+	}
+}
+client.Watch(callback)
 ```
 
