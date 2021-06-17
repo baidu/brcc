@@ -44,7 +44,7 @@ save above configuration to local file. eg. "brcc.toml"
 ```go
 // 使用toml配置文件初始化brcc客户端, name为配置文件路径
 name := "brcc.toml"
-client, err := brcc.NewClientWithConf(name)
+client, err := rcc.NewClientWithConf(name)
 if err != nil {
 	panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
@@ -65,7 +65,7 @@ brccConf := &rcc.Conf{
     CacheDir:            "/tmp/brcc",
 }
 
-client, err := brcc.NewClientWithConf(brccConf)
+client, err := rcc.NewClientWithConf(brccConf)
 if err != nil {
     panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
@@ -93,6 +93,25 @@ v := &Test{}
 client.Bind(v)
 ```
 
+#### dynamic watch configuration items update
+```go
+			// define update callback for Watch function
+			callback := func(ce *rcc.ChangeEvent) {
+				// 建议defer捕获协程panic
+				defer func() {
+					if r := recover(); r != nil {
+						fmt.Println("watch update callback panic")
+					}
+				}()
 
-
+				for key, change := range ce.Changes {
+					if change.ChangeType == rcc.MODIFY change.ChangeType.rcc.ADD||  {
+						So(key, ShouldEqual, C_Key1)
+						So(change.ChangeType, ShouldEqual, change.ChangeType == rcc.MODIFY)
+						So(change.NewValue, ShouldEqual, newvalue)
+					}
+				}
+			}
+			client.Watch(callback)
+```
 
