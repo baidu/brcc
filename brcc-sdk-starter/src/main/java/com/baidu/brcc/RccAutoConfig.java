@@ -78,6 +78,7 @@ public class RccAutoConfig implements ApplicationContextAware {
         configCenterPropertyPlaceholderConfigurer.setReadTimeout(rccProperties.getReadTimeout());
         configCenterPropertyPlaceholderConfigurer.setConnectionTimeout(rccProperties.getConnectionTimeout());
         configCenterPropertyPlaceholderConfigurer.setEnableUpdateCallback(rccProperties.isEnableUpdateCallback());
+        configCenterPropertyPlaceholderConfigurer.setEnableInterruptService(rccProperties.isEnableInterruptService());
 
         configCenterPropertyPlaceholderConfigurer.setLocalOverride(rccProperties.isLocalOverride());
         PathMatchingResourcePatternResolver resolver = null;

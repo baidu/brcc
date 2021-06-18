@@ -87,6 +87,11 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
     protected Properties rccProperties = null;
 
     /**
+     * set if enable interrupt service when api password is wrong
+     */
+    private boolean enableInterruptService = true;
+
+    /**
      * set if enable update call back
      */
     private boolean enableUpdateCallback = false;
@@ -193,6 +198,10 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
         this.callbackInteval = callbackInteval;
     }
 
+
+    public void setEnableInterruptService(boolean enableInterruptService) {
+        this.enableInterruptService = enableInterruptService;
+    }
     /**
      * set server url
      *
@@ -386,6 +395,7 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
     private void checkValid() throws IOException {
         if (configLoader == null) {
             configLoader = new ConfigLoader(
+                    enableInterruptService,
                     ccServerUrl,
                     ccPassword,
                     projectName,
