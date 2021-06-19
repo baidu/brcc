@@ -33,6 +33,7 @@ rcc:
   cc-version-name: 1.0
   log-properties: true
   enable-update-callback: true
+  enable-interrupt-service: true
 ```
 | 配置属性名称 | 默认值 | 必填 | 描述 |
 | :-----| :----: | :----: | :---- |
@@ -43,6 +44,7 @@ rcc:
 | rcc.cc-version-name | null | 是 | 版本名称 |
 | rcc.log-properties | false | 否 | 是否在日志中打印配置 |
 | rcc.enable-update-callback | false | 是 | 否启用自动更新 |
+| rcc.enable-interrupt-service | true | 是 | 若第一次加载时工程的api密码错误，是否中断服务 |
 | rcc.callback-interval | 2000 | 否 | 心跳探测频率（ms） | 
 | rcc.connection-timeout | 3000 | 否 | 链接超时时间（ms） |
 | rcc.read-timeout | 10000 | 否 | 读超时时间（ms） |
