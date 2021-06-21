@@ -89,10 +89,9 @@ public class ConfigLoader {
     private Collection<ConfigItemChangedCallable> changedCallable;
     private ConfigChangedListener configChangedListener;
 
-    public ConfigLoader(boolean enableInterruptService, String ccServerUrl, String apiPassword, String projectName,
+    public ConfigLoader(String ccServerUrl, String apiPassword, String projectName,
                         String envName, String ccVersionName, boolean enableUpdateCallback, long connectionTimeOut,
-                        long readTimeOut, long callbackInteval) throws IOException {
-        this.enableInterruptService = enableInterruptService;
+                        long readTimeOut, long callbackInteval, boolean enableInterruptService) throws IOException {
         this.ccServerUrl = ccServerUrl;
         this.apiPassword = apiPassword;
         this.projectName = projectName;
@@ -100,6 +99,7 @@ public class ConfigLoader {
         this.ccVersionName = ccVersionName;
         this.enableUpdateCallback = enableUpdateCallback;
         this.callbackInteval = callbackInteval;
+        this.enableInterruptService = enableInterruptService;
 
         okHttpClientUtils = new OkHttpClientUtils(readTimeOut, connectionTimeOut);
 
@@ -135,9 +135,8 @@ public class ConfigLoader {
             } else {
                 msg = vo.getMsg();
             }
-            if (msg.equals("工程密码不正确") && !enableInterruptService) {
+            if (vo.getStatus() == 100204 && !enableInterruptService) {
                 return null;
-
             } else {
                 throw new RccException(msg);
             }

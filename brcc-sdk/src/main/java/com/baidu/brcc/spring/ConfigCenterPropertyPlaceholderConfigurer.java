@@ -395,7 +395,6 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
     private void checkValid() throws IOException {
         if (configLoader == null) {
             configLoader = new ConfigLoader(
-                    enableInterruptService,
                     ccServerUrl,
                     ccPassword,
                     projectName,
@@ -404,7 +403,8 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
                     enableUpdateCallback,
                     connectionTimeout,
                     readTimeout,
-                    callbackInteval
+                    callbackInteval,
+                    enableInterruptService
             );
         }
 

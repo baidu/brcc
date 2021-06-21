@@ -18,8 +18,34 @@
  */
 package com.baidu.brcc.controller;
 
-import static com.baidu.brcc.common.ErrorStatusMsg.*;
+
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_ID_EMPTY_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_ID_EMPTY_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_PASSWORD_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_PASSWORD_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_REF_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_REF_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_STATUS;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -330,10 +356,8 @@ public class ProjectController {
                     MetaApiToken.COLUMN_NAME_ID,
                     MetaApiToken.COLUMN_NAME_TOKEN
             );
+            apiTokenService.updateApiTokens(apiTokens, token, project.getName());
             for (ApiToken apiToken : apiTokens) {
-                apiToken.setToken(token);
-                apiToken.setUpdateTime(new Date());
-                apiTokenService.updateByPrimaryKeySelective(apiToken);
                 cacheEvictApiTokens.add(apiToken.getToken());
             }
             rccCache.evictProject(cacheEvictProjectName, cacheEvictApiTokens);
