@@ -18,6 +18,7 @@
  */
 package com.baidu.brcc.controller;
 
+
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
@@ -29,6 +30,7 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_STATU
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_STATUS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyByte;
 import static org.mockito.Mockito.anyLong;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.baidu.brcc.domain.vo.ResetApiPasswordVo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -138,6 +141,53 @@ public class ProjectControllerTest {
         when(projectUserService.checkAuth(anyLong(), anyLong(), any())).thenReturn(true);
         result = projectController.addProject(req, user);
         Assert.assertEquals(OK, result.getStatus());
+    }
+
+    @Test
+    public void testResetApiPassword() throws Exception{
+        ResetApiPasswordVo resetApiPassword = new ResetApiPasswordVo();
+        resetApiPassword.setApiPassword("pwd");
+        resetApiPassword.setId(ID);
+        //String name = user.getName();
+        R result = projectController.resetApiPassword(ID, null, resetApiPassword);
+        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
+        //resetApiPassword.setId(null);
+
+        result = projectController.resetApiPassword(null, user, resetApiPassword);
+        Assert.assertEquals(PROJECT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(projectService.selectByPrimaryKey(any())).thenReturn(null);
+        result = projectController.resetApiPassword(ID, user, resetApiPassword);
+        Assert.assertEquals(PROJECT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        Project project = new Project();
+        project.setProductId(ID);
+        project.setId(ID);
+        when(projectService.selectByPrimaryKey(any())).thenReturn(project);
+        when(productUserService.checkAuth(anyLong(), any())).thenReturn(false);
+        result = projectController.resetApiPassword(ID, user, resetApiPassword);
+        Assert.assertEquals(PRIV_MIS_STATUS.intValue(), result.getStatus());
+
+        resetApiPassword.setApiPassword(null);
+        when(productUserService.checkAuth(anyLong(), any())).thenReturn(true);
+        result = projectController.resetApiPassword(ID, user, resetApiPassword);
+        Assert.assertEquals(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        resetApiPassword.setApiPassword("pwd");
+        when(userService.selectUserByName(any())).thenReturn(null);
+        result = projectController.resetApiPassword(ID, user, resetApiPassword);
+        Assert.assertEquals(USER_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(userService.selectUserByName(any())).thenReturn(user);
+        projectService.updateByPrimaryKeySelective(project);
+        List<ApiToken> apiTokens = new ArrayList<>();
+        when(apiTokenService.selectByProjectId(anyLong(), anyVararg())).thenReturn(apiTokens);
+        apiTokenService.updateByPrimaryKeySelective(new ApiToken());
+        rccCache.evictProject(anyString(), any());
+        result = projectController.resetApiPassword(ID, user, resetApiPassword);
+        Assert.assertEquals(OK, result.getStatus());
+
+
     }
 
     @Test
@@ -283,13 +333,13 @@ public class ProjectControllerTest {
         Assert.assertEquals(OK, result.getStatus());
     }
 
-        @Test
-        public void testGetMemberList() throws Exception {
-            R result = projectController.getMemberList(null);
-            Assert.assertEquals(PROJECT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+    @Test
+    public void testGetMemberList() throws Exception {
+        R result = projectController.getMemberList(null);
+        Assert.assertEquals(PROJECT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
 
-            result = projectController.getMemberList(ID);
-            Assert.assertEquals(OK, result.getStatus());
+        result = projectController.getMemberList(ID);
+        Assert.assertEquals(OK, result.getStatus());
 
-        }
+    }
 }

@@ -112,4 +112,21 @@ public class ApiTokenServiceImpl extends GenericServiceImpl<ApiToken, Long, ApiT
                 .toExample()
         );
     }
+
+    @Override
+    public int updateApiTokens(List<ApiToken> apiTokens, String token, String projectName) {
+        if(CollectionUtils.isEmpty(apiTokens)) {
+            return 0;
+        }
+        int count = 0;
+        for (ApiToken apiToken : apiTokens) {
+            apiToken.setToken(token);
+            apiToken.setUpdateTime(new Date());
+            count = count + updateByPrimaryKeySelective(apiToken);
+        }
+        return count;
+    }
+
+
+
 }

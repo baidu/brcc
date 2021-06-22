@@ -85,6 +85,7 @@ rcc:
   cc-version-name: 1.0                  #版本名称
   log-properties: true                  #是否打印配置
   enable-update-callback: true          #是否启用自动更新
+  enable-interrupt-service: true        #第一次加载工程api密码错误时是否中断服务
 ```
 #### 检查配置
 启动应用， 在日志中检查是否有打印类似如下信息：

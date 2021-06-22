@@ -35,4 +35,8 @@ public interface ApiTokenService extends GenericService<ApiToken, Long, ApiToken
 
     int deleteByIds(Collection<Long> ids);
 
+    int updateApiTokens(List<ApiToken> apiTokens, String token, String projectName);
+
+
+
 }

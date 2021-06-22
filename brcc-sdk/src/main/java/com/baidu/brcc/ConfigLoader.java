@@ -69,6 +69,7 @@ public class ConfigLoader {
     private static final String VERSION_API = "/api/version/{0}";
     private static final String ITEM_API = "/api/item";
 
+    private boolean enableInterruptService;
     private String ccServerUrl;
     private String apiPassword;
     private String projectName;
@@ -88,9 +89,9 @@ public class ConfigLoader {
     private Collection<ConfigItemChangedCallable> changedCallable;
     private ConfigChangedListener configChangedListener;
 
-    public ConfigLoader(String ccServerUrl, String apiPassword, String projectName, String envName,
-                        String ccVersionName, boolean enableUpdateCallback, long connectionTimeOut,
-                        long readTimeOut, long callbackInteval) throws IOException {
+    public ConfigLoader(String ccServerUrl, String apiPassword, String projectName,
+                        String envName, String ccVersionName, boolean enableUpdateCallback, long connectionTimeOut,
+                        long readTimeOut, long callbackInteval, boolean enableInterruptService) throws IOException {
         this.ccServerUrl = ccServerUrl;
         this.apiPassword = apiPassword;
         this.projectName = projectName;
@@ -98,6 +99,7 @@ public class ConfigLoader {
         this.ccVersionName = ccVersionName;
         this.enableUpdateCallback = enableUpdateCallback;
         this.callbackInteval = callbackInteval;
+        this.enableInterruptService = enableInterruptService;
 
         okHttpClientUtils = new OkHttpClientUtils(readTimeOut, connectionTimeOut);
 
@@ -106,14 +108,17 @@ public class ConfigLoader {
 
     private void init() throws IOException {
         // 登录
-        login();
+        String res = login();
+        if (!StringUtils.isBlank(res)) {
 
-        // 获取环境
-        getEnv();
+            // 获取环境
+            getEnv();
 
-        // 获取版本
-        VersionVo version = getVersion();
-        lastCheckSum = version.getCheckSum();
+            // 获取版本
+            VersionVo version = getVersion();
+            lastCheckSum = version.getCheckSum();
+        }
+
     }
 
     // 登录
@@ -130,7 +135,11 @@ public class ConfigLoader {
             } else {
                 msg = vo.getMsg();
             }
-            throw new RccException(msg);
+            if (vo.getStatus() == 100204 && !enableInterruptService) {
+                return null;
+            } else {
+                throw new RccException(msg);
+            }
         }
         this.currentToken = vo.getData().getToken();
         return this.currentToken;
@@ -163,7 +172,6 @@ public class ConfigLoader {
      * 根据版本名称获取版本
      *
      * @return
-     *
      * @throws IOException
      */
     public VersionVo getVersion() throws IOException {
@@ -214,7 +222,6 @@ public class ConfigLoader {
      * 拉取得配置
      *
      * @return
-     *
      * @throws IOException
      */
     public Map<String, String> getFromCC() throws IOException {

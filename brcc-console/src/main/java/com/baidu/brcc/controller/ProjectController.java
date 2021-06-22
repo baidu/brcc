@@ -18,6 +18,7 @@
  */
 package com.baidu.brcc.controller;
 
+
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
@@ -43,6 +44,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_MS
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_STATUS;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -56,6 +59,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.baidu.brcc.domain.vo.ResetApiPasswordVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -293,6 +297,74 @@ public class ProjectController {
         rccCache.evictProject(cacheEvictProjectName, cacheEvictApiTokens);
 
         return R.ok(id);
+    }
+
+    /**
+     * 重置工程的api密码
+     *
+     * @param resetApiPassword
+     * @param loginUser
+     * @param projectId
+     * @return
+     */
+    @SaveLog(scene = "重置工程的api密码",
+            paramsIdxes = {0},
+            params = {"resetApiPassword", "user", "projectId"},
+            masks = @MaskLog(paramsIdx = 0,
+                    fields = "apiPassword"))
+    @PostMapping("/resetApiPassword/{projectId}")
+    public R resetApiPassword(@PathVariable("projectId") Long projectId, @LoginUser User loginUser,
+                              @RequestBody ResetApiPasswordVo resetApiPassword) {
+        if (loginUser == null) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        Long productId = resetApiPassword.getId();
+        String username = loginUser.getName();
+        Date now = DateTimeUtils.now();
+        if (null == projectId || projectId <= 0) {
+            return R.error(PROJECT_ID_NOT_EXISTS_STATUS, PROJECT_ID_NOT_EXISTS_MSG);
+        }
+        Project project = projectService.selectByPrimaryKey(projectId);
+        if (project == null || Deleted.DELETE.getValue().equals(project.getDeleted())) {
+            return R.error(PROJECT_NOT_EXISTS_STATUS, PROJECT_NOT_EXISTS_MSG);
+        }
+        if (!productUserService.checkAuth(productId, loginUser)) {
+            return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        String apiPassword = resetApiPassword.getApiPassword();
+        if (StringUtils.isBlank(apiPassword)) {
+            return R.error(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS, PROJECT_API_PASSWORD_NOT_EXISTS_MSG);
+        }
+        try {
+            String token = UUID.randomUUID().toString().replace("-", "");
+            List<String> cacheEvictApiTokens = null;
+            String cacheEvictProjectName = null;
+            cacheEvictProjectName = project.getName();
+            User user = userService.selectUserByName(username);
+            if (user == null || Deleted.DELETE.getValue().equals(user.getStatus())) {
+                return R.error(USER_NOT_EXISTS_STATUS, USER_NOT_EXISTS_MSG);
+            }
+            Project update = new Project();
+            update.setId(projectId);
+            update.setUpdateTime(now);
+            update.setApiPassword(Md5Util.md5(resetApiPassword.getApiPassword()));
+            update.setApiToken(token);
+            projectService.updateByPrimaryKeySelective(update);
+            cacheEvictApiTokens = new ArrayList<>();
+            List<ApiToken> apiTokens = apiTokenService.selectByProjectId(
+                    project.getId(),
+                    MetaApiToken.COLUMN_NAME_ID,
+                    MetaApiToken.COLUMN_NAME_TOKEN
+            );
+            apiTokenService.updateApiTokens(apiTokens, token, project.getName());
+            for (ApiToken apiToken : apiTokens) {
+                cacheEvictApiTokens.add(apiToken.getToken());
+            }
+            rccCache.evictProject(cacheEvictProjectName, cacheEvictApiTokens);
+        } catch (Exception e) {
+            return R.error();
+        }
+        return R.ok();
     }
 
     /**

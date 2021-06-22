@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 @ConfigurationProperties(prefix = "rcc")
 public class RccProperties {
+    private static final String ENABLE_INTERRUPT_SERVICE = "rcc.enableInterruptService";
     private static final String ENABLE_UPDATE_CALLBACK = "rcc.enableUpdateCallback";
 
     private static final String CONNECTION_TIMEOUT = "rcc.connectionTimeout";
@@ -90,6 +91,10 @@ public class RccProperties {
         Boolean enableUpdateCallBack = getValueFromEnv(ENABLE_UPDATE_CALLBACK, Boolean.class);
         if (enableUpdateCallBack != null) {
             this.enableUpdateCallback = enableUpdateCallBack;
+        }
+        Boolean enableInterruptService = getValueFromEnv(ENABLE_INTERRUPT_SERVICE, Boolean.class);
+        if (enableInterruptService != null) {
+            this.enableInterruptService = enableInterruptService;
         }
 
         Integer connectionTimeout = getValueFromEnv(CONNECTION_TIMEOUT, Integer.class);
@@ -186,6 +191,11 @@ public class RccProperties {
      * set if enable update call back
      */
     private boolean enableUpdateCallback = false;
+
+    /**
+     * set if enable interrupt service when api password is wrong
+     */
+    private boolean enableInterruptService = true;
 
     /**
      * connection time out value to connect configuration center server.
@@ -318,6 +328,12 @@ public class RccProperties {
 
     public void setEnableUpdateCallback(boolean enableUpdateCallback) {
         this.enableUpdateCallback = enableUpdateCallback;
+    }
+
+    public boolean isEnableInterruptService() {return enableInterruptService;}
+
+    public void setEnableInterruptService(boolean enableInterruptService) {
+        this.enableInterruptService = enableInterruptService;
     }
 
     public int getConnectionTimeout() {
