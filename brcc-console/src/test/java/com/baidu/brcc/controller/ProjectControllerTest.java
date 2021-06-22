@@ -18,7 +18,19 @@
  */
 package com.baidu.brcc.controller;
 
-import static com.baidu.brcc.common.ErrorStatusMsg.*;
+
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_ID_EMPTY_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_PASSWORD_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_STATUS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyByte;
 import static org.mockito.Mockito.anyLong;

@@ -2,7 +2,10 @@ package com.baidu.brcc;
 import com.baidu.brcc.model.AuthVo;
 import com.baidu.brcc.model.R;
 import java.util.Set;
-import static org.mockito.ArgumentMatchers.*;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.baidu.brcc.utils.OkHttpClientUtils;
