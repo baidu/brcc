@@ -14,7 +14,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.baidu.mapp</groupId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<artifactId>brcc-sdk-starter</artifactId>
 
 	<properties>
