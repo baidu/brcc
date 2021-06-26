@@ -76,6 +76,10 @@ b. 用户管理界面 (管理员用户，重置指定用户的密码)
 
 ![工程管理](img/project-member-edit.png)
 
+- 重置工程的api密码(系统管理员、产品线管理员权限)
+
+![工程管理](img/reset-apipassword.png)
+
 
 ## 2.3 环境管理
 
