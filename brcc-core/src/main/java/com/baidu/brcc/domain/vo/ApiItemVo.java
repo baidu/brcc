@@ -31,12 +31,16 @@ public class ApiItemVo {
     // 配置值
     private String value;
 
+    //分组id
+    private Long id;
+
     public ApiItemVo copyFrom(ConfigItem item) {
         if (item == null) {
             return this;
         }
         setKey(item.getName());
         setValue(item.getVal());
+        setId(item.getGroupId());
         return this;
     }
 }

@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.brcc.domain.vo.ApiItemVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,15 +290,19 @@ public class ConfigItemController {
         if (groupId == null || groupId <= 0) {
             return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
         }
+        ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
         if (!CollectionUtils.isEmpty(itemReq.getItems())) {
             for (ItemReq req : itemReq.getItems()) {
                 String name = req.getName();
                 if (StringUtils.isBlank(name)) {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
+               ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
+                if (apiItemVo !=null && !apiItemVo.getId().equals(groupId)) {
+                    return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
+                }
             }
         }
-        ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
         if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
             return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
         }
