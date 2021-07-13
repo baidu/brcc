@@ -309,9 +309,8 @@ public class ProjectController {
      */
     @SaveLog(scene = "重置工程的api密码",
             paramsIdxes = {0},
-            params = {"resetApiPassword", "user", "projectId"},
-            masks = @MaskLog(paramsIdx = 0,
-                    fields = "apiPassword"))
+            params = {"projectId"}
+            )
     @PostMapping("/resetApiPassword/{projectId}")
     public R resetApiPassword(@PathVariable("projectId") Long projectId, @LoginUser User loginUser,
                               @RequestBody ResetApiPasswordVo resetApiPassword) {
