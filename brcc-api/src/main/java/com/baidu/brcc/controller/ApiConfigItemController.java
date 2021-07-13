@@ -205,6 +205,14 @@ public class ApiConfigItemController {
 
     /**
      * 增加配置
+     * @param apiToken api token
+     * @param itemAddReqVo 新增配置信息
+     *  itemAddReqVo.versionId 版本ID
+     *  itemAddReqVo.key 配置KEY
+     *  itemAddReqVo.value 配置值
+     *  itemAddReqVo.groupId 分组ID
+     *  itemAddReqVo.memo 配置简介
+     * @return
      */
     @SaveLog(scene = "增加配置",
             paramsIdxes = {1},
@@ -229,6 +237,7 @@ public class ApiConfigItemController {
         if (null == groupId || groupId <= 0) {
             return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
         }
+        //检查新增配置项是否为空
         Long cacheEvictVersionId = null;
         if (key == null) {
             if (value == null) {
@@ -240,7 +249,7 @@ public class ApiConfigItemController {
         ApiItemVo itemVo = configItemService.getByVersionIdAndName(tokenVo.getProjectId(), versionId, key);
         Long id = null;
         if (itemVo == null) {
-            //新增
+            //新增配置
             ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
             if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
                 return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
@@ -254,6 +263,7 @@ public class ApiConfigItemController {
                             .toExample(),
                     MetaConfigItem.COLUMN_NAME_ID
             );
+            //检查配置是否已经存在
             if (configItem != null) {
                 return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
             }
@@ -299,23 +309,33 @@ public class ApiConfigItemController {
 
     /**
      * 删除配置
+     * @param apiToken api token
+     * @param apiItemDeleteVo 删除配置信息
+     *  apiItemDeleteVo.versionId 版本ID
+     *  apiItemDeleteVo.key 配置key
+     *@return
+     *
      */
     @SaveLog(scene = "删除配置",
             paramsIdxes = {1},
             params = {"apiItemDeleteVo"})
     @PostMapping("itemDelete")
     public R deleteItem(String apiToken, @RequestBody ApiItemDeleteVo apiItemDeleteVo) {
+        // 鉴权token
         if (isBlank(apiToken)) {
             return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
         }
+        // 鉴定版本
         Long versionId = apiItemDeleteVo.getVersionId();
         if (versionId == null || versionId <= 0) {
             return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
         }
+        // 鉴定工程
         ApiToken tokenVo = apiTokenCacheService.getApiToken(apiToken);
         if (tokenVo == null) {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
         }
+        // 鉴定配置项
         String key = apiItemDeleteVo.getKey();
         if (key == null) {
             return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
@@ -352,19 +372,29 @@ public class ApiConfigItemController {
 
     /**
      * 修改配置
+     * @param apiToken api token
+     * @param apiItemEditVo 配置信息
+     *   apiItemEditVo.versionId 版本ID
+     *   apiItemEditVo.key 配置key
+     *   apiItemEditVo.value 配置值
+     *   apiItemEditVo.memo 配置简介
+     * @return
      */
     @SaveLog(scene = "修改配置",
             paramsIdxes = {1},
             params = {"apiItemEditVo"})
     @PostMapping("itemEdit")
     public R<Long> EditItem(String apiToken, @RequestBody ApiItemEditVo apiItemEditVo) {
+        // 鉴权token
         if (isBlank(apiToken)) {
             return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
         }
+        // 鉴定版本
         Long versionId = apiItemEditVo.getVersionId();
         if (versionId == null || versionId <= 0) {
             return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
         }
+        // 鉴定工程
         ApiToken tokenVo = apiTokenCacheService.getApiToken(apiToken);
         if (tokenVo == null) {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
@@ -379,6 +409,7 @@ public class ApiConfigItemController {
         if (configItem == null || Deleted.DELETE.getValue().equals(configItem.getDeleted())) {
             return R.error(CONFIG_ITEM_NOT_EXISTS_STATUS, CONFIG_ITEM_NOT_EXISTS_MSG);
         } else {
+            // 更新配置信息
             ConfigItem update = new ConfigItem();
             update.setId(configItem.getId());
             update.setUpdateTime(now);
@@ -430,28 +461,39 @@ public class ApiConfigItemController {
 
     /**
      * 批量修改配置
+     * @param apiToken api token
+     * @param batchEditItemVo 配置信息
+     *  batchEditItemVo.groupId 分组ID
+     *  batchEditItemVo.versionId 版本ID
+     *  batchEditItemVo.items 分组下的配置列表
+     * @return
      */
     @SaveLog(scene = "批量新增或修改配置",
             paramsIdxes = {0},
             params = {"itemReq"})
     @PostMapping("batchSave")
     public R<Integer> batchSaveItems(String apiToken, @RequestBody BatchEditItemVo batchEditItemVo) {
+        // 鉴权token
         if (isBlank(apiToken)) {
             return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
         }
+        // 鉴定版本
         Long versionId = batchEditItemVo.getVersionId();
         if (versionId == null || versionId <= 0) {
             return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
         }
+        // 鉴定工程
         ApiToken tokenVo = apiTokenCacheService.getApiToken(apiToken);
         if (tokenVo == null) {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
         }
+        // 鉴定分组
         Long groupId = batchEditItemVo.getGroupId();
         if (groupId == null || groupId <= 0) {
             return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
         }
         ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
+        // 鉴定配置项信息
         if (!CollectionUtils.isEmpty(batchEditItemVo.getItems())) {
             for (ItemReq req : batchEditItemVo.getItems()) {
                 String name = req.getName();
@@ -459,7 +501,7 @@ public class ApiConfigItemController {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
                 ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
-                if (apiItemVo !=null && !apiItemVo.getId().equals(groupId)) {
+                if (apiItemVo !=null && !apiItemVo.getGroupId().equals(groupId)) {
                     return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
                 }
             }
@@ -475,6 +517,7 @@ public class ApiConfigItemController {
         batchConfigItemReq.setGroupId(batchEditItemVo.getGroupId());
         batchConfigItemReq.setItems(batchEditItemVo.getItems());
 
+        // 更新配置信息
         int cnt = configItemService.batchSave(user, batchConfigItemReq, configGroup);
 
         // 失效版本下的配置

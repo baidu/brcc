@@ -32,15 +32,15 @@ public class ApiItemVo {
     private String value;
 
     //分组id
-    private Long id;
+    private Long groupId;
 
-    public ApiItemVo copyFrom(ConfigItem item) {
+    public ApiItemVo copy(ConfigItem item) {
         if (item == null) {
             return this;
         }
         setKey(item.getName());
         setValue(item.getVal());
-        setId(item.getGroupId());
+        setGroupId(item.getGroupId());
         return this;
     }
 }

@@ -401,7 +401,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 if (!CollectionUtils.isEmpty(items)) {
                     List<ApiItemVo> itemsVos = new ArrayList<>(items.size());
                     for (ConfigItem item : items) {
-                        ApiItemVo v = new ApiItemVo().copyFrom(item);
+                        ApiItemVo v = new ApiItemVo().copy(item);
                         itemsVos.add(v);
                         if (StringUtils.equals(item.getName(), key)) {
                             itemVo = v;
@@ -415,7 +415,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         versionId,
                         key);
                 if (item != null) {
-                    itemVo = new ApiItemVo().copyFrom(item);
+                    itemVo = new ApiItemVo().copy(item);
                     // 为了数据一致性，此处不重新加载缓存
                     // rccCache.loadItem(versionId, itemVo);
                 }
@@ -432,7 +432,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
             if (!CollectionUtils.isEmpty(items)) {
                 itemsVos = new ArrayList<>(items.size());
                 for (ConfigItem item : items) {
-                    ApiItemVo vo = new ApiItemVo().copyFrom(item);
+                    ApiItemVo vo = new ApiItemVo().copy(item);
                     itemsVos.add(vo);
                 }
                 rccCache.loadItems(versionId, itemsVos, true);
@@ -459,7 +459,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 if (!CollectionUtils.isEmpty(items)) {
                     List<ApiItemVo> itemsVos = new ArrayList<>(items.size());
                     for (ConfigItem item : items) {
-                        ApiItemVo vo = new ApiItemVo().copyFrom(item);
+                        ApiItemVo vo = new ApiItemVo().copy(item);
                         itemsVos.add(vo);
 
                         if (CollectionUtils.isEmpty(names) || names.contains(item.getName())) {
@@ -477,7 +477,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 if (!CollectionUtils.isEmpty(items)) {
                     result = new ArrayList<>(items.size());
                     for (ConfigItem item : items) {
-                        ApiItemVo vo = new ApiItemVo().copyFrom(item);
+                        ApiItemVo vo = new ApiItemVo().copy(item);
                         result.add(vo);
                     }
                     // rccCache.loadItems(versionId, result, CollectionUtils.isEmpty(names));
