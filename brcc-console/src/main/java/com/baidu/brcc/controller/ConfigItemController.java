@@ -298,7 +298,7 @@ public class ConfigItemController {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
                ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
-                if (apiItemVo !=null && !apiItemVo.getId().equals(groupId)) {
+                if (apiItemVo !=null && !apiItemVo.getGroupId().equals(groupId)) {
                     return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
                 }
             }
