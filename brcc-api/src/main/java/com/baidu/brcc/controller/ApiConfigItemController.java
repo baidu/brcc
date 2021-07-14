@@ -30,8 +30,6 @@ import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NOT_EXISTS_STATUS;
-import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
-import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_MSG;
@@ -49,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.baidu.brcc.annotation.LoginUser;
 import com.baidu.brcc.annotation.SaveLog;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigItem;
@@ -172,6 +169,42 @@ public class ApiConfigItemController {
             return R.ok(new ArrayList<>(0));
         }
         return R.ok(itemsVos);
+    }
+
+    /**
+     * get configItem by groupId
+     * @param token api token
+     * @param groupId groupID
+     * @return
+     */
+    @GetMapping("groupItem")
+    public R<List<ApiItemVo>> getItemByGroupId (String token, Long groupId) {
+        // check token
+        if (isBlank(token)) {
+            return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
+        }
+        // check group
+        if (groupId == null || groupId <= 0) {
+            return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
+        }
+        // check apiToken valid
+        ApiToken apiToken = apiTokenCacheService.getApiToken(token);
+        if (apiToken == null) {
+            return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
+        }
+        // get all configItems by groupId
+        Map<String, String> itemMap = configItemService.findConfigItemsByGroupId(groupId);
+        List<ApiItemVo> apiItemVos = new ArrayList<>();
+        for(Map.Entry<String, String> entry : itemMap.entrySet()) {
+            ApiItemVo item = new ApiItemVo();
+            item.setKey(entry.getKey());
+            item.setValue(entry.getValue());
+            apiItemVos.add(item);
+        }
+        if (CollectionUtils.isEmpty(apiItemVos)) {
+            return R.ok(new ArrayList<>(0));
+        }
+        return R.ok(apiItemVos);
     }
 
     /**
