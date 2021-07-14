@@ -30,6 +30,7 @@ import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.TreeNode;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.Version;
+import com.baidu.brcc.domain.vo.ApiGroupVo;
 import com.baidu.brcc.service.base.GenericService;
 
 public interface ConfigGroupService extends GenericService<ConfigGroup, Long, ConfigGroupExample> {
@@ -68,4 +69,6 @@ public interface ConfigGroupService extends GenericService<ConfigGroup, Long, Co
     );
 
     List<TreeNode> findTreeInfo(@LoginUser User user);
+
+    List<ConfigGroup> listAllGroupByVersionId (Long projectId, Long versionId);
 }

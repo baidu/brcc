@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.baidu.brcc.domain.vo.ApiGroupVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -634,5 +635,19 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
 
         log.info("findTreeInfo cost:{}ms, userId:{}", System.currentTimeMillis() - start, user.getId());
         return result;
+    }
+
+    @Override
+    public List<ConfigGroup> listAllGroupByVersionId (Long projectId, Long versionId) {
+        return selectByExample(ConfigGroupExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .andProjectIdEqualTo(projectId)
+                .andVersionIdEqualTo(versionId)
+                .toExample()
+        );
+
+
     }
 }

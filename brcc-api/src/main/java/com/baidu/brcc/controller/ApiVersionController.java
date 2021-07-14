@@ -24,6 +24,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_M
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NAME_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NAME_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NOT_EXISTS_MSG;
@@ -33,6 +35,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.baidu.brcc.domain.ConfigGroup;
+import com.baidu.brcc.domain.vo.ApiGroupVo;
+import com.baidu.brcc.service.ConfigGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +64,9 @@ public class ApiVersionController {
 
     @Autowired
     private RccCache rccCache;
+
+    @Autowired
+    private ConfigGroupService configGroupService;
 
     /**
      * @param token
@@ -121,6 +129,43 @@ public class ApiVersionController {
             return R.ok(new ArrayList<>(0));
         }
         return R.ok(versionVos);
+    }
+
+    /**
+     * list all groups by versionId
+     * @param token
+     * @param versionId
+     *
+     * @return
+     */
+    @GetMapping("group")
+    public R<List<ApiGroupVo>> getAllGroup(String token, Long versionId) {
+        // check project
+        if (isBlank(token)) {
+            return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
+        }
+        // check version id
+        if (versionId == null || versionId <= 0) {
+            return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
+        }
+        // check apiToken valid
+        ApiToken apiToken = apiTokenCacheService.getApiToken(token);
+        if (apiToken == null) {
+            return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
+        }
+        // get all groups by versionId
+        List<ConfigGroup> configGroupList = configGroupService.listAllGroupByVersionId(apiToken.getProjectId(), versionId);
+        List<ApiGroupVo> apiGroupVos = new ArrayList<>();
+        for (ConfigGroup item: configGroupList) {
+            ApiGroupVo vo = new ApiGroupVo();
+            vo.setGroupId(item.getId());
+            vo.setGroupName(item.getName());
+            apiGroupVos.add(vo);
+        }
+        if (CollectionUtils.isEmpty(apiGroupVos)) {
+            return R.ok(new ArrayList<>(0));
+        }
+        return R.ok(apiGroupVos);
     }
 
 }
