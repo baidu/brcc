@@ -79,7 +79,7 @@
     - [请求示例](#请求示例-9)
     - [返回参数](#返回参数-9)
     - [返回样例](#返回样例-9)
-  - [11. 新增配置项](#11-新增配置项)
+  - [11. 新增环境](#11-新增环境)
     - [描述](#描述-10)
     - [请求类型](#请求类型-10)
     - [请求URL](#请求url-10)
@@ -87,7 +87,7 @@
     - [请求示例](#请求示例-10)
     - [返回参数](#返回参数-10)
     - [返回样例](#返回样例-10)
-  - [12. 修改配置项](#12-修改配置项)
+  - [12. 新增版本](#12-新增版本)
     - [描述](#描述-11)
     - [请求类型](#请求类型-11)
     - [请求URL](#请求url-11)
@@ -95,7 +95,7 @@
     - [请求示例](#请求示例-11)
     - [返回参数](#返回参数-11)
     - [返回样例](#返回样例-11)
-  - [13. 删除配置项](#13-删除配置项)
+  - [13. 新增分组](#13-新增分组)
     - [描述](#描述-12)
     - [请求类型](#请求类型-12)
     - [请求URL](#请求url-12)
@@ -103,7 +103,7 @@
     - [请求示例](#请求示例-12)
     - [返回参数](#返回参数-12)
     - [返回样例](#返回样例-12)
-  - [14. 批量修改配置项](#14-批量修改配置项)
+  - [14. 新增配置项](#14-新增配置项)
     - [描述](#描述-13)
     - [请求类型](#请求类型-13)
     - [请求URL](#请求url-13)
@@ -111,6 +111,30 @@
     - [请求示例](#请求示例-13)
     - [返回参数](#返回参数-13)
     - [返回样例](#返回样例-13)
+  - [15. 修改配置项](#15-修改配置项)
+    - [描述](#描述-14)
+    - [请求类型](#请求类型-14)
+    - [请求URL](#请求url-14)
+    - [请求参数（query string）](#请求参数query-string-13)
+    - [请求示例](#请求示例-14)
+    - [返回参数](#返回参数-14)
+    - [返回样例](#返回样例-14)
+  - [16. 删除配置项](#16-删除配置项)
+    - [描述](#描述-15)
+    - [请求类型](#请求类型-15)
+    - [请求URL](#请求url-15)
+    - [请求参数（query string）](#请求参数query-string-14)
+    - [请求示例](#请求示例-15)
+    - [返回参数](#返回参数-15)
+    - [返回样例](#返回样例-15)
+  - [17. 批量修改配置项](#17-批量修改配置项)
+    - [描述](#描述-16)
+    - [请求类型](#请求类型-16)
+    - [请求URL](#请求url-16)
+    - [请求参数（query string）](#请求参数query-string-15)
+    - [请求示例](#请求示例-16)
+    - [返回参数](#返回参数-16)
+    - [返回样例](#返回样例-16)
   
 # open api 对外接口文档
 
@@ -661,7 +685,152 @@ value | string | 配置值
 }
 ```
 
-## 11. 新增配置项
+## 11. 新增环境
+
+### 描述
+
+新增环境
+
+### 请求类型
+
+POST
+
+### 请求URL
+
+/api/environmentAdd
+
+### 请求参数（query string）
+
+参数名称 | 类型 | 方式 | 必填 | 说明
+---|---|---|---|---
+token | String | query | y | api token
+name | String | body | y | 环境名称
+memo | String | body | n | 环境简介
+
+### 请求示例
+
+```json
+{
+  "name":"dev",
+  "memo":"开发"  
+}
+```
+
+### 返回参数
+
+参数名称 | 类型 | 说明
+---|---|---
+id | long | 环境ID
+
+### 返回样例
+
+```json
+{
+  "status":0,
+  "msg":"success",
+  "data":1
+}
+```
+
+## 12. 新增版本
+
+### 描述
+
+新增版本
+
+### 请求类型
+
+POST
+
+### 请求URL
+
+/api/versionAdd
+
+### 请求参数（query string）
+
+参数名称 | 类型 | 方式 | 必填 | 说明
+---|---|---|---|---
+token | String | query | y | api token
+environmentId | Long | body | y | 环境ID
+name | String | body | y | 版本名称
+memo | String | body | n | 版本简介
+
+### 请求示例
+
+```json
+{
+  "environmentId":50,
+  "name":"1.0",
+  "memo":"1.0版本"  
+}
+```
+
+### 返回参数
+
+参数名称 | 类型 | 说明
+---|---|---
+id | long | 版本ID
+
+### 返回样例
+
+```json
+{
+  "status":0,
+  "msg":"success",
+  "data":1
+}
+```
+
+## 13. 新增分组
+
+### 描述
+
+新增分组
+
+### 请求类型
+
+POST
+
+### 请求URL
+
+/api/groupAdd
+
+### 请求参数（query string）
+
+参数名称 | 类型 | 方式 | 必填 | 说明
+---|---|---|---|---
+token | String | query | y | api token
+versionId | long | body | y | 版本ID
+name | String | body | y | 分组名称
+memo | String | body | n | 分组简介
+
+### 请求示例
+
+```json
+{
+  "versionId":63,
+  "name":"g1",
+  "memo":"简介"  
+}
+```
+
+### 返回参数
+
+参数名称 | 类型 | 说明
+---|---|---
+id | long | 分组ID
+
+### 返回样例
+
+```json
+{
+  "status":0,
+  "msg":"success",
+  "data":1
+}
+```
+
+## 14. 新增配置项
 
 ### 描述
 
@@ -679,7 +848,7 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-apiToken | String | query | y | api token
+token | String | query | y | api token
 versionId | long | body | y | 版本ID
 groupId | long | body | y | 分组ID
 key | String | body | y | 配置项名称
@@ -714,7 +883,7 @@ id | long | 配置项ID
 }
 ```
 
-## 12. 修改配置项
+## 15. 修改配置项
 
 ### 描述
 
@@ -732,7 +901,7 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-apiToken | String | query | y | api token
+token | String | query | y | api token
 versionId | long | body | y | 版本ID
 key | String | body | y | 配置项名称
 value | String | body | n | 配置项值
@@ -765,7 +934,7 @@ cnt | long | 影响行数
 }
 ```
 
-## 13. 删除配置项
+## 16. 删除配置项
 
 ### 描述
 
@@ -783,7 +952,7 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-apiToken | String | query | y | api token
+token | String | query | y | api token
 versionId | long | body | y | 版本ID
 key | String | body | y | 配置项名称
 
@@ -812,7 +981,7 @@ cnt | long | 影响行数
 }
 ```
 
-## 14. 批量修改配置项
+## 17. 批量修改配置项
 
 ### 描述
 
@@ -830,7 +999,7 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-apiToken | String | query | y | api token
+token | String | query | y | api token
 versionId | long | body | y | 版本ID
 groupId | long | body | y | 分组ID
 items | List\<Object\> | body | n | 配置项列表
