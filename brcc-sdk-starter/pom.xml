@@ -14,7 +14,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.baidu.mapp</groupId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<artifactId>brcc-sdk-starter</artifactId>
 
 	<properties>
@@ -122,7 +122,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>2.10.1</version>
 				<configuration>
 					<aggregate>true</aggregate>
 				</configuration>

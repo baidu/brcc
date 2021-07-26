@@ -61,7 +61,6 @@ import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.Version;
 import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.Deleted;
-import com.baidu.brcc.domain.em.GrayFlag;
 import com.baidu.brcc.domain.exception.BizException;
 import com.baidu.brcc.domain.meta.MetaConfigGroup;
 import com.baidu.brcc.domain.meta.MetaEnvironment;
