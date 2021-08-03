@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -137,5 +138,13 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long, UserExample>
         }
 
         return resIdList;
+    }
+
+    @Override
+    public List<User> queryUsersByUserName(List<String> users) {
+        if (CollectionUtils.isEmpty(users)) {
+            return Lists.newArrayList();
+        }
+     return userMapper.queryUsersByUserName(users);
     }
 }

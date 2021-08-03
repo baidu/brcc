@@ -34,4 +34,6 @@ public interface UserService extends GenericService<User, Long, UserExample> {
 
     List<Long> getProjectIdsByUserId(Long userId);
 
+    List<User> queryUsersByUserName(List<String> users);
+
 }
