@@ -1005,7 +1005,7 @@ groupId | long | body | y | 分组ID
 items | List\<Object\> | body | n | 配置项列表
 items[i].name | string | body | y | 配置项名称
 items[i].memo | string | body | n | 配置项简介
-items[i].val | string | body | n | 配置项值
+items[i].value | string | body | n | 配置项值
 
 ### 请求示例
 
@@ -1015,7 +1015,8 @@ items[i].val | string | body | n | 配置项值
   "groupId":60,
   "items":[
     {
-      "key":"test",
+      "name":"test",
+      "memo":"测试"
       "value":"123"
   }
     ]  
