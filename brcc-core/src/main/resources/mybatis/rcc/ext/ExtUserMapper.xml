@@ -6,7 +6,7 @@
     <where>
         name in
         <foreach collection="list" item="users" open="(" separator="," close=")">
-           '${users}'
+            #{users}
         </foreach>
     </where>
 </select>

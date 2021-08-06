@@ -145,6 +145,12 @@ public class UserServiceImpl extends GenericServiceImpl<User, Long, UserExample>
         if (CollectionUtils.isEmpty(users)) {
             return Lists.newArrayList();
         }
-     return userMapper.queryUsersByUserName(users);
+        List<String> queryUsers = Lists.newArrayList();
+        users.forEach(x -> {
+            if (!StringUtils.isBlank(x)) {
+                queryUsers.add(x);
+            }
+        });
+        return userMapper.queryUsersByUserName(queryUsers);
     }
 }
