@@ -24,6 +24,15 @@ import com.baidu.brcc.dao.base.BaseMapper;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.UserExample;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper extends BaseMapper<User, Long, UserExample> {
+
+
+    List<User> queryUsersByUserName (List<String> users);
+
+
+
 }
+
