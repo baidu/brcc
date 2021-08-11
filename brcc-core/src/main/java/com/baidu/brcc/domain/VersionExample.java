@@ -1690,6 +1690,34 @@ public class VersionExample extends BaseExample {
             addCriterion("create_time not between", value1, value2, "createTime");
             return (Criteria) this;
         }
+
+        public Criteria andMainVersionIdEqualTo(Long value) {
+            return andMainVersionIdEqualTo(value, Boolean.TRUE);
+        }
+
+        public Criteria andMainVersionIdEqualTo(Long value, Boolean condition) {
+            if (condition == null || !condition){
+                return (Criteria) this;
+            }
+            addCriterion("main_version_id =", value, "mainVersionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGrayFlagEqualTo(Byte value) {
+            return andGrayFlagEqualTo(value, Boolean.TRUE);
+        }
+
+        public Criteria andGrayFlagEqualTo(Byte value, Boolean condition) {
+            if (condition == null || !condition){
+                return (Criteria) this;
+            }
+            addCriterion("gray_flag =", value, "grayFlag");
+            return (Criteria) this;
+        }
+
+
+
+
     }
 
     public static class Criteria extends GeneratedCriteria {

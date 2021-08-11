@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.baidu.brcc.domain.vo.ApiGroupVo;
+import com.baidu.brcc.domain.VersionExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +50,6 @@ import com.baidu.brcc.domain.ProjectUserExample;
 import com.baidu.brcc.domain.TreeNode;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.Version;
-import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.Deleted;
 import com.baidu.brcc.domain.em.ProductUserAdmin;
 import com.baidu.brcc.domain.em.ProjectUserAdmin;

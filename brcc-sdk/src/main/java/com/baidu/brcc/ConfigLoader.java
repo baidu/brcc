@@ -67,9 +67,11 @@ public class ConfigLoader {
     private static final String AUTH_API = "/api/auth";
     private static final String ENV_API = "/api/environment/{0}";
     private static final String VERSION_API = "/api/version/{0}";
+    private static final String GRAY_VERSION_API = "api/grayVersion/{0}";
     private static final String ITEM_API = "/api/item";
 
     private boolean enableInterruptService;
+    private boolean enableGray;
     private String ccServerUrl;
     private String apiPassword;
     private String projectName;
@@ -91,7 +93,7 @@ public class ConfigLoader {
 
     public ConfigLoader(String ccServerUrl, String apiPassword, String projectName,
                         String envName, String ccVersionName, boolean enableUpdateCallback, long connectionTimeOut,
-                        long readTimeOut, long callbackInteval, boolean enableInterruptService) throws IOException {
+                        long readTimeOut, long callbackInteval, boolean enableInterruptService, boolean enableGray) throws IOException {
         this.ccServerUrl = ccServerUrl;
         this.apiPassword = apiPassword;
         this.projectName = projectName;
@@ -100,6 +102,7 @@ public class ConfigLoader {
         this.enableUpdateCallback = enableUpdateCallback;
         this.callbackInteval = callbackInteval;
         this.enableInterruptService = enableInterruptService;
+        this.enableGray = enableGray;
 
         okHttpClientUtils = new OkHttpClientUtils(readTimeOut, connectionTimeOut);
 
@@ -188,7 +191,16 @@ public class ConfigLoader {
 
         // 获取头部信息
         Map<String, String> header = getHeaderInfo();
-        R<VersionVo> result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, header);
+        param.put("ip", header.get(HEADER_CLIENT_IP));
+        param.put("containerId", header.get(HEADER_CONTAINER_ID));
+        param.put("idc", header.get(HEADER_IDC));
+        R<VersionVo> result = null;
+        if (enableGray) {
+            String grayVersionUrl = ccServerUrl.concat(MessageFormat.format(GRAY_VERSION_API, ccVersionName));
+            result = okHttpClientUtils.get(grayVersionUrl, VersionVo.class, param, header);
+        } else {
+            result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, header);
+        }
         if (result == null || result.getData() == null || result.getStatus() != 0) {
             String msg = null;
             if (result == null) {
@@ -343,6 +355,14 @@ public class ConfigLoader {
 
     public void setEnableUpdateCallback(boolean enableUpdateCallback) {
         this.enableUpdateCallback = enableUpdateCallback;
+    }
+
+    public boolean isEnableGray() {
+        return enableGray;
+    }
+
+    public void setEnableGray(boolean enableGray) {
+        this.enableGray = enableGray;
     }
 
     public Properties getRccProperties() {

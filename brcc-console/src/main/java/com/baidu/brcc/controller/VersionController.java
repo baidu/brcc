@@ -20,6 +20,18 @@ package com.baidu.brcc.controller;
 
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
+
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_NOT_SET_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_NOT_SET_STATUS;
+
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.INSTANCE_COUNT_NOT_EXIST_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.INSTANCE_COUNT_NOT_EXIST_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
@@ -59,6 +71,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.baidu.brcc.domain.GrayInfo;
+import com.baidu.brcc.domain.GrayRule;
+import com.baidu.brcc.domain.VersionExample;
+import com.baidu.brcc.domain.em.GrayFlag;
+import com.baidu.brcc.domain.vo.GrayAddReq;
+import com.baidu.brcc.domain.vo.GrayRuleReq;
+import com.baidu.brcc.domain.vo.GrayRuleVo;
+import com.baidu.brcc.domain.vo.GrayVersionReq;
+import com.baidu.brcc.domain.vo.GrayVersionRuleVo;
+import com.baidu.brcc.service.BrccInstanceService;
+import com.baidu.brcc.service.GrayInfoService;
+import com.baidu.brcc.service.GrayRuleService;
+import com.baidu.brcc.utils.time.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,7 +105,6 @@ import com.baidu.brcc.domain.Environment;
 import com.baidu.brcc.domain.TreeNode;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.Version;
-import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.base.Pagination;
 import com.baidu.brcc.domain.base.R;
 import com.baidu.brcc.domain.em.Deleted;
@@ -98,6 +122,8 @@ import com.baidu.brcc.service.EnvironmentUserService;
 import com.baidu.brcc.service.ProjectUserService;
 import com.baidu.brcc.service.RccCache;
 import com.baidu.brcc.service.VersionService;
+
+import javax.xml.crypto.Data;
 
 /**
  * 管理端版本相关接口
@@ -127,12 +153,20 @@ public class VersionController {
     @Autowired
     private ConfigItemService configItemService;
 
+    @Autowired
+    private BrccInstanceService brccInstanceService;
+
+    @Autowired
+    private GrayRuleService grayRuleService;
+
+    @Autowired
+    private GrayInfoService grayInfoService;
+
     /**
      * 新增或修改版本
      *
      * @param req  req.id > 0 表示修改， 否则新增
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "修改版本",
@@ -168,11 +202,162 @@ public class VersionController {
     }
 
     /**
+     * 新增或修改灰度版本
+     *
+     * @param req
+     * @param user
+     * @return
+     */
+    @SaveLog(scene = "新增或修改灰度版本",
+            paramsIdxes = {0},
+            params = {"req"})
+    @PostMapping("saveGray")
+    public R<Long> saveGrayVersion(@RequestBody VersionReq req, @LoginUser User user) {
+        if (user == null) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        Long mainVersionId = req.getId();
+        String name = trim(req.getName());
+        String memo = trim(req.getMemo());
+        Long grayVersionId = req.getGrayVersionId();
+        Long cacheEvictEnvironmentId = null;
+        Long id = null;
+        if (mainVersionId != null && mainVersionId > 0) {
+            // 检查主版本是否存在
+            Version version = versionService.selectByPrimaryKey(mainVersionId);
+            if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
+                throw new BizException(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+            }
+            if (grayVersionId != null && grayVersionId >0) {
+                // 更新
+                Version grayVersion = versionService.selectByPrimaryKey(grayVersionId);
+                if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted()) || grayVersion.getMainVersionId() <=0 ) {
+                    throw new BizException(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
+                }
+                versionService.updateVersion(grayVersion, name, memo, user);
+                cacheEvictEnvironmentId = version.getEnvironmentId();
+            }else {
+                // 新增
+                version.setGrayFlag(GrayFlag.GRAY.getValue());
+                versionService.updateByPrimaryKey(version);
+                id = versionService.saveGrayVersion(mainVersionId, req.getEnvironmentId(), name, memo, user);
+                cacheEvictEnvironmentId = req.getEnvironmentId();
+            }
+        } else {
+            return R.error(MAIN_VERSION_ID_NOT_EXISTS_STATUS, MAIN_VERSION_ID_NOT_EXISTS_MSG);
+        }
+        // 失效缓存
+        rccCache.evictVersion(cacheEvictEnvironmentId);
+        return R.ok(id);
+    }
+
+    /**
+     * 删除灰度版本
+     *
+     * @param grayVersionId
+     * @param user
+     * @return
+     */
+    @SaveLog(scene = "删除版本",
+            paramsIdxes = {0},
+            params = {"grayVersionId"})
+    @PostMapping("deleteGray/{grayVersionId}")
+    public R deleteGrayVersion(@PathVariable("grayVersionId") Long grayVersionId, @LoginUser User user) {
+        if (user == null) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        if (null == grayVersionId || grayVersionId <= 0) {
+            return R.error(GRAY_VERSION_ID_NOT_EXIST_STATUS, GRAY_VERSION_ID_NOT_EXIST_MSG);
+        }
+        Version grayVersion = versionService.selectByPrimaryKey(grayVersionId);
+        if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted())) {
+            return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        if (!projectUserService.checkAuth(grayVersion.getProductId(), grayVersion.getProjectId(), user)) {
+            return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        // 主版本灰度标识置0
+        Version version = versionService.selectByPrimaryKey(grayVersion.getMainVersionId());
+        version.setGrayFlag(GrayFlag.NOT.getValue());
+        versionService.updateByPrimaryKey(version);
+        // 删除版本及失效缓存
+        int del = versionService.deleteCascadeByVersionId(grayVersionId);
+
+        // 失效id->version的缓存
+        rccCache.evictVersionById(Arrays.asList(grayVersionId));
+        return R.ok(del);
+    }
+
+    /**
+     * 新增或者修改灰度规则
+     */
+    @PostMapping("addGrayRule")
+    public R<List<GrayRuleVo>> addGrayVersion(@RequestBody GrayAddReq grayVersionReq, @LoginUser User user) {
+        if (user == null) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        // 检查灰度版本是否存在
+        Long grayVersionId = grayVersionReq.getGrayVersionId();
+        if (grayVersionId == null || grayVersionId < 0) {
+            return R.error(GRAY_VERSION_ID_NOT_EXIST_STATUS, GRAY_VERSION_ID_NOT_EXIST_MSG);
+        }
+        Version grayVersion = versionService.selectByPrimaryKey(grayVersionId);
+        if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted())) {
+            return R.error(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
+        }
+        if (grayVersionReq.getGrayRuleReqs() == null) {
+            return R.error(GRAY_RULE_NOT_SET_STATUS, GRAY_RULE_NOT_SET_MSG);
+        }
+        List<GrayRuleVo> grayRuleVos = new ArrayList<>();
+        for (GrayRuleReq item : grayVersionReq.getGrayRuleReqs()) {
+            GrayRuleVo grayRuleVo = new GrayRuleVo();
+            Long grayInfoId = grayInfoService.saveGrayInfo(item, user);
+            item.setGrayInfoId(grayInfoId);
+            Long grayRuleId = grayRuleService.saveGrayRule(grayVersionId, item, user);
+            grayRuleVo.setGrayInfoId(grayInfoId);
+            grayRuleVo.setGrayRuleId(grayRuleId);
+            grayRuleVos.add(grayRuleVo);
+        }
+        return R.ok(grayRuleVos);
+    }
+
+    /**
+     * 列出灰度规则
+     */
+    @GetMapping("grayRule")
+    public R<List<GrayVersionRuleVo>> listGrayRules(Long grayVersionId, @LoginUser User user) {
+        if (user == null) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        if (grayVersionId == null || grayVersionId <= 0) {
+            return R.error(GRAY_VERSION_ID_NOT_EXIST_STATUS, GRAY_VERSION_ID_NOT_EXIST_MSG);
+        }
+        Version grayVersion = versionService.selectByPrimaryKey(grayVersionId);
+        if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted())) {
+            return R.error(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
+        }
+        List<GrayRule> grayRules = grayRuleService.selectByGrayVersionId(grayVersionId);
+        List<Long> grayInfoIds = new ArrayList<>();
+        for (GrayRule item : grayRules) {
+            grayInfoIds.add(item.getRuleId());
+        }
+        List<GrayInfo> grayInfos = grayInfoService.selectByIds(grayInfoIds);
+        List<GrayVersionRuleVo> res = new ArrayList<>();
+        for (GrayInfo grayInfo : grayInfos) {
+            GrayVersionRuleVo grayVersionRuleVo = new GrayVersionRuleVo();
+            grayVersionRuleVo.setGrayInfoId(grayInfo.getId());
+            grayVersionRuleVo.setRuleContent(grayInfo.getRuleContent());
+            grayVersionRuleVo.setRuleName(grayInfo.getRuleName());
+            res.add(grayVersionRuleVo);
+        }
+        return R.ok(res);
+    }
+
+    /**
      * 删除版本
      *
      * @param versionId
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "删除版本",
@@ -193,6 +378,12 @@ public class VersionController {
         if (!projectUserService.checkAuth(version.getProductId(), version.getProjectId(), user)) {
             return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
         }
+        if (version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
+            version.setGrayFlag(GrayFlag.NOT.getValue());
+            versionService.updateByPrimaryKey(version);
+            Version grayVersion = versionService.selectByMainVersionId(version.getId());
+            versionService.deleteCascadeByVersionId(grayVersion.getId());
+        }
 
         // 删除版本及失效缓存
         int del = versionService.deleteCascadeByVersionId(versionId);
@@ -202,6 +393,13 @@ public class VersionController {
         return R.ok(del);
     }
 
+    /**
+     * 列出版本
+     *
+     * @param environmentId
+     * @param user
+     * @return
+     */
     @GetMapping("list")
     public R<Pagination<VersionVo>> pagination(
             @RequestParam(value = "sortField", defaultValue = "id") String sortField,
@@ -238,6 +436,12 @@ public class VersionController {
                     versionVo.setName(item.getName());
                     versionVo.setMemo(item.getMemo());
                     versionVo.setEnvironmentId(item.getEnvironmentId());
+                    if (item.getMainVersionId() > 0) {
+                        versionVo.setGrayFlag(GrayFlag.GRAY.getValue());
+                        versionVo.setMianVersionId(item.getMainVersionId());
+                    } else {
+                        versionVo.setGrayFlag(GrayFlag.NOT.getValue());
+                    }
                     return versionVo;
                 }
         );
@@ -275,7 +479,7 @@ public class VersionController {
         }
 
         Map<Long, String> productNameMap = toMap(versionNodeVos,
-                VersionNodeVo :: getProductId, VersionNodeVo :: getProductName);
+                VersionNodeVo::getProductId, VersionNodeVo::getProductName);
         Map<Long, TreeNode> productTreeNodeMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(productNameMap)) {
             for (Map.Entry<Long, String> entry : productNameMap.entrySet()) {
@@ -288,7 +492,7 @@ public class VersionController {
             }
         }
 
-        Map<Long, List<VersionNodeVo>> projectListMap = toMapList(versionNodeVos, VersionNodeVo :: getProjectId);
+        Map<Long, List<VersionNodeVo>> projectListMap = toMapList(versionNodeVos, VersionNodeVo::getProjectId);
         Map<Long, TreeNode> projectTreeNodeMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(projectListMap)) {
             for (List<VersionNodeVo> ps : projectListMap.values()) {
@@ -316,7 +520,7 @@ public class VersionController {
             }
         }
 
-        Map<Long, List<VersionNodeVo>> envListMap = toMapList(versionNodeVos, VersionNodeVo :: getEnvironmentId);
+        Map<Long, List<VersionNodeVo>> envListMap = toMapList(versionNodeVos, VersionNodeVo::getEnvironmentId);
         Map<Long, TreeNode> envTreeNodeMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(envListMap)) {
             for (List<VersionNodeVo> es : envListMap.values()) {
@@ -344,7 +548,7 @@ public class VersionController {
             }
         }
 
-        Map<Long, List<VersionNodeVo>> versionListMap = toMapList(versionNodeVos, VersionNodeVo :: getVersionId);
+        Map<Long, List<VersionNodeVo>> versionListMap = toMapList(versionNodeVos, VersionNodeVo::getVersionId);
         if (!CollectionUtils.isEmpty(versionListMap)) {
             for (List<VersionNodeVo> vs : versionListMap.values()) {
                 if (!CollectionUtils.isEmpty(vs)) {
@@ -378,7 +582,6 @@ public class VersionController {
      *
      * @param versionId
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "推送变更",
@@ -400,7 +603,6 @@ public class VersionController {
         update.setCheckSumDate(new Date());
         update.setUpdateTime(new Date());
         int cnt = versionService.updateByPrimaryKeySelective(update);
-
         rccCache.evictVersion(version.getEnvironmentId());
         // 失效id->version的缓存
         rccCache.evictVersionById(Arrays.asList(versionId));
@@ -416,7 +618,6 @@ public class VersionController {
      * @param pageNo
      * @param pageSize
      * @param user
-     *
      * @return
      */
     @GetMapping("{versionId}/getChangeLogs")
@@ -466,7 +667,6 @@ public class VersionController {
      *
      * @param copyVersionDto
      * @param user
-     *
      * @return
      */
     @RequestMapping(value = "/copy", method = RequestMethod.POST)
@@ -489,7 +689,7 @@ public class VersionController {
         }
 
         Map<Long, Version> map =
-                versionService.selectMapByPrimaryKeys(Arrays.asList(srcVersionId, destVersionId), Version :: getId);
+                versionService.selectMapByPrimaryKeys(Arrays.asList(srcVersionId, destVersionId), Version::getId);
 
         if (map == null || map.get(srcVersionId) == null) {
             return R.error(VERSION_SRC_NOT_EXISTS_STATUS, VERSION_SRC_NOT_EXISTS_MSG);

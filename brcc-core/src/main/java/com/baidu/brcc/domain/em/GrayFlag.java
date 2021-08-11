@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,26 +16,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.brcc.domain.vo;
+package com.baidu.brcc.domain.em;
 
-import lombok.Data;
+public enum GrayFlag {
+    NOT((byte) 0, "否"),
 
-@Data
-public class VersionReq {
+    GRAY((byte) 1, "是");
 
-    // 主版本ID
-    private Long id;
-
-    // 版本名称
+    private Byte value;
     private String name;
 
-    // 版本描述
-    private String memo;
+    GrayFlag(Byte value, String name) {
+        this.value = value;
+        this.name = name;
+    }
 
-    // 环境ID
-    private Long environmentId;
+    public Byte getValue() {
+        return value;
+    }
 
-    // 灰度版本ID
-    private Long grayVersionId;
+    public void setValue(Byte value) {
+        this.value = value;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

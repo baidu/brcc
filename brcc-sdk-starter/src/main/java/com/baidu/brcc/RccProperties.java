@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 public class RccProperties {
     private static final String ENABLE_INTERRUPT_SERVICE = "rcc.enableInterruptService";
     private static final String ENABLE_UPDATE_CALLBACK = "rcc.enableUpdateCallback";
+    private static final String ENABLE_GRAY = "rcc.enableGray";
 
     private static final String CONNECTION_TIMEOUT = "rcc.connectionTimeout";
     private static final String READ_TIMEOUT = "rcc.readTimeout";
@@ -95,6 +96,10 @@ public class RccProperties {
         Boolean enableInterruptService = getValueFromEnv(ENABLE_INTERRUPT_SERVICE, Boolean.class);
         if (enableInterruptService != null) {
             this.enableInterruptService = enableInterruptService;
+        }
+        Boolean enableGray = getValueFromEnv(ENABLE_GRAY, Boolean.class);
+        if (enableGray != null) {
+            this.enableGray = enableGray;
         }
 
         Integer connectionTimeout = getValueFromEnv(CONNECTION_TIMEOUT, Integer.class);
@@ -191,6 +196,8 @@ public class RccProperties {
      * set if enable update call back
      */
     private boolean enableUpdateCallback = false;
+
+    private boolean enableGray = false;
 
     /**
      * set if enable interrupt service when api password is wrong
@@ -335,7 +342,11 @@ public class RccProperties {
     public void setEnableInterruptService(boolean enableInterruptService) {
         this.enableInterruptService = enableInterruptService;
     }
+    public boolean isEnableGray() {return enableGray;}
 
+    public void setEnableGray(boolean enableGray) {
+        this.enableGray = enableGray;
+    }
     public int getConnectionTimeout() {
         return connectionTimeout;
     }

@@ -216,7 +216,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                             .projectId(configGroup.getProjectId())
                             .productId(configGroup.getProductId())
                             .updateTime(now)
-                            .val(trim(req.getVal()))
+                            .val(trim(req.getValue()))
                             .versionId(configGroup.getVersionId())
                             .build();
                     insertSelective(configItemInsert);
@@ -228,7 +228,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                             .id(configItem.getId())
                             .memo(trim(req.getMemo()))
                             .updateTime(now)
-                            .val(trim(req.getVal()))
+                            .val(trim(req.getValue()))
                             .build();
                     updateByPrimaryKeySelective(configItemUpdate);
                     result++;
@@ -263,7 +263,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         Map<String, String> newConfigMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(items)) {
             for (ItemReq item : items) {
-                newConfigMap.put(item.getName(), item.getVal());
+                newConfigMap.put(item.getName(), item.getValue());
             }
         }
         configChangeLogService.saveLogWithBackground(user.getId(), user.getName(), groupId, oldConfigMap, newConfigMap,

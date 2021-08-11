@@ -241,6 +241,10 @@ public class ErrorStatusMsg {
     public static final Integer VERSION_ID_NOT_EXISTS_STATUS = 100211;
     public static final String VERSION_ID_NOT_EXISTS_MSG = "版本ID不能为空";
 
+    // 灰度关联主版本ID不能为空
+    public static final Integer MAIN_VERSION_ID_NOT_EXISTS_STATUS = 100216;
+    public static final String MAIN_VERSION_ID_NOT_EXISTS_MSG = "主版本ID不能为空";
+
     // 版本名称不能为空
     public static final Integer VERSION_NAME_NOT_EXISTS_STATUS = 100212;
     public static final String VERSION_NAME_NOT_EXISTS_MSG = "版本名称不能为空";
@@ -248,6 +252,34 @@ public class ErrorStatusMsg {
     // 版本不存在
     public static final Integer VERSION_NOT_EXISTS_STATUS = 100213;
     public static final String VERSION_NOT_EXISTS_MSG = "版本不存在";
+
+    //灰度实例未设置
+    public static final Integer GRAY_VERSION_RELETED_STATUS = 100217;
+    public static final String GRAY_VERSION_RELETED_MSG = "已有灰度版本关联";
+
+    //灰度版本不存在
+    public static final Integer GRAY_VERSION_NOT_EXISTS_STATUS = 100218;
+    public static final String GRAY_VERSION_NOT_EXISTS_MSG = "灰度版本不存在";
+
+    //实例个数未设置
+    public static final Integer INSTANCE_COUNT_NOT_EXIST_STATUS = 100219;
+    public static final String INSTANCE_COUNT_NOT_EXIST_MSG = "实例个数未设置";
+
+    //灰度规则未设置
+    public static final Integer GRAY_RULE_NOT_SET_STATUS = 100220;
+    public static final String GRAY_RULE_NOT_SET_MSG = "灰度规则未设置";
+
+    //灰度版本ID不能为空
+    public static final Integer GRAY_VERSION_ID_NOT_EXIST_STATUS = 100221;
+    public static final String GRAY_VERSION_ID_NOT_EXIST_MSG = "灰度版本ID不能为空";
+
+    // 灰度规则重复
+    public static final Integer GRAY_RULE_EXIST_STATUS = 100222;
+    public static final String GRAY_RULE_EXIST_MSG = "灰度规则重复";
+
+    // 灰度版本已存在
+    public static final Integer GRAY_VERSION_EXIST_STATUS = 100223;
+    public static final String GRAY_VERSION_EXIST_MSG = "灰度版本已存在";
 
     // 配置项
     // 配置项KEY不能为空

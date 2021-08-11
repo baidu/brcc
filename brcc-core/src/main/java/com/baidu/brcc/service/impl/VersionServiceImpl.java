@@ -24,6 +24,14 @@ import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_MS
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_EXIST_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_EXIST_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_RELETED_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_RELETED_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_COPY_DEST_VERSION_NOT_EXISTS_MSG;
@@ -32,6 +40,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_COPY_SRC_VERSION_NOT_
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_COPY_SRC_VERSION_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NAME_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NAME_NOT_EXISTS_STATUS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.baidu.brcc.domain.VersionExample;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -62,7 +73,6 @@ import com.baidu.brcc.domain.Product;
 import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.Version;
-import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.Deleted;
 import com.baidu.brcc.domain.exception.BizException;
 import com.baidu.brcc.domain.meta.MetaEnvironment;
@@ -170,7 +180,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
             throw new BizException(ENVIRONMENT_ID_NOT_EXISTS_STATUS, ENVIRONMENT_ID_NOT_EXISTS_MSG);
         }
         if (StringUtils.isBlank(name)) {
-            throw new BizException(ENVIRONMENT_NAME_NOT_EMPTY_STATUS, ENVIRONMENT_NAME_NOT_EMPTY_MSG);
+            throw new BizException(VERSION_NAME_NOT_EXISTS_STATUS, VERSION_NAME_NOT_EXISTS_MSG);
         }
         Environment environment = environmentService.selectByPrimaryKey(environmentId);
         if (environment == null || Deleted.DELETE.getValue().equals(environment.getDeleted())) {
@@ -205,6 +215,82 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         insert.setCheckSumDate(new Date());
         insertSelective(insert);
         return insert.getId();
+    }
+
+    @Override
+    @Transactional
+    public Long saveGrayVersion(Long mainVersionId, Long environmentId, String name, String memo, User loginUser) {
+        // 新增
+        if (null == mainVersionId || mainVersionId <= 0) {
+            throw new BizException(MAIN_VERSION_ID_NOT_EXISTS_STATUS, MAIN_VERSION_ID_NOT_EXISTS_MSG);
+        }
+        if (null == environmentId || environmentId <= 0) {
+            throw new BizException(ENVIRONMENT_ID_NOT_EXISTS_STATUS, ENVIRONMENT_ID_NOT_EXISTS_MSG);
+        }
+        if (StringUtils.isBlank(name)) {
+            throw new BizException(VERSION_NAME_NOT_EXISTS_STATUS, VERSION_NAME_NOT_EXISTS_MSG);
+        }
+        Environment environment = environmentService.selectByPrimaryKey(environmentId);
+        if (environment == null || Deleted.DELETE.getValue().equals(environment.getDeleted())) {
+            throw new BizException(ENVIRONMENT_NOT_EXISTS_STATUS, ENVIRONMENT_NOT_EXISTS_MSG);
+        }
+        if (!projectUserService.checkAuth(environment.getProductId(), environment.getProjectId(), loginUser)) {
+            throw new BizException(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        // 灰度版本名称不能重复
+        Version version = selectOneByExample(VersionExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andDeletedEqualTo(Deleted.OK.getValue())
+                        .andEnvironmentIdEqualTo(environmentId)
+                        .andNameEqualTo(name)
+                        .toExample(),
+                MetaVersion.COLUMN_NAME_ID
+        );
+        if (version != null) {
+            throw new BizException(GRAY_VERSION_EXIST_STATUS, GRAY_VERSION_EXIST_MSG);
+        }
+        Version grayVersion = selectOneByExample(VersionExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andDeletedEqualTo(Deleted.OK.getValue())
+                        .andEnvironmentIdEqualTo(environmentId)
+                        .andMainVersionIdEqualTo(mainVersionId)
+                        .toExample(),
+                MetaVersion.COLUMN_NAME_ID
+        );
+        if (grayVersion != null) {
+            throw new BizException(GRAY_VERSION_RELETED_STATUS, GRAY_VERSION_RELETED_MSG);
+        }
+        Version insert = new Version();
+        insert.setUpdateTime(new Date());
+        insert.setCreateTime(new Date());
+        insert.setDeleted(Deleted.OK.getValue());
+        insert.setName(name);
+        insert.setMemo(memo);
+        insert.setEnvironmentId(environmentId);
+        insert.setProjectId(environment.getProjectId());
+        insert.setProductId(environment.getProductId());
+        insert.setCheckSum(UUID.randomUUID().toString());
+        insert.setCheckSumDate(new Date());
+        insert.setMainVersionId(mainVersionId);
+        insertSelective(insert);
+        return insert.getId();
+    }
+
+    @Override
+    public Version selectByMainVersionId(Long mainVersionId) {
+        Version grayVersion = selectOneByExample(VersionExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andDeletedEqualTo(Deleted.OK.getValue())
+                        .andMainVersionIdEqualTo(mainVersionId)
+                        .toExample()
+        );
+        if (grayVersion == null) {
+            throw new BizException(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
+        }
+        return grayVersion;
     }
 
     @Override
@@ -517,7 +603,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                         .andProjectIdEqualTo(projectId)
                         .andEnvironmentIdIn(environmentIds)
                         .toExample(),
-                Version :: getId,
+                Version::getId,
                 MetaVersion.COLUMN_NAME_ID
         );
     }

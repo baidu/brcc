@@ -2266,6 +2266,30 @@ public class BrccInstanceExample extends BaseExample {
             return (Criteria) this;
         }
 
+        public Criteria andGrayVersionIdEqualTo(Long value) {
+            return andGrayVersionIdEqualTo(value, Boolean.TRUE);
+        }
+
+        public Criteria andGrayVersionIdEqualTo(Long value, Boolean condition) {
+            if (condition == null || !condition){
+                return (Criteria) this;
+            }
+            addCriterion("gray_version_id =", value, "GrayVersionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andGrayFlagEqualTo(Byte value) {
+            return andGrayFlagEqualTo(value, Boolean.TRUE);
+        }
+
+        public Criteria andGrayFlagEqualTo(Byte value, Boolean condition) {
+            if (condition == null || !condition){
+                return (Criteria) this;
+            }
+            addCriterion("gray_flag =", value, "GrayFlag");
+            return (Criteria) this;
+        }
+
         public Criteria andVersionIdNotEqualTo(Long value) {
             return andVersionIdNotEqualTo(value, Boolean.TRUE);
         }

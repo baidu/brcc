@@ -94,6 +94,20 @@ public class Version implements Serializable {
     private Date createTime;
 
     /**
+     * column-name:gray_flag
+     * grayFlag
+     */
+    @ApiModelProperty(value = "灰度标识", position = 12)
+    private Byte grayFlag;
+
+    /**
+     * column-name:gray_version_id
+     * mainVersionId
+     */
+    @ApiModelProperty(value = "关联的主版本ID", position = 13)
+    private Long mainVersionId;
+
+    /**
      * 版本
      */
     public Version() {
@@ -116,6 +130,8 @@ public class Version implements Serializable {
         this.deleted = builder.deleted;
         this.updateTime = builder.updateTime;
         this.createTime = builder.createTime;
+        this.grayFlag = builder.grayFlag;
+        this.mainVersionId = builder.mainVersionId;
     }
 
     public static XBuilder newBuilder() {
@@ -290,6 +306,34 @@ public class Version implements Serializable {
         this.createTime = createTime;
     }
 
+    /**
+     * grayFlag
+     */
+    public Byte getGrayFlag() {
+        return grayFlag;
+    }
+
+    /**
+     * grayFlag
+     */
+    public void setGrayFlag(Byte grayFlag) {
+        this.grayFlag = grayFlag;
+    }
+
+    /**
+     * mainVersionId
+     */
+    public Long getMainVersionId() {
+        return mainVersionId;
+    }
+
+    /**
+     * mainVersionId
+     */
+    public void setMainVersionId(Long mainVersionId) {
+        this.mainVersionId = mainVersionId;
+    }
+
     public Version copyFrom(Version other) {
         this.id = other.id;
         this.name = other.name;
@@ -303,6 +347,8 @@ public class Version implements Serializable {
         this.deleted = other.deleted;
         this.updateTime = other.updateTime;
         this.createTime = other.createTime;
+        this.grayFlag = other.grayFlag;
+        this.mainVersionId = other.mainVersionId;
         return this;
     }
 
@@ -322,6 +368,8 @@ public class Version implements Serializable {
         to.setDeleted(from.deleted);
         to.setUpdateTime(from.updateTime);
         to.setCreateTime(from.createTime);
+        to.setGrayFlag(from.grayFlag);
+        to.setMainVersionId(from.mainVersionId);
         return to;
     }
 
@@ -343,7 +391,7 @@ public class Version implements Serializable {
         }
         */
 
-        return "{\"id\": \"\",\"name\": \"\",\"productId\": \"\",\"memo\": \"\",\"projectId\": \"\",\"environmentId\": \"\",\"checkSum\": \"\",\"checkSumDate\": \"\",\"checkSumEnable\": \"\",\"deleted\": \"\",\"updateTime\": \"\",\"createTime\": \"\"}" ;
+        return "{\"id\": \"\",\"name\": \"\",\"productId\": \"\",\"memo\": \"\",\"projectId\": \"\",\"environmentId\": \"\",\"checkSum\": \"\",\"checkSumDate\": \"\",\"checkSumEnable\": \"\",\"deleted\": \"\",\"updateTime\": \"\",\"createTime\": \"\",\"grayFlag\": \"\",\"mainVersionId\": \"\"}" ;
     }
 
     @Override
@@ -364,6 +412,8 @@ public class Version implements Serializable {
         sb.append(", deleted=").append(deleted);
         sb.append(", updateTime=").append(updateTime);
         sb.append(", createTime=").append(createTime);
+        sb.append(", grayFlag=").append(grayFlag);
+        sb.append(", mainVersionId=").append(mainVersionId);
         sb.append("]");
         return sb.toString();
     }
@@ -429,6 +479,17 @@ public class Version implements Serializable {
          * 创建时间
          */
         private Date createTime;
+
+        /**
+         * grayFlag
+         */
+        private Byte grayFlag;
+
+        /**
+         * mainVersionId
+         */
+        private Long mainVersionId;
+
 
         private XBuilder() {
 
@@ -527,6 +588,22 @@ public class Version implements Serializable {
          */
         public XBuilder createTime(Date createTime) {
             this.createTime = createTime;
+            return this;
+        }
+
+        /**
+         * grayFlag
+         */
+        public XBuilder grayFlag(Byte grayFlag) {
+            this.grayFlag = grayFlag;
+            return this;
+        }
+
+        /**
+         * mainVersionId
+         */
+        public XBuilder mainVersionId(Long mainVersionId) {
+            this.mainVersionId = mainVersionId;
             return this;
         }
 

@@ -114,6 +114,20 @@ public class BrccInstance implements Serializable {
     private Date createTime;
 
     /**
+     * column-name:gray_flag
+     * grayFlag
+     */
+    @ApiModelProperty(value = "灰度标识", position = 15)
+    private Byte grayFlag;
+
+    /**
+     * column-name:gray_version_id
+     * grayVersionId
+     */
+    @ApiModelProperty(value = "灰度版本ID", position = 16)
+    private Long grayVersionId;
+
+    /**
      * 实例信息
      */
     public BrccInstance() {
@@ -139,6 +153,8 @@ public class BrccInstance implements Serializable {
         this.netCost = builder.netCost;
         this.heartbeatTime = builder.heartbeatTime;
         this.createTime = builder.createTime;
+        this.grayFlag = builder.grayFlag;
+        this.grayVersionId = builder.grayVersionId;
     }
 
     public static XBuilder newBuilder() {
@@ -355,6 +371,35 @@ public class BrccInstance implements Serializable {
         this.createTime = createTime;
     }
 
+    /**
+     * grayFlag
+     */
+    public Byte getGrayFlag() {
+        return grayFlag;
+    }
+
+    /**
+     * grayFlag
+     */
+    public void setGrayFlag(Byte grayFlag) {
+        this.grayFlag = grayFlag;
+    }
+
+    /**
+     * grayVersionId
+     */
+    public Long getGrayVersionId() {
+        return grayVersionId;
+    }
+
+    /**
+     * grayVersionId
+     */
+    public void setGrayVersionId(Long grayVersionId) {
+        this.grayVersionId = grayVersionId;
+    }
+
+
     public BrccInstance copyFrom(BrccInstance other) {
         this.id = other.id;
         this.idc = other.idc;
@@ -371,6 +416,8 @@ public class BrccInstance implements Serializable {
         this.netCost = other.netCost;
         this.heartbeatTime = other.heartbeatTime;
         this.createTime = other.createTime;
+        this.grayFlag = other.grayFlag;
+        this.grayVersionId = other.grayVersionId;
         return this;
     }
 
@@ -393,6 +440,8 @@ public class BrccInstance implements Serializable {
         to.setNetCost(from.netCost);
         to.setHeartbeatTime(from.heartbeatTime);
         to.setCreateTime(from.createTime);
+        to.setGrayFlag(from.grayFlag);
+        to.setGrayVersionId(from.grayVersionId);
         return to;
     }
 
@@ -417,7 +466,7 @@ public class BrccInstance implements Serializable {
         }
         */
         
-        return "{\"id\": \"\",\"idc\": \"\",\"containerId\": \"\",\"appName\": \"\",\"ip\": \"\",\"clientVersion\": \"\",\"enableUpdateCallback\": \"\",\"lastChecksum\": \"\",\"lastChecksumTime\": \"\",\"currentChecksum\": \"\",\"currentChecksumTime\": \"\",\"versionId\": \"\",\"netCost\": \"\",\"heartbeatTime\": \"\",\"createTime\": \"\"}" ;
+        return "{\"id\": \"\",\"idc\": \"\",\"containerId\": \"\",\"appName\": \"\",\"ip\": \"\",\"clientVersion\": \"\",\"enableUpdateCallback\": \"\",\"lastChecksum\": \"\",\"lastChecksumTime\": \"\",\"currentChecksum\": \"\",\"currentChecksumTime\": \"\",\"versionId\": \"\",\"netCost\": \"\",\"heartbeatTime\": \"\",\"createTime\": \"\",\"grayFlag\": \"\",\"grayVersionId\": \"\"}" ;
     }
 
     @Override
@@ -441,6 +490,8 @@ public class BrccInstance implements Serializable {
         sb.append(", netCost=").append(netCost);
         sb.append(", heartbeatTime=").append(heartbeatTime);
         sb.append(", createTime=").append(createTime);
+        sb.append(", grayFlag=").append(grayFlag);
+        sb.append(", grayVersionId=").append(grayVersionId);
         sb.append("]");
         return sb.toString();
     }
@@ -521,6 +572,16 @@ public class BrccInstance implements Serializable {
          * 创建时间
          */
         private Date createTime;
+
+        /**
+         * grayFlag
+         */
+        private Byte grayFlag;
+
+        /**
+         * grayVersionId
+         */
+        private Long grayVersionId;
 
         private XBuilder() {
             
@@ -643,6 +704,22 @@ public class BrccInstance implements Serializable {
          */
         public XBuilder createTime(Date createTime) {
             this.createTime = createTime;
+            return this;
+        }
+
+        /**
+         * grayFlag
+         */
+        public XBuilder grayFlag(Byte grayFlag) {
+            this.grayFlag = grayFlag;
+            return this;
+        }
+
+        /**
+         * grayVersionId
+         */
+        public XBuilder grayVersionId(Long grayVersionId) {
+            this.grayVersionId = grayVersionId;
             return this;
         }
 
