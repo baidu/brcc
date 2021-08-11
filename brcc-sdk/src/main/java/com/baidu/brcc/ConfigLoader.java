@@ -66,7 +66,7 @@ public class ConfigLoader {
 
     private static final String AUTH_API = "/api/auth";
     private static final String ENV_API = "/api/environment/{0}";
-    private static final String VERSION_API = "/api/version/{0}";
+    private static final String VERSION_API = "/api/v2/version/{0}";
     private static final String GRAY_VERSION_API = "api/grayVersion/{0}";
     private static final String ITEM_API = "/api/item";
 
@@ -194,13 +194,9 @@ public class ConfigLoader {
         param.put("ip", header.get(HEADER_CLIENT_IP));
         param.put("containerId", header.get(HEADER_CONTAINER_ID));
         param.put("idc", header.get(HEADER_IDC));
+        param.put("enableGray", enableGray);
         R<VersionVo> result = null;
-        if (enableGray) {
-            String grayVersionUrl = ccServerUrl.concat(MessageFormat.format(GRAY_VERSION_API, ccVersionName));
-            result = okHttpClientUtils.get(grayVersionUrl, VersionVo.class, param, header);
-        } else {
-            result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, header);
-        }
+        result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, header);
         if (result == null || result.getData() == null || result.getStatus() != 0) {
             String msg = null;
             if (result == null) {

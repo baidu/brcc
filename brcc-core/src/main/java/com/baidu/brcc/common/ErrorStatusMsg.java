@@ -281,6 +281,10 @@ public class ErrorStatusMsg {
     public static final Integer GRAY_VERSION_EXIST_STATUS = 100223;
     public static final String GRAY_VERSION_EXIST_MSG = "灰度版本已存在";
 
+    // 灰度版本不唯一
+    public static final Integer GRAY_VERSION_MORE_THAN_ONE_STATUS = 100224;
+    public static final String GRAY_VERSION_MORE_THAN_ONE_MSG = "灰度版本不唯一";
+
     // 配置项
     // 配置项KEY不能为空
     public static final Integer CONFIG_KEY_NOT_EXISTS_STATUS = 100214;

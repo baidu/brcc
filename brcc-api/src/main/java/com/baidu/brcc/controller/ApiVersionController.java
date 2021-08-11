@@ -81,6 +81,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.brcc.domain.ApiToken;
@@ -155,8 +156,10 @@ public class ApiVersionController {
         return R.ok(versionVo);
     }
 
-    @GetMapping("grayVersion/{versionName}")
-    public R<ApiVersionVo> getGrayVersion(String token, Long environmentId, String containerId, String idc, String ip, @PathVariable("versionName") String name) {
+    @GetMapping("/v2/version/{versionName}")
+    public R<ApiVersionVo> getGrayVersion(String token, Long environmentId, String containerId, String idc, String ip,
+                                          @RequestParam(value = "enableGray", required = false) Boolean enableGray,
+                                          @PathVariable("versionName") String name) {
         // 1、从数据库里根据grayversionid拿到rule 列表
         // 2、根据rule对象获得 spring的GrayHitRule列表
         if (isBlank(token)) {
@@ -172,8 +175,6 @@ public class ApiVersionController {
         if (apiToken == null) {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
         }
-//        ApiVersionVo versionVo = versionService.getByEnvironmentAndNameInCache(apiToken.getProjectId(), environmentId
-//                , name);
         Version version = versionService.selectByProjectIdAndEnvironmentIdAndName(apiToken.getProjectId(), environmentId
                 , name);
         if (version == null || version.getDeleted().equals(Deleted.DELETE.getValue())) {
@@ -185,14 +186,16 @@ public class ApiVersionController {
         contentMap.put("idc", idc);
         contentMap.put("containerId", containerId);
         ApiVersionVo versionVo = new ApiVersionVo();
+        versionVo.setVersionName(version.getName());
+        versionVo.setCheckSum(version.getCheckSum());
+        versionVo.setEnvironmentId(version.getEnvironmentId());
+        versionVo.setProjectId(version.getProjectId());
+        versionVo.setVersionId(version.getId());
         // 判断是否灰度
-        if (version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
+        if (enableGray && version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
             // 获取灰度版本
             Long mainVersionId = version.getId();
             Version grayVersion = versionService.selectByMainVersionId(mainVersionId);
-            if (null == grayVersion || grayVersion.getDeleted().equals(Deleted.DELETE.getValue())) {
-                return R.error(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
-            }
             Long grayVersionId = grayVersion.getId();
             // 获取灰度规则
             List<GrayRule> grayRules = grayRuleService.selectByGrayVersionId(grayVersionId);
@@ -211,13 +214,6 @@ public class ApiVersionController {
                 versionVo.setVersionId(grayVersion.getId());
                 // 命中后修改实例的灰度信息
                 brccInstanceService.updateInstance(ip, idc, containerId, grayVersionId);
-            } else {
-                // 未命中
-                versionVo.setVersionName(version.getName());
-                versionVo.setCheckSum(version.getCheckSum());
-                versionVo.setEnvironmentId(version.getEnvironmentId());
-                versionVo.setProjectId(version.getProjectId());
-                versionVo.setVersionId(version.getId());
             }
         }
         return R.ok(versionVo);

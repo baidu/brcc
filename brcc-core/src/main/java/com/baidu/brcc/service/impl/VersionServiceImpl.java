@@ -26,6 +26,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_EXIST_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_EXIST_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_MORE_THAN_ONE_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_MORE_THAN_ONE_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_RELETED_MSG;
@@ -280,17 +282,20 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
 
     @Override
     public Version selectByMainVersionId(Long mainVersionId) {
-        Version grayVersion = selectOneByExample(VersionExample.newBuilder()
+        List<Version> grayVersions = selectByExample(VersionExample.newBuilder()
                         .build()
                         .createCriteria()
                         .andDeletedEqualTo(Deleted.OK.getValue())
                         .andMainVersionIdEqualTo(mainVersionId)
                         .toExample()
         );
-        if (grayVersion == null) {
+        if (grayVersions == null) {
             throw new BizException(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
         }
-        return grayVersion;
+        if (grayVersions.size() != 1) {
+            throw new BizException(GRAY_VERSION_MORE_THAN_ONE_STATUS, GRAY_VERSION_MORE_THAN_ONE_MSG);
+        }
+        return grayVersions.get(0);
     }
 
     @Override
