@@ -157,9 +157,14 @@ public class ApiVersionController {
     }
 
     @GetMapping("/v2/version/{versionName}")
-    public R<ApiVersionVo> getGrayVersion(String token, Long environmentId, String containerId, String idc, String ip,
-                                          @RequestParam(value = "enableGray", required = false) Boolean enableGray,
-                                          @PathVariable("versionName") String name) {
+    public R<ApiVersionVo> getGrayVersion(
+            @RequestParam(name = "token") String token,
+            @RequestParam(name = "environmentId") Long environmentId,
+            @RequestParam(name = "containerId", required = false, defaultValue = "") String containerId,
+            @RequestParam(name = "idc", required = false, defaultValue = "") String idc,
+            @RequestParam(name = "ip", required = false, defaultValue = "") String ip,
+            @RequestParam(name = "enableGray", required = false) Boolean enableGray,
+            @PathVariable("versionName") String name) {
         // 1、从数据库里根据grayversionid拿到rule 列表
         // 2、根据rule对象获得 spring的GrayHitRule列表
         if (isBlank(token)) {
@@ -192,7 +197,7 @@ public class ApiVersionController {
         versionVo.setProjectId(version.getProjectId());
         versionVo.setVersionId(version.getId());
         // 判断是否灰度
-        if (enableGray && version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
+        if (enableGray != null && enableGray && version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
             // 获取灰度版本
             Long mainVersionId = version.getId();
             Version grayVersion = versionService.selectByMainVersionId(mainVersionId);
