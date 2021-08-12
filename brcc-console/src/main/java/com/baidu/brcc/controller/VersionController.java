@@ -291,8 +291,8 @@ public class VersionController {
     /**
      * 新增或者修改灰度规则
      */
-    @PostMapping("addGrayRule")
-    public R<List<GrayRuleVo>> addGrayVersion(@RequestBody GrayAddReq grayVersionReq, @LoginUser User user) {
+    @PostMapping("saveGrayRule")
+    public R<List<GrayRuleVo>> saveGrayRule(@RequestBody GrayAddReq grayVersionReq, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
