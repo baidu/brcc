@@ -169,7 +169,7 @@ public class ErrorStatusMsg {
     public static final String GROUP_NAME_NOT_EXISTS_MSG = "分组名不能为空";
 
     // 分组不存在
-    public static final Integer GROUP_NOT_EXISTS_STATUS = 100127;
+    public static final Integer GROUP_NOT_EXISTS_STATUS = 100128;
     public static final String GROUP_NOT_EXISTS_MSG = "分组不存在";
 
     // 分组已存在
@@ -261,28 +261,25 @@ public class ErrorStatusMsg {
     public static final Integer GRAY_VERSION_NOT_EXISTS_STATUS = 100218;
     public static final String GRAY_VERSION_NOT_EXISTS_MSG = "灰度版本不存在";
 
-    //实例个数未设置
-    public static final Integer INSTANCE_COUNT_NOT_EXIST_STATUS = 100219;
-    public static final String INSTANCE_COUNT_NOT_EXIST_MSG = "实例个数未设置";
 
     //灰度规则未设置
-    public static final Integer GRAY_RULE_NOT_SET_STATUS = 100220;
+    public static final Integer GRAY_RULE_NOT_SET_STATUS = 100219;
     public static final String GRAY_RULE_NOT_SET_MSG = "灰度规则未设置";
 
     //灰度版本ID不能为空
-    public static final Integer GRAY_VERSION_ID_NOT_EXIST_STATUS = 100221;
+    public static final Integer GRAY_VERSION_ID_NOT_EXIST_STATUS = 100220;
     public static final String GRAY_VERSION_ID_NOT_EXIST_MSG = "灰度版本ID不能为空";
 
     // 灰度规则重复
-    public static final Integer GRAY_RULE_EXIST_STATUS = 100222;
+    public static final Integer GRAY_RULE_EXIST_STATUS = 100221;
     public static final String GRAY_RULE_EXIST_MSG = "灰度规则重复";
 
     // 灰度版本已存在
-    public static final Integer GRAY_VERSION_EXIST_STATUS = 100223;
+    public static final Integer GRAY_VERSION_EXIST_STATUS = 100222;
     public static final String GRAY_VERSION_EXIST_MSG = "灰度版本已存在";
 
     // 灰度版本不唯一
-    public static final Integer GRAY_VERSION_MORE_THAN_ONE_STATUS = 100224;
+    public static final Integer GRAY_VERSION_MORE_THAN_ONE_STATUS = 100223;
     public static final String GRAY_VERSION_MORE_THAN_ONE_MSG = "灰度版本不唯一";
 
     // 配置项

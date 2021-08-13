@@ -94,7 +94,7 @@ public class GroupController {
      *
      * @return
      */
-    @SaveLog(scene = "修改分组",
+    @SaveLog(scene = "0005",
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("save")
@@ -189,7 +189,7 @@ public class GroupController {
      *
      * @return
      */
-    @SaveLog(scene = "删除分组",
+    @SaveLog(scene = "0006",
             paramsIdxes = {0},
             params = {"groupId"})
     @PostMapping("delete/{groupId}")

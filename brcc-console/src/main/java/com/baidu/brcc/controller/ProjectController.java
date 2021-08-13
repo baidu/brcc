@@ -161,7 +161,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "修改工程",
+    @SaveLog(scene = "0009",
             paramsIdxes = {0},
             params = {"req"},
             masks = @MaskLog(paramsIdx = 0,
@@ -307,7 +307,7 @@ public class ProjectController {
      * @param projectId
      * @return
      */
-    @SaveLog(scene = "重置工程的api密码",
+    @SaveLog(scene = "0010",
             paramsIdxes = {0},
             params = {"projectId"}
             )
@@ -371,7 +371,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "删除工程",
+    @SaveLog(scene = "0011",
             paramsIdxes = {0},
             params = {"projectId"})
     @PostMapping("delete/{projectId}")
@@ -478,7 +478,7 @@ public class ProjectController {
         return R.ok(pagination, ext);
     }
 
-    @SaveLog(scene = "修改工程依赖",
+    @SaveLog(scene = "0012",
             paramsIdxes = {0, 1},
             params = {"projectId", "refProjectDto"})
     @PostMapping(value = "/{projectId}/ref")
@@ -535,7 +535,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "新增工程成员",
+    @SaveLog(scene = "0013",
             paramsIdxes = {0, 1, 2},
             params = {"productId", "projectId", "projectUserDto"})
     @PostMapping("addMember/{productId}/{projectId}")
@@ -646,7 +646,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "删除工程成员",
+    @SaveLog(scene = "0014",
             paramsIdxes = {0, 1, 2},
             params = {"productId", "projectId", "userIds"})
     @Transactional

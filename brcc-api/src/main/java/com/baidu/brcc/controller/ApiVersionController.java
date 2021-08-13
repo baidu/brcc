@@ -295,7 +295,7 @@ public class ApiVersionController {
      * @param configGroupReq
      * @return
      */
-    @SaveLog(scene = "增加分组",
+    @SaveLog(scene = "0005",
             paramsIdxes = {1},
             params = {"configGroupReq"})
     @PostMapping("groupAdd")
@@ -359,7 +359,7 @@ public class ApiVersionController {
      * @param
      * @return
      */
-    @SaveLog(scene = "增加版本",
+    @SaveLog(scene = "0015",
             paramsIdxes = {1},
             params = {"versionReq"})
     @PostMapping("versionAdd")

@@ -28,8 +28,6 @@ import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_MSG
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
-import static com.baidu.brcc.common.ErrorStatusMsg.INSTANCE_COUNT_NOT_EXIST_MSG;
-import static com.baidu.brcc.common.ErrorStatusMsg.INSTANCE_COUNT_NOT_EXIST_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
@@ -78,12 +76,10 @@ import com.baidu.brcc.domain.em.GrayFlag;
 import com.baidu.brcc.domain.vo.GrayAddReq;
 import com.baidu.brcc.domain.vo.GrayRuleReq;
 import com.baidu.brcc.domain.vo.GrayRuleVo;
-import com.baidu.brcc.domain.vo.GrayVersionReq;
 import com.baidu.brcc.domain.vo.GrayVersionRuleVo;
 import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.GrayInfoService;
 import com.baidu.brcc.service.GrayRuleService;
-import com.baidu.brcc.utils.time.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -153,8 +149,6 @@ public class VersionController {
     @Autowired
     private ConfigItemService configItemService;
 
-    @Autowired
-    private BrccInstanceService brccInstanceService;
 
     @Autowired
     private GrayRuleService grayRuleService;
@@ -169,7 +163,7 @@ public class VersionController {
      * @param user
      * @return
      */
-    @SaveLog(scene = "修改版本",
+    @SaveLog(scene = "0015",
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("save")
@@ -208,7 +202,7 @@ public class VersionController {
      * @param user
      * @return
      */
-    @SaveLog(scene = "新增或修改灰度版本",
+    @SaveLog(scene = "0016",
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("saveGray")
@@ -226,13 +220,13 @@ public class VersionController {
             // 检查主版本是否存在
             Version version = versionService.selectByPrimaryKey(mainVersionId);
             if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
-                throw new BizException(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+                return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
             }
             if (grayVersionId != null && grayVersionId >0) {
                 // 更新
                 Version grayVersion = versionService.selectByPrimaryKey(grayVersionId);
                 if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted()) || grayVersion.getMainVersionId() <=0 ) {
-                    throw new BizException(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
+                    return R.error(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
                 }
                 versionService.updateVersion(grayVersion, name, memo, user);
                 cacheEvictEnvironmentId = version.getEnvironmentId();
@@ -258,7 +252,7 @@ public class VersionController {
      * @param user
      * @return
      */
-    @SaveLog(scene = "删除版本",
+    @SaveLog(scene = "0017",
             paramsIdxes = {0},
             params = {"grayVersionId"})
     @PostMapping("deleteGray/{grayVersionId}")
@@ -291,6 +285,9 @@ public class VersionController {
     /**
      * 新增或者修改灰度规则
      */
+    @SaveLog(scene = "0018",
+            paramsIdxes = {0},
+            params = {"grayVersionReq"})
     @PostMapping("saveGrayRule")
     public R<List<GrayRuleVo>> saveGrayRule(@RequestBody GrayAddReq grayVersionReq, @LoginUser User user) {
         if (user == null) {
@@ -360,7 +357,7 @@ public class VersionController {
      * @param user
      * @return
      */
-    @SaveLog(scene = "删除版本",
+    @SaveLog(scene = "0019",
             paramsIdxes = {0},
             params = {"versionId"})
     @PostMapping("delete/{versionId}")
@@ -584,7 +581,7 @@ public class VersionController {
      * @param user
      * @return
      */
-    @SaveLog(scene = "推送变更",
+    @SaveLog(scene = "0020",
             paramsIdxes = {0},
             params = {"versionId"})
     @PostMapping("pushChange/{versionId}")

@@ -160,7 +160,7 @@ public class ApiEnvironmentController {
      * @param environmentReq environment info
      * @return
      */
-    @SaveLog(scene = "增加环境",
+    @SaveLog(scene = "0003",
             paramsIdxes = {1},
             params = {"environmentReq"})
     @PostMapping("environmentAdd")
