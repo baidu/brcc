@@ -22,8 +22,6 @@ import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_MSG
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
-import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
-import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NAME_NOT_EXISTS_MSG;
@@ -65,7 +63,6 @@ import com.baidu.brcc.domain.meta.MetaConfigGroup;
 import com.baidu.brcc.domain.meta.MetaVersion;
 import com.baidu.brcc.domain.vo.ApiGroupVo;
 import com.baidu.brcc.domain.vo.ConfigGroupReq;
-import com.baidu.brcc.domain.vo.GrayVersionReq;
 import com.baidu.brcc.domain.vo.VersionReq;
 import com.baidu.brcc.rule.GrayExcutor;
 import com.baidu.brcc.service.BrccInstanceService;

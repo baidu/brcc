@@ -21,6 +21,15 @@ package com.baidu.brcc.controller;
 import java.util.Arrays;
 import java.util.List;
 
+import com.baidu.brcc.domain.ConfigGroup;
+import com.baidu.brcc.domain.Environment;
+import com.baidu.brcc.domain.Version;
+import com.baidu.brcc.domain.em.Deleted;
+import com.baidu.brcc.domain.vo.ApiGroupVo;
+import com.baidu.brcc.domain.vo.ConfigGroupReq;
+import com.baidu.brcc.domain.vo.VersionReq;
+import com.baidu.brcc.service.ConfigGroupService;
+import com.baidu.brcc.service.EnvironmentService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +46,12 @@ import com.baidu.brcc.service.RccCache;
 import com.baidu.brcc.service.VersionService;
 
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NAME_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NAME_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NOT_EXISTS_STATUS;
 import static org.mockito.Mockito.*;
@@ -50,6 +63,10 @@ public class ApiVersionControllerTest {
     VersionService versionService;
     @Mock
     RccCache rccCache;
+    @Mock
+    ConfigGroupService configGroupService;
+    @Mock
+    EnvironmentService environmentService;
     @InjectMocks
     ApiVersionController apiVersionController;
 
@@ -65,55 +82,171 @@ public class ApiVersionControllerTest {
         when(rccCache.getProject(anyString())).thenReturn(project);
     }
 
-//    @Test
-//    public void testGetVersion() throws Exception {
-//        R<ApiVersionVo> result = apiVersionController.getVersion("", Long.valueOf(1), "name");
-//        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
-//
-//        result = apiVersionController.getVersion("token", Long.valueOf(-1), "name");
-//        Assert.assertEquals(ENVIRONMENT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-//
-//        result = apiVersionController.getVersion("token", Long.valueOf(1), "");
-//        Assert.assertEquals(VERSION_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-//
-//        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
-//        result = apiVersionController.getVersion("token", Long.valueOf(1), "name");
-//        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-//
-//        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(new ApiToken());
-//        when(versionService.getByEnvironmentAndNameInCache(any(), any(), anyString()))
-//                .thenReturn(null);
-//        result = apiVersionController.getVersion("token", Long.valueOf(1), "name");
-//        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-//
-//        when(versionService.getByEnvironmentAndNameInCache(any(), any(), anyString()))
-//                .thenReturn(new ApiVersionVo());
-//        result = apiVersionController.getVersion("token", Long.valueOf(1), "name");
-//        Assert.assertEquals(0, result.getStatus());
-//    }
+    @Test
+    public void testGetVersion() throws Exception {
+        R<ApiVersionVo> result = apiVersionController.getVersion("", Long.valueOf(1), "name");
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
 
-//    @Test
-//    public void testGetAllVersion() throws Exception {
-//        R<List<ApiVersionVo>> result = apiVersionController.getAllVersion("", Long.valueOf(1));
-//        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
-//
-//        result = apiVersionController.getAllVersion("token", Long.valueOf(-1));
-//        Assert.assertEquals(ENVIRONMENT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-//
-//        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
-//        result = apiVersionController.getAllVersion("token", Long.valueOf(1));
-//        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-//
-//        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(new ApiToken());
-//        result = apiVersionController.getAllVersion("token", Long.valueOf(1));
-//        Assert.assertEquals(0, result.getStatus());
-//
-//        ApiToken apiToken = new ApiToken();
-//        apiToken.setProjectId(1L);
-//        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(apiToken);
-//        when(versionService.getAllByEnvironmentIdInCache(anyLong(), anyLong()))
-//                .thenReturn(Arrays.asList(new ApiVersionVo()));
-//        result = apiVersionController.getAllVersion("token", Long.valueOf(1));
-//        Assert.assertEquals(0, result.getStatus());
-//    }
+        result = apiVersionController.getVersion("token", Long.valueOf(-1), "name");
+        Assert.assertEquals(ENVIRONMENT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        result = apiVersionController.getVersion("token", Long.valueOf(1), "");
+        Assert.assertEquals(VERSION_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
+        result = apiVersionController.getVersion("token", Long.valueOf(1), "name");
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(new ApiToken());
+        when(versionService.getByEnvironmentAndNameInCache(any(), any(), anyString()))
+                .thenReturn(null);
+        result = apiVersionController.getVersion("token", Long.valueOf(1), "name");
+        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(versionService.getByEnvironmentAndNameInCache(any(), any(), anyString()))
+                .thenReturn(new ApiVersionVo());
+        result = apiVersionController.getVersion("token", Long.valueOf(1), "name");
+        Assert.assertEquals(0, result.getStatus());
+    }
+
+    @Test
+    public void testGetAllVersion() throws Exception {
+        R<List<ApiVersionVo>> result = apiVersionController.getAllVersion("", Long.valueOf(1));
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        result = apiVersionController.getAllVersion("token", Long.valueOf(-1));
+        Assert.assertEquals(ENVIRONMENT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
+        result = apiVersionController.getAllVersion("token", Long.valueOf(1));
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(new ApiToken());
+        result = apiVersionController.getAllVersion("token", Long.valueOf(1));
+        Assert.assertEquals(0, result.getStatus());
+
+        ApiToken apiToken = new ApiToken();
+        apiToken.setProjectId(1L);
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(apiToken);
+        when(versionService.getAllByEnvironmentIdInCache(anyLong(), anyLong()))
+                .thenReturn(Arrays.asList(new ApiVersionVo()));
+        result = apiVersionController.getAllVersion("token", Long.valueOf(1));
+        Assert.assertEquals(0, result.getStatus());
+    }
+
+    @Test
+    public void testGetGrayVersion() throws Exception {
+        R<ApiVersionVo> result = apiVersionController.getGrayVersion("", Long.valueOf(1), "", "", "", Boolean.valueOf(false),"name");
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        result = apiVersionController.getGrayVersion("token", Long.valueOf(-1), "", "", "", Boolean.valueOf(false),"name");
+        Assert.assertEquals(ENVIRONMENT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        result = apiVersionController.getGrayVersion("token", Long.valueOf(1), "", "", "", Boolean.valueOf(false),"");
+        Assert.assertEquals(VERSION_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        result = apiVersionController.getGrayVersion("token", Long.valueOf(1), "", "", "", Boolean.valueOf(false),"");
+        Assert.assertEquals(VERSION_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
+        result = apiVersionController.getGrayVersion("token", Long.valueOf(1), "", "", "", Boolean.valueOf(false),"name");
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(new ApiToken());
+        when(versionService.selectByProjectIdAndEnvironmentIdAndName(anyLong(), anyLong(), anyString())).thenReturn(null);
+        result = apiVersionController.getGrayVersion("token", Long.valueOf(1), "", "", "", Boolean.valueOf(false),"name");
+        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+    }
+
+    @Test
+    public void testAddGroup() {
+        R<Long> result = apiVersionController.addGroup("", null);
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        ConfigGroupReq configGroupReq = new ConfigGroupReq();
+        result = apiVersionController.addGroup("token", configGroupReq);
+        Assert.assertEquals(GROUP_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        configGroupReq.setName("aaa");
+        result = apiVersionController.addGroup("token", configGroupReq);
+        Assert.assertEquals(VERSION_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        configGroupReq.setVersionId(1L);
+        result = apiVersionController.addGroup("token", configGroupReq);
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(null);
+        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        Version version = new Version();
+        version.setId(1L);
+        version.setDeleted(Deleted.OK.getValue());
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(version);
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
+        result = apiVersionController.addGroup("token", configGroupReq);
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(version);
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(new ApiToken());
+        when(configGroupService.selectOneByExample(any())).thenReturn(null);
+        result = apiVersionController.addGroup("token", configGroupReq);
+        Assert.assertEquals(0, result.getStatus());
+    }
+
+    @Test
+    public void testAddVersion() {
+        VersionReq versionReq = new VersionReq();
+        R<Long> result = apiVersionController.addVersion("", versionReq);
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(null);
+        result = apiVersionController.addVersion("token", versionReq);
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        ApiToken apiToken = new ApiToken();
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(apiToken);
+        result = apiVersionController.addVersion("token", versionReq);
+        Assert.assertEquals(VERSION_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(apiToken);
+        versionReq.setName("n");
+        result = apiVersionController.addVersion("token", versionReq);
+        Assert.assertEquals(ENVIRONMENT_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(anyString())).thenReturn(apiToken);
+        versionReq.setName("n");
+        versionReq.setEnvironmentId(1L);
+        Environment environment = new Environment();
+        when(environmentService.selectByPrimaryKey(any())).thenReturn(null);
+        result = apiVersionController.addVersion("token", versionReq);
+        Assert.assertEquals(ENVIRONMENT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(environmentService.selectByPrimaryKey(any())).thenReturn(environment);
+        when(versionService.selectOneByExample(any())).thenReturn(null);
+        result = apiVersionController.addVersion("token", versionReq);
+        Assert.assertEquals(0, result.getStatus());
+    }
+
+    @Test
+    public void testGetAllGroup() {
+        R<List<ApiGroupVo>> result = apiVersionController.getAllGroup(null, anyLong());
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        String token = "token";
+        result = apiVersionController.getAllGroup(token, null);
+        Assert.assertEquals(VERSION_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        Long id = 1L;
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(null);
+        result = apiVersionController.getAllGroup(token, id);
+        Assert.assertEquals(0, result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(new ApiToken());
+        result = apiVersionController.getAllGroup(token, id);
+        Assert.assertEquals(0, result.getStatus());
+
+    }
+
+
+
+
 }
