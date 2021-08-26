@@ -188,7 +188,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         if (environment == null || Deleted.DELETE.getValue().equals(environment.getDeleted())) {
             throw new BizException(ENVIRONMENT_NOT_EXISTS_STATUS, ENVIRONMENT_NOT_EXISTS_MSG);
         }
-        if (!projectUserService.checkAuth(environment.getProductId(), environment.getProjectId(), loginUser)) {
+        if (!environmentUserService.checkAuth(environment.getProductId(), environment.getProjectId(), environmentId, loginUser)) {
             throw new BizException(PRIV_MIS_STATUS, PRIV_MIS_MSG);
         }
         Version version = selectOneByExample(VersionExample.newBuilder()
@@ -236,7 +236,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         if (environment == null || Deleted.DELETE.getValue().equals(environment.getDeleted())) {
             throw new BizException(ENVIRONMENT_NOT_EXISTS_STATUS, ENVIRONMENT_NOT_EXISTS_MSG);
         }
-        if (!projectUserService.checkAuth(environment.getProductId(), environment.getProjectId(), loginUser)) {
+        if (!environmentUserService.checkAuth(environment.getProductId(), environment.getProjectId(), environmentId, loginUser)) {
             throw new BizException(PRIV_MIS_STATUS, PRIV_MIS_MSG);
         }
         // 灰度版本名称不能重复

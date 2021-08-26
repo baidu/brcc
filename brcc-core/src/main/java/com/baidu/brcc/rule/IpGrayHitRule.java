@@ -1,6 +1,7 @@
 package com.baidu.brcc.rule;
 
 import org.springframework.stereotype.Component;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.Map;
 
@@ -12,11 +13,11 @@ public class IpGrayHitRule implements GrayHitRule {
         String ip = content.get("ip");
         String[] spilt = ruleContent.split(",");
         for (String item : spilt) {
-            if (ip.equals(item)) {
+            if (ip.equals(trim(item))) {
                 return true;
             }
         }
-            return false;
+        return false;
         }
     }
 

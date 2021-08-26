@@ -34,5 +34,5 @@ public class ItemReq {
 
     // 配置值
     @ApiModelProperty(value = "配置值", position = 2)
-    private String value;
+    private String val;
 }

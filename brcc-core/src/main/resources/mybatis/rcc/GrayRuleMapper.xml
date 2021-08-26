@@ -6,6 +6,7 @@
         <result column="gray_version_id" jdbcType="BIGINT" property="grayVersionId" />
         <result column="rule_id" jdbcType="BIGINT" property="ruleId" />
         <result column="rule_content" jdbcType="VARCHAR" property="ruleContent" />
+        <result column="deleted" jdbcType="TINYINT" property="deleted" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
@@ -122,7 +123,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    id, gray_version_id, rule_id, rule_content, update_time, create_time
+    id, gray_version_id, rule_id, rule_content, deleted, update_time, create_time
   </sql>
     <select id="selectByExample" parameterType="com.baidu.brcc.domain.GrayRuleExample" resultMap="BaseResultMap">
         select
@@ -172,8 +173,8 @@
         <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        insert into rcc_gray_rule (gray_version_id, rule_id, rule_content, update_time, create_time)
-        values (#{grayVersionId,jdbcType=BIGINT}, #{ruleId,jdbcType=BIGINT}, #{ruleContent,jdbcType=VARCHAR},
+        insert into rcc_gray_rule (gray_version_id, rule_id, rule_content, deleted, update_time, create_time)
+        values (#{grayVersionId,jdbcType=BIGINT}, #{ruleId,jdbcType=BIGINT}, #{ruleContent,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT},
         #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="com.baidu.brcc.domain.GrayRule">
@@ -191,6 +192,9 @@
             <if test="ruleContent != null">
                 rule_content,
             </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
             <if test="updateTime != null">
                 update_time,
             </if>
@@ -207,6 +211,9 @@
             </if>
             <if test="ruleContent != null">
                 #{ruleContent,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=TINYINT},
             </if>
             <if test="updateTime != null">
                 #{updateTime,jdbcType=TIMESTAMP},
@@ -237,6 +244,9 @@
             <if test="record.ruleContent != null">
                 rule_content = #{record.ruleContent,jdbcType=VARCHAR},
             </if>
+            <if test="record.deleted != null">
+                deleted = #{record.deleted,jdbcType=TINYINT},
+            </if>
             <if test="record.updateTime != null">
                 update_time = #{record.updateTime,jdbcType=TIMESTAMP},
             </if>
@@ -254,6 +264,7 @@
         gray_version_id = #{record.grayVersionId,jdbcType=BIGINT},
         rule_id = #{record.ruleId,jdbcType=BIGINT},
         rule_content = #{record.ruleContent,jdbcType=VARCHAR},
+        deleted = #{record.deleted,jdbcType=TINYINT},
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
         <if test="_parameter != null">
@@ -272,6 +283,9 @@
             <if test="ruleContent != null">
                 rule_content = #{ruleContent,jdbcType=VARCHAR},
             </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=TINYINT},
+            </if>
             <if test="updateTime != null">
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
@@ -286,6 +300,7 @@
     set gray_version_id = #{grayVersionId,jdbcType=BIGINT},
       rule_id = #{ruleId,jdbcType=BIGINT},
       rule_content = #{ruleContent,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=TINYINT},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
     where id = #{id,jdbcType=BIGINT}

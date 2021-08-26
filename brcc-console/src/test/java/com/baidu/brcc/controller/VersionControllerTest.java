@@ -58,8 +58,6 @@ import com.baidu.brcc.domain.vo.GrayRuleVo;
 import com.baidu.brcc.domain.vo.GrayVersionRuleVo;
 import com.baidu.brcc.service.GrayInfoService;
 import com.baidu.brcc.service.GrayRuleService;
-import com.sun.xml.internal.ws.spi.db.DatabindingException;
-import org.apache.ibatis.annotations.Delete;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

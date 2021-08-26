@@ -39,6 +39,6 @@ public class VersionVo {
     private Byte grayFlag;
 
     // 关联的主版本ID
-    private Long mianVersionId;
+    private Long mainVersionId;
 
 }

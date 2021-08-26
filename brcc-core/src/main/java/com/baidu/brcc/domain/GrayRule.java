@@ -6,6 +6,8 @@ import java.util.Date;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.print.DocFlavor;
+
 @ApiModel(description = "灰度规则")
 public class GrayRule implements Serializable {
 
@@ -38,6 +40,13 @@ public class GrayRule implements Serializable {
     private String ruleContent;
 
     /**
+     * column-name:deleted
+     * 是否删除
+     */
+    @ApiModelProperty(value = "是否删除", position = 4)
+    private Byte deleted;
+
+    /**
      * column-name:update_time
      * 更新时间
      */
@@ -67,6 +76,7 @@ public class GrayRule implements Serializable {
         this.grayVersionId = builder.grayVersionId;
         this.ruleId = builder.ruleId;
         this.ruleContent = builder.ruleContent;
+        this.deleted = builder.deleted;
         this.updateTime = builder.updateTime;
         this.createTime = builder.createTime;
 
@@ -132,6 +142,13 @@ public class GrayRule implements Serializable {
         this.ruleContent = ruleContent;
     }
 
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
+    }
     /**
      * 更新时间
      */
@@ -166,6 +183,7 @@ public class GrayRule implements Serializable {
         this.grayVersionId = other.grayVersionId;
         this.ruleId = other.ruleId;
         this.ruleContent = other.ruleContent;
+        this.deleted = other.deleted;
         this.updateTime = other.updateTime;
         this.createTime = other.createTime;
         return this;
@@ -179,6 +197,7 @@ public class GrayRule implements Serializable {
         to.setGrayVersionId(from.grayVersionId);
         to.setRuleId(from.ruleId);
         to.setRuleContent(from.ruleContent);
+        to.setDeleted(from.deleted);
         to.setUpdateTime(from.updateTime);
         to.setCreateTime(from.createTime);
         return to;
@@ -191,12 +210,13 @@ public class GrayRule implements Serializable {
             grayVersionId: '',
             ruleId: '',
             ruleContent: '',
+            deleted: '',
             updateTime: '',
             createTime: ''
         }
         */
 
-        return "{\"id\": \"\",\"grayVersionId\": \"\",\"ruleId\": \"\",\"ruleContent\": \"\",\"updateTime\": \"\",\"createTime\": \"\"}" ;
+        return "{\"id\": \"\",\"grayVersionId\": \"\",\"ruleId\": \"\",\"ruleContent\": \"\",\"deleted\": \"\",\"updateTime\": \"\",\"createTime\": \"\"}" ;
     }
 
     @Override
@@ -209,6 +229,7 @@ public class GrayRule implements Serializable {
         sb.append(", grayVersionId=").append(grayVersionId);
         sb.append(", ruleId=").append(ruleId);
         sb.append(", ruleContent=").append(ruleContent);
+        sb.append(", deleted=").append(deleted);
         sb.append(", updateTime=").append(updateTime);
         sb.append(", createTime=").append(createTime);
         sb.append("]");
@@ -236,6 +257,8 @@ public class GrayRule implements Serializable {
          * 灰度规则内容
          */
         private String ruleContent;
+
+        private Byte deleted;
 
         /**
          * 更新时间
@@ -280,6 +303,11 @@ public class GrayRule implements Serializable {
          */
         public XBuilder ruleContent(String ruleContent) {
             this.ruleContent = ruleContent;
+            return this;
+        }
+
+        public XBuilder deleted(Byte deleted) {
+            this.deleted = deleted;
             return this;
         }
 

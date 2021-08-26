@@ -181,11 +181,11 @@ apiPassword| String | body | Y | 工程api密码
 
 参数名称 | 类型 | 说明
 ---|---|---
-projectId| long | 工程ID
+projectId| Long | 工程ID
 projectName| String | 工程名称
 token| String | 访问工程的 api token
-neverExpired | boolean | 是否永不过期，true: 永不过期，false: 根据expiredTime判断是否过期
-expiredTime| long | 过期时间，时间戳形式，单位为毫秒
+neverExpired | Boolean | 是否永不过期，true: 永不过期，false: 根据expiredTime判断是否过期
+expiredTime| Long | 过期时间，时间戳形式，单位为毫秒
 
 ### 返回样例
 
@@ -237,8 +237,8 @@ curl --request GET -sL \
 
 参数名称 | 类型 | 说明
 ---|---|---
-projectId| long | 工程ID
-environmentId| long | 环境ID
+projectId| Long | 工程ID
+environmentId| Long | 环境ID
 environmentName| String | 环境名称
 
 ### 返回样例
@@ -286,22 +286,22 @@ GET
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
 token | String | query | Y | 工程的	api token
-environmentName | String | path | y | 环境名称
+environmentName | String | path | Y | 环境名称
 
 ### 请求示例
 
 ```shell
-
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/environment/dev?token=03ecc4c89105461a90b926f8fe1f0948'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-projectId | long | 工程ID
-environmentId | long | 环境ID
-environmentName | string | 环境名称
+projectId | Long | 工程ID
+environmentId | Long | 环境ID
+environmentName | String | 环境名称
 
 ### 返回样例
 
@@ -335,24 +335,25 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-environmentId | long | query | y | 环境ID
+token | String | query | Y | api token
+environmentId | Long | query | Y | 环境ID
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/version?token=03ecc61a90b926f8fe1f0948&environmentId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-projectId | long | 工程ID
-environmentId | long | 环境ID
-versionId | long | 版本ID
-versionName | string | 版本名称
-checkSum | string | 版本checkSum
+projectId | Long | 工程ID
+environmentId | Long | 环境ID
+versionId | Long | 版本ID
+versionName | String | 版本名称
+checkSum | String | 版本checkSum
 
 ### 返回样例
 
@@ -390,26 +391,27 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-environmentId | long | query | y | 环境ID
-versionName | String | path | y | 版本名称
+token | String | query | Y | api token
+environmentId | Long | query | Y | 环境ID
+versionName | String | path | Y | 版本名称
 
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/version/1.0.0?token=03eccb926f8fe1f0948&environmentId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-projectId | long | 工程ID
-environmentId | long | 环境ID
-versionId | long | 版本ID
-versionName | string | 版本名称
-checkSum | string | 版本checkSum
+projectId | Long | 工程ID
+environmentId | Long | 环境ID
+versionId | Long | 版本ID
+versionName | String | 版本名称
+checkSum | String | 版本checkSum
 
 ### 返回样例
 
@@ -445,28 +447,29 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-environmentId | Long | query | y | 环境ID
-containerId | String | query | n | 容器ID
-idc | String | query | n | 机房名称
-ip | String | query | n | ip
-versionName | String | path | y | 主版本名称
+token | String | query | Y | api token
+environmentId | Long | query | Y | 环境ID
+containerId | String | query | N | 容器ID
+idc | String | query | N | 机房名称
+ip | String | query | N | ip
+versionName | String | path | Y | 主版本名称
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/v2/version/1.0.0?token=5461a26f8fe1f0948&environmentId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-projectId | long | 工程ID
-environmentId | long | 环境ID
-versionId | long | 版本ID
-versionName | string | 版本名称
-checkSum | string | 版本checkSum
+projectId | Long | 工程ID
+environmentId | Long | 环境ID
+versionId | Long | 版本ID
+versionName | String | 版本名称
+checkSum | String | 版本checkSum
 
 ### 返回样例
 
@@ -503,21 +506,22 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | query | y | 版本ID
+token | String | query | Y | api token
+versionId | Long | query | Y | 版本ID
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/group/1.0.0?token=03ecc4c891090b926f8fe1f0948&versionId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-groupId | long | 分组ID
-groupName | string | 分组名称
+groupId | Long | 分组ID
+groupName | String | 分组名称
 
 ### 返回样例
 
@@ -556,21 +560,22 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | query | y | 环境ID
+token | String | query | Y | api token
+versionId | Long | query | Y | 版本ID
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/item?token=03ecc4c8910b926f8fe1f0948&versionId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-key | string | 配置项名称
-value | string | 配置值
+key | String | 配置项名称
+value | String | 配置值
 
 ### 返回样例
 
@@ -621,21 +626,22 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-groupId | long | query | y | 分组ID
+token | String | query | Y | api token
+groupId | Long | query | Y | 分组ID
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/groupItem?token=03ecc4c89106f8fe1f0948&groupId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-key | string | 配置项名称
-value | string | 配置值
+key | String | 配置项名称
+value | String | 配置值
 
 ### 返回样例
 
@@ -668,22 +674,23 @@ GET
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | query | y | 版本ID
-itemName | String | path | y | 配置名称
+token | String | query | Y | api token
+versionId | Long | query | Y | 版本ID
+itemName | String | path | Y | 配置名称
 
 ### 请求示例
 
 ```shell
-
+curl --request GET -sL \
+     --url 'http://ip:port/api/item/MySQL?token=03ecc4c8926f8fe1f0948&versionId=3'
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-key | string | 配置项名称
-value | string | 配置值
+key | String | 配置项名称
+value | String | 配置值
 
 ### 返回样例
 
@@ -717,22 +724,28 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | body | y | 版本ID
-keys | List\<String\> | body | n | 如果为空则获取版本下的所有配置项
+token | String | query | Y | api token
+versionId | Long | body | Y | 版本ID
+keys | List\<String\> | body | N | 如果为空则获取版本下的所有配置项
 
 ### 请求示例
 
-```shell
-
+```json
+{
+    "versionId":3,
+    "keys":[
+        "k1",
+        "k2"
+    ]
+}
 ```
 
 ### 返回参数
 
 参数名称 | 类型 | 说明
 ---|---|---
-key | string | 配置项名称
-value | string | 配置值
+key | String | 配置项名称
+value | String | 配置值
 
 ### 返回样例
 
@@ -771,9 +784,9 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-name | String | body | y | 环境名称
-memo | String | body | n | 环境简介
+token | String | query | Y | api token
+name | String | body | Y | 环境名称
+memo | String | body | N | 环境简介
 
 ### 请求示例
 
@@ -788,7 +801,7 @@ memo | String | body | n | 环境简介
 
 参数名称 | 类型 | 说明
 ---|---|---
-id | long | 环境ID
+id | Long | 环境ID
 
 ### 返回样例
 
@@ -818,10 +831,10 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-environmentId | Long | body | y | 环境ID
-name | String | body | y | 版本名称
-memo | String | body | n | 版本简介
+token | String | query | Y | api token
+environmentId | Long | body | Y | 环境ID
+name | String | body | Y | 版本名称
+memo | String | body | N | 版本简介
 
 ### 请求示例
 
@@ -837,7 +850,7 @@ memo | String | body | n | 版本简介
 
 参数名称 | 类型 | 说明
 ---|---|---
-id | long | 版本ID
+id | Long | 版本ID
 
 ### 返回样例
 
@@ -867,10 +880,10 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | body | y | 版本ID
-name | String | body | y | 分组名称
-memo | String | body | n | 分组简介
+token | String | query | Y | api token
+versionId | Long | body | Y | 版本ID
+name | String | body | Y | 分组名称
+memo | String | body | N | 分组简介
 
 ### 请求示例
 
@@ -886,7 +899,7 @@ memo | String | body | n | 分组简介
 
 参数名称 | 类型 | 说明
 ---|---|---
-id | long | 分组ID
+id | Long | 分组ID
 
 ### 返回样例
 
@@ -916,12 +929,12 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | body | y | 版本ID
-groupId | long | body | y | 分组ID
-key | String | body | y | 配置项名称
-value | String | body | y | 配置项值
-memo | String | body | n | 配置项简介
+token | String | query | Y | api token
+versionId | Long | body | Y | 版本ID
+groupId | Long | body | Y | 分组ID
+key | String | body | Y | 配置项名称
+value | String | body | Y | 配置项值
+memo | String | body | N | 配置项简介
 
 ### 请求示例
 
@@ -939,7 +952,7 @@ memo | String | body | n | 配置项简介
 
 参数名称 | 类型 | 说明
 ---|---|---
-id | long | 配置项ID
+id | Long | 配置项ID
 
 ### 返回样例
 
@@ -969,11 +982,11 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | body | y | 版本ID
-key | String | body | y | 配置项名称
-value | String | body | n | 配置项值
-memo | String | body | n | 配置项简介
+token | String | query | Y | api token
+versionId | Long | body | Y | 版本ID
+key | String | body | Y | 配置项名称
+value | String | body | N | 配置项值
+memo | String | body | N | 配置项简介
 
 ### 请求示例
 
@@ -990,7 +1003,7 @@ memo | String | body | n | 配置项简介
 
 参数名称 | 类型 | 说明
 ---|---|---
-cnt | long | 影响行数
+cnt | Long | 影响行数
 
 ### 返回样例
 
@@ -1020,9 +1033,9 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | body | y | 版本ID
-key | String | body | y | 配置项名称
+token | String | query | Y | api token
+versionId | Long | body | Y | 版本ID
+key | String | body | Y | 配置项名称
 
 ### 请求示例
 
@@ -1037,7 +1050,7 @@ key | String | body | y | 配置项名称
 
 参数名称 | 类型 | 说明
 ---|---|---
-cnt | long | 影响行数
+cnt | Long | 影响行数
 
 ### 返回样例
 
@@ -1067,13 +1080,13 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
-token | String | query | y | api token
-versionId | long | body | y | 版本ID
-groupId | long | body | y | 分组ID
-items | List\<Object\> | body | n | 配置项列表
-items[i].name | string | body | y | 配置项名称
-items[i].memo | string | body | n | 配置项简介
-items[i].val | string | body | n | 配置项值
+token | String | query | Y | api token
+versionId | Long | body | Y | 版本ID
+groupId | Long | body | Y | 分组ID
+items | List\<Object\> | body | N | 配置项列表
+items[i].name | String | body | Y | 配置项名称
+items[i].memo | String | body | N | 配置项简介
+items[i].val | String | body | N | 配置项值
 
 ### 请求示例
 
@@ -1083,8 +1096,8 @@ items[i].val | string | body | n | 配置项值
   "groupId":60,
   "items":[
     {
-      "key":"test",
-      "value":"123"
+      "name":"test",
+      "val":"123"
   }
     ]  
 }
@@ -1094,7 +1107,7 @@ items[i].val | string | body | n | 配置项值
 
 参数名称 | 类型 | 说明
 ---|---|---
-cnt | long | 影响行数
+cnt | Long | 影响行数
 
 ### 返回样例
 

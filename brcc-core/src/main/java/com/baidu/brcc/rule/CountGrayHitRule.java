@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.trim;
+
 @Component("count")
 public class CountGrayHitRule implements GrayHitRule {
 

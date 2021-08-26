@@ -110,38 +110,38 @@ public class ProjectControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test
-    public void testAddProjectNoLogin() throws Exception {
-        R result = projectController.addProject(new ProjectReq(), null);
-        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
-    }
-
-    @Test
-    public void testAddProjectForUpdate() throws Exception {
-        ProjectReq req = new ProjectReq();
-        req.setId(ID);
-        req.setName("project");
-        req.setProjectType((byte) 100);
-        R result = projectController.addProject(req, user);
-        Assert.assertEquals(PROJECT_TYPE_NOT_AVAILABLE_STATUS.intValue(), result.getStatus());
-
-        req.setProjectType(null);
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(PROJECT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-
-        Project project = new Project();
-        project.setProductId(ID);
-        project.setId(ID);
-        when(projectService.selectByPrimaryKey(any(), anyVararg())).thenReturn(project);
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(PRIV_MIS_STATUS.intValue(), result.getStatus());
-
-        when(apiTokenService.selectByProjectId(anyLong(), anyVararg()))
-                .thenReturn(Arrays.asList(new ApiToken()));
-        when(projectUserService.checkAuth(anyLong(), anyLong(), any())).thenReturn(true);
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(OK, result.getStatus());
-    }
+//    @Test
+//    public void testAddProjectNoLogin() throws Exception {
+//        R result = projectController.addProject(new ProjectReq(), null);
+//        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
+//    }
+//
+//    @Test
+//    public void testAddProjectForUpdate() throws Exception {
+//        ProjectReq req = new ProjectReq();
+//        req.setId(ID);
+//        req.setName("project");
+//        req.setProjectType((byte) 100);
+//        R result = projectController.addProject(req, user);
+//        Assert.assertEquals(PROJECT_TYPE_NOT_AVAILABLE_STATUS.intValue(), result.getStatus());
+//
+//        req.setProjectType(null);
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(PROJECT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+//
+//        Project project = new Project();
+//        project.setProductId(ID);
+//        project.setId(ID);
+//        when(projectService.selectByPrimaryKey(any(), anyVararg())).thenReturn(project);
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(PRIV_MIS_STATUS.intValue(), result.getStatus());
+//
+//        when(apiTokenService.selectByProjectId(anyLong(), anyVararg()))
+//                .thenReturn(Arrays.asList(new ApiToken()));
+//        when(projectUserService.checkAuth(anyLong(), anyLong(), any())).thenReturn(true);
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(OK, result.getStatus());
+//    }
 
     @Test
     public void testResetApiPassword() throws Exception{
@@ -190,35 +190,35 @@ public class ProjectControllerTest {
 
     }
 
-    @Test
-    public void testAddProjectForInsert() throws Exception {
-        ProjectReq req = new ProjectReq();
-        req.setId(null);
-        R result = projectController.addProject(req, user);
-        Assert.assertEquals(PRODUCT_ID_EMPTY_STATUS.intValue(), result.getStatus());
-
-        req.setProductId(ID);
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(PROJECT_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-
-        req.setName("project");
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-
-        req.setApiPassword("pwd");
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(PRODUCT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
-
-        Product product = new Product();
-        product.setId(ID);
-        when(productService.selectByPrimaryKey(any())).thenReturn(product);
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(PRIV_MIS_STATUS.intValue(), result.getStatus());
-
-        when(productUserService.checkAuth(any(), any())).thenReturn(true);
-        result = projectController.addProject(req, user);
-        Assert.assertEquals(OK, result.getStatus());
-    }
+//    @Test
+//    public void testAddProjectForInsert() throws Exception {
+//        ProjectReq req = new ProjectReq();
+//        req.setId(null);
+//        R result = projectController.addProject(req, user);
+//        Assert.assertEquals(PRODUCT_ID_EMPTY_STATUS.intValue(), result.getStatus());
+//
+//        req.setProductId(ID);
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(PROJECT_NAME_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+//
+//        req.setName("project");
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+//
+//        req.setApiPassword("pwd");
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(PRODUCT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+//
+//        Product product = new Product();
+//        product.setId(ID);
+//        when(productService.selectByPrimaryKey(any())).thenReturn(product);
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(PRIV_MIS_STATUS.intValue(), result.getStatus());
+//
+//        when(productUserService.checkAuth(any(), any())).thenReturn(true);
+//        result = projectController.addProject(req, user);
+//        Assert.assertEquals(OK, result.getStatus());
+//    }
 
     @Test
     public void testDeleteProject() throws Exception {

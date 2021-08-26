@@ -222,15 +222,15 @@ public class VersionController {
             if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
                 return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
             }
-            if (grayVersionId != null && grayVersionId >0) {
+            if (grayVersionId != null && grayVersionId > 0) {
                 // 更新
                 Version grayVersion = versionService.selectByPrimaryKey(grayVersionId);
-                if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted()) || grayVersion.getMainVersionId() <=0 ) {
+                if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted()) || grayVersion.getMainVersionId() <= 0) {
                     return R.error(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
                 }
                 versionService.updateVersion(grayVersion, name, memo, user);
                 cacheEvictEnvironmentId = version.getEnvironmentId();
-            }else {
+            } else {
                 // 新增
                 version.setGrayFlag(GrayFlag.GRAY.getValue());
                 versionService.updateByPrimaryKey(version);
@@ -302,7 +302,7 @@ public class VersionController {
         if (grayVersion == null || Deleted.DELETE.getValue().equals(grayVersion.getDeleted())) {
             return R.error(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
         }
-        if (grayVersionReq.getGrayRuleReqs() == null) {
+        if (grayVersionReq.getGrayRuleReqs() == null || grayVersionReq.getGrayRuleReqs().isEmpty()) {
             return R.error(GRAY_RULE_NOT_SET_STATUS, GRAY_RULE_NOT_SET_MSG);
         }
         List<GrayRuleVo> grayRuleVos = new ArrayList<>();
@@ -340,12 +340,14 @@ public class VersionController {
         }
         List<GrayInfo> grayInfos = grayInfoService.selectByIds(grayInfoIds);
         List<GrayVersionRuleVo> res = new ArrayList<>();
-        for (GrayInfo grayInfo : grayInfos) {
-            GrayVersionRuleVo grayVersionRuleVo = new GrayVersionRuleVo();
-            grayVersionRuleVo.setGrayInfoId(grayInfo.getId());
-            grayVersionRuleVo.setRuleContent(grayInfo.getRuleContent());
-            grayVersionRuleVo.setRuleName(grayInfo.getRuleName());
-            res.add(grayVersionRuleVo);
+        if (grayInfos != null && !grayInfos.isEmpty()) {
+            for (GrayInfo grayInfo : grayInfos) {
+                GrayVersionRuleVo grayVersionRuleVo = new GrayVersionRuleVo();
+                grayVersionRuleVo.setGrayInfoId(grayInfo.getId());
+                grayVersionRuleVo.setRuleContent(grayInfo.getRuleContent());
+                grayVersionRuleVo.setRuleName(grayInfo.getRuleName());
+                res.add(grayVersionRuleVo);
+            }
         }
         return R.ok(res);
     }
@@ -435,7 +437,7 @@ public class VersionController {
                     versionVo.setEnvironmentId(item.getEnvironmentId());
                     if (item.getMainVersionId() > 0) {
                         versionVo.setGrayFlag(GrayFlag.GRAY.getValue());
-                        versionVo.setMianVersionId(item.getMainVersionId());
+                        versionVo.setMainVersionId(item.getMainVersionId());
                     } else {
                         versionVo.setGrayFlag(GrayFlag.NOT.getValue());
                     }

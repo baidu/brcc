@@ -69,6 +69,7 @@ public class GrayRuleServiceImpl extends GenericServiceImpl<GrayRule, Long, Gray
                 .createCriteria()
                 .andGrayVersionIdEqualTo(grayVersionId)
                 .andRuleIdEqualTo(grayRuleReq.getGrayInfoId())
+                .andDeletedEqualTo(Deleted.OK.getValue())
                 .toExample()
         );
         if (grayRule == null) {
@@ -77,16 +78,23 @@ public class GrayRuleServiceImpl extends GenericServiceImpl<GrayRule, Long, Gray
                     .grayVersionId(grayVersionId)
                     .ruleId(grayRuleReq.getGrayInfoId())
                     .ruleContent(grayRuleReq.getRuleContent())
+                    .deleted(Deleted.OK.getValue())
                     .updateTime(now)
                     .createTime(now)
                     .build();
             insert(insert);
             id = insert.getId();
         } else {
+            if (grayRuleReq.getRuleContent().equals("")) {
+                grayRule.setDeleted(Deleted.DELETE.getValue());
+                grayRule.setUpdateTime(now);
+                updateByPrimaryKeySelective(grayRule);
+            }else{
             grayRule.setRuleContent(grayRuleReq.getRuleContent());
             grayRule.setUpdateTime(now);
             updateByPrimaryKeySelective(grayRule);
             id = grayRule.getId();
+        }
         }
         return id;
     }
@@ -104,6 +112,7 @@ public class GrayRuleServiceImpl extends GenericServiceImpl<GrayRule, Long, Gray
                         .build()
                         .createCriteria()
                         .andGrayVersionIdEqualTo(grayVersionId)
+                        .andDeletedEqualTo(Deleted.OK.getValue())
                         .toExample()
         );
         if (grayRules == null) {

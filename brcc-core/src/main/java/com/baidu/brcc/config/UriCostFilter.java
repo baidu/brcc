@@ -106,7 +106,7 @@ public class UriCostFilter implements Filter {
     }
 
     private void collectionHeaderInfo(String uri, HttpServletRequest httpServletRequest) {
-        if (StringUtils.startsWith(uri, "/api/version/") || StringUtils.equals(uri, "/api/item")) {
+        if (StringUtils.startsWith(uri, "/v2/api/version/") || StringUtils.equals(uri, "/api/item")) {
             InstanceInfoEventDto event = new InstanceInfoEventDto();
             // 心跳接口 || 拉取配置接口
             String versionId = httpServletRequest.getHeader(HEADER_VERSION_ID);
@@ -129,7 +129,7 @@ public class UriCostFilter implements Filter {
             event.setNetCost(netCost);
             String versionName = "";
             String envId = "";
-            if (StringUtils.startsWith(uri, "/api/version/")) {
+            if (StringUtils.startsWith(uri, "/v2/api/version/")) {
                 if (StringUtils.isBlank(versionId)) {
                     versionName = uri.substring(13);
                     event.setVersionName(versionName);

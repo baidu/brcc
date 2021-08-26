@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.trim;
+
 @Component("idc")
 public class IdcGrayHitRule implements GrayHitRule {
     @Override
@@ -12,7 +14,7 @@ public class IdcGrayHitRule implements GrayHitRule {
         String idc = content.get("idc");
         String[] spilt = ruleContent.split(",");
         for (String item : spilt) {
-            if (idc.equals(item)) {
+            if (idc.equals(trim(item))) {
                 return true;
             }
         }

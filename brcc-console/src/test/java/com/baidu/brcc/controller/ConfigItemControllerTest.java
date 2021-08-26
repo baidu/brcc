@@ -212,7 +212,7 @@ public class ConfigItemControllerTest {
 
         ItemReq itemReq = new ItemReq();
         itemReq.setName("key");
-        itemReq.setValue("value");
+        itemReq.setVal("value");
         BatchConfigItemReq req = new BatchConfigItemReq();
         req.setGroupId(ID);
         req.setItems(Arrays.asList(itemReq));

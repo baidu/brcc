@@ -153,7 +153,7 @@ public class ApiVersionController {
         return R.ok(versionVo);
     }
 
-    @GetMapping("/v2/version/{versionName}")
+    @GetMapping("v2/version/{versionName}")
     public R<ApiVersionVo> getGrayVersion(
             @RequestParam(name = "token") String token,
             @RequestParam(name = "environmentId") Long environmentId,
@@ -201,21 +201,23 @@ public class ApiVersionController {
             Long grayVersionId = grayVersion.getId();
             // 获取灰度规则
             List<GrayRule> grayRules = grayRuleService.selectByGrayVersionId(grayVersionId);
-            List<Long> ids = new ArrayList<>();
-            for (GrayRule grayRule : grayRules) {
-                ids.add(grayRule.getRuleId());
-            }
-            // 获取灰度规则内容
-            List<GrayInfo> grayInfos = grayInfoService.selectByIds(ids);
-            if (grayExcutor.hit(grayInfos, grayVersionId, contentMap)) {
-                // 若命中，则返回灰度版本
-                versionVo.setVersionName(grayVersion.getName());
-                versionVo.setCheckSum(grayVersion.getCheckSum());
-                versionVo.setEnvironmentId(grayVersion.getEnvironmentId());
-                versionVo.setProjectId(grayVersion.getProjectId());
-                versionVo.setVersionId(grayVersion.getId());
-                // 命中后修改实例的灰度信息
-                brccInstanceService.updateInstance(ip, idc, containerId, grayVersionId);
+            if (grayRules != null && !grayRules.isEmpty()) {
+                List<Long> ids = new ArrayList<>();
+                for (GrayRule grayRule : grayRules) {
+                    ids.add(grayRule.getRuleId());
+                }
+                // 获取灰度规则内容
+                List<GrayInfo> grayInfos = grayInfoService.selectByIds(ids);
+                if (grayExcutor.hit(grayInfos, grayVersionId, contentMap)) {
+                    // 若命中，则返回灰度版本
+                    versionVo.setVersionName(grayVersion.getName());
+                    versionVo.setCheckSum(grayVersion.getCheckSum());
+                    versionVo.setEnvironmentId(grayVersion.getEnvironmentId());
+                    versionVo.setProjectId(grayVersion.getProjectId());
+                    versionVo.setVersionId(grayVersion.getId());
+                    // 命中后修改实例的灰度信息
+                    brccInstanceService.updateInstance(ip, idc, containerId, grayVersionId);
+                }
             }
         }
         return R.ok(versionVo);

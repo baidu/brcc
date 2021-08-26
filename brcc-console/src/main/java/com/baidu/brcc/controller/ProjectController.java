@@ -163,13 +163,10 @@ public class ProjectController {
      */
     @SaveLog(scene = "0009",
             paramsIdxes = {0},
-            params = {"req"},
-            masks = @MaskLog(paramsIdx = 0,
-                    fields = "apiPassword"
-            )
+            params = {"req"}
     )
     @PostMapping("save")
-    public R addProject(@RequestBody ProjectReq req, @LoginUser User user) {
+    public R addProject(@RequestBody ProjectReq req, @RequestParam(defaultValue = "0") String apiPassword, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
@@ -247,7 +244,6 @@ public class ProjectController {
             if (isBlank(name)) {
                 return R.error(PROJECT_NAME_NOT_EXISTS_STATUS, PROJECT_NAME_NOT_EXISTS_MSG);
             }
-            String apiPassword = req.getApiPassword();
             if (isBlank(apiPassword)) {
                 return R.error(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS, PROJECT_API_PASSWORD_NOT_EXISTS_MSG);
             }
