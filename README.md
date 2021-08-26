@@ -6,6 +6,53 @@
 [![brcc sdk starter](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter)
 
 ----------------------------------------
+# Description
+Better Remote Config Center(BRCC) is a distributed config center, which is used to uniformly manage the configuration information of application services, avoid the spread of  resources in various projects, and simplify the maintenance cost of resources. As a lightweight solution, BRCC is simple to deploy, supports multi-environment, multi-version, multi-role resource management, and can seamlessly switch and take real-time configuration information without changing the source code.
+BRCC consists of three parts: console, server and SDK.
+
+(1) **Console**: Based on Spring Boot 2.0. Support six dimensions of product, project, environment, version, group and configuration. Support Fine-grained access control, operation log and configuration in key-value format. Support multi-environment, multi-version and multi-role. Support plug-in extensions to easily integrate any company/organization account management system.<br/>
+(2) **Server**: Based on Spring Boot 2.0. Support configuration distribution and hot update.<br/>
+(3) **SDK**: Support JAVA and Go. Support spring annotation, configuration change monitoring and updating. You can use it with spring boot starter.<br/>
+
+## Feature
+### 1. Management of the configuration in different environments and products
+- Manage the configuration of different environments, products, and projects on the console
+- Complete the configuration of new application efficiently by copying the version
+### 2. Real-time configuration modification(Hot update)
+- Update in 2 seconds by default
+- Push security
+### 3. Authority management, role isolation
+- Multi-permissions, multi-role
+- Read and write permissions
+- Encrypted interaction
+- Token mechanism
+### 4. Multi-language support
+- Support JAVA and Go
+- Support OpenAPI quick access (Http)
+### 5. Traceable
+- Trace operation log
+- Query historical configuration
+### 6. Cacheable
+- Support cache switch configuration
+### 7. Lightweight
+- Easy to deploy, rely on MySQL only
+- Focus on the control of configuration
+### 8. Convenient for query
+- key-value configuration
+- Support fuzzy matching search
+
+## Quick Start
+You can learn how to use BRCC by these guides.
+
+[Quick Start](./doc/en-quick-start.md)
+
+[Deploy Guide](./doc/en-deploy-guide.md)
+
+[Open API Guide](./doc/en-open-api.md)
+
+[Java SDK GUide](./doc/en-java-sdk-guide.md)
+
+[Go SDK Guide](./doc/en-go-sdk-guide.md)
 # 简介
 &ensp;&ensp;BRCC是一个分布式配置中心，用于统一管理应用服务的配置信息，避免各类资源散落在各个项目中，简化资源配置的维护成本。作为一种轻量级的解决方案，部署简单，同时支持多环境、多版本、多角色的资源管理，可以在不改变应用源码的情况下无缝切换和实时生效配置信息。
 
