@@ -7,18 +7,7 @@
 
 ----------------------------------------
 ## English Version
-You can learn how to use BRCC by these guides.
-
-[Quick Start](./doc/en-quick-start.md)
-
-[Deploy Guide](./doc/en-deploy-guide.md)
-
-[Open API Guide](./doc/en-open-api.md)
-
-[Java SDK GUide](./doc/en-java-sdk-guide.md)
-
-[Go SDK Guide](./doc/en-go-sdk-guide.md)
-
+[README](./doc/README_en.md)
 # 简介
 &ensp;&ensp;BRCC是一个分布式配置中心，用于统一管理应用服务的配置信息，避免各类资源散落在各个项目中，简化资源配置的维护成本。作为一种轻量级的解决方案，部署简单，同时支持多环境、多版本、多角色的资源管理，可以在不改变应用源码的情况下无缝切换和实时生效配置信息。
 
