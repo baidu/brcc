@@ -1080,6 +1080,7 @@ POST
 
 参数名称 | 类型 | 方式 | 必填 | 说明
 ---|---|---|---|---
+
 token | String | query | Y | api token
 versionId | Long | body | Y | 版本ID
 groupId | Long | body | Y | 分组ID
