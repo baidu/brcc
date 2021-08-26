@@ -20,11 +20,11 @@ package com.baidu.brcc.service;
 
 import java.util.List;
 
+import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.service.base.GenericService;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.Version;
-import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.vo.ApiVersionVo;
 import com.baidu.brcc.domain.vo.VersionNodeVo;
 
@@ -33,6 +33,10 @@ public interface VersionService extends GenericService<Version, Long, VersionExa
     int updateVersion(Version version, String name, String memo, User loginUser);
 
     Long saveVersion(Long environmentId, String name, String memo, User loginUser);
+
+    Long saveGrayVersion(Long mainVersionId, Long environmentId, String name, String memo, User loginUser);
+
+    Version selectByMainVersionId(Long mainVersionId);
 
     Integer deleteCascadeByVersionId(Long versionId);
 

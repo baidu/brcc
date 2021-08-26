@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baidu.brcc.dao.GrayRuleMapper">
+    <resultMap id="BaseResultMap" type="com.baidu.brcc.domain.GrayRule">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="gray_version_id" jdbcType="BIGINT" property="grayVersionId" />
+        <result column="rule_id" jdbcType="BIGINT" property="ruleId" />
+        <result column="rule_content" jdbcType="VARCHAR" property="ruleContent" />
+        <result column="deleted" jdbcType="TINYINT" property="deleted" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.type == 0">
+                                    <choose>
+                                        <when test="criterion.noValue">
+                                            AND ${criterion.condition}
+                                        </when>
+                                        <when test="criterion.singleValue">
+                                            AND ${criterion.condition} #{criterion.value}
+                                        </when>
+                                        <when test="criterion.betweenValue">
+                                            AND ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                        </when>
+                                        <when test="criterion.listValue">
+                                            AND ${criterion.condition}
+                                            <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                                #{listItem}
+                                            </foreach>
+                                        </when>
+                                    </choose>
+                                </when>
+                                <when test="criterion.type == 1">
+                                    <trim prefix="(" prefixOverrides="OR" suffix=")">
+                                        <foreach collection="criterion.inlineOrCriteria" item="criterion">
+                                            <choose>
+                                                <when test="criterion.noValue">
+                                                    OR ${criterion.condition}
+                                                </when>
+                                                <when test="criterion.singleValue">
+                                                    OR ${criterion.condition} #{criterion.value}
+                                                </when>
+                                                <when test="criterion.betweenValue">
+                                                    OR ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                                </when>
+                                                <when test="criterion.listValue">
+                                                    OR ${criterion.condition}
+                                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                                        #{listItem}
+                                                    </foreach>
+                                                </when>
+                                            </choose>
+                                        </foreach>
+                                    </trim>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.type == 0">
+                                    <choose>
+                                        <when test="criterion.noValue">
+                                            AND ${criterion.condition}
+                                        </when>
+                                        <when test="criterion.singleValue">
+                                            AND ${criterion.condition} #{criterion.value}
+                                        </when>
+                                        <when test="criterion.betweenValue">
+                                            AND ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                        </when>
+                                        <when test="criterion.listValue">
+                                            AND ${criterion.condition}
+                                            <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                                #{listItem}
+                                            </foreach>
+                                        </when>
+                                    </choose>
+                                </when>
+                                <when test="criterion.type == 1">
+                                    <trim prefix="(" prefixOverrides="OR" suffix=")">
+                                        <foreach collection="criterion.inlineOrCriteria" item="criterion">
+                                            <choose>
+                                                <when test="criterion.noValue">
+                                                    OR ${criterion.condition}
+                                                </when>
+                                                <when test="criterion.singleValue">
+                                                    OR ${criterion.condition} #{criterion.value}
+                                                </when>
+                                                <when test="criterion.betweenValue">
+                                                    OR ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                                </when>
+                                                <when test="criterion.listValue">
+                                                    OR ${criterion.condition}
+                                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                                        #{listItem}
+                                                    </foreach>
+                                                </when>
+                                            </choose>
+                                        </foreach>
+                                    </trim>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, gray_version_id, rule_id, rule_content, deleted, update_time, create_time
+  </sql>
+    <select id="selectByExample" parameterType="com.baidu.brcc.domain.GrayRuleExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <if test="columns!=null and columns.size() &gt; 0">
+            <foreach collection="columns" item="listItem" separator=",">
+                ${listItem}
+            </foreach>
+        </if>
+        <if test="columns==null or columns.size() &lt;= 0">
+            <include refid="Base_Column_List" />
+        </if>
+        from rcc_gray_rule
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <if test="limit != null and limit > 0">
+            limit
+            <if test="start != null and start > 0">
+                #{start},
+            </if>
+            #{limit}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from rcc_gray_rule
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from rcc_gray_rule
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.baidu.brcc.domain.GrayRuleExample">
+        delete from rcc_gray_rule
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.baidu.brcc.domain.GrayRule">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into rcc_gray_rule (gray_version_id, rule_id, rule_content, deleted, update_time, create_time)
+        values (#{grayVersionId,jdbcType=BIGINT}, #{ruleId,jdbcType=BIGINT}, #{ruleContent,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT},
+        #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.baidu.brcc.domain.GrayRule">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into rcc_gray_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="grayVersionId != null">
+                gray_version_id,
+            </if>
+            <if test="ruleId != null">
+                rule_id,
+            </if>
+            <if test="ruleContent != null">
+                rule_content,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="grayVersionId != null">
+                #{grayVersionId,jdbcType=BIGINT},
+            </if>
+            <if test="ruleId != null">
+                #{ruleId,jdbcType=BIGINT},
+            </if>
+            <if test="ruleContent != null">
+                #{ruleContent,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.baidu.brcc.domain.GrayRuleExample" resultType="java.lang.Long">
+        select count(*) from rcc_gray_rule
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update rcc_gray_rule
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.grayVersionId != null">
+                gray_version_id = #{record.grayVersionId,jdbcType=BIGINT},
+            </if>
+            <if test="record.ruleId != null">
+                rule_id = #{record.ruleId,jdbcType=BIGINT},
+            </if>
+            <if test="record.ruleContent != null">
+                rule_content = #{record.ruleContent,jdbcType=VARCHAR},
+            </if>
+            <if test="record.deleted != null">
+                deleted = #{record.deleted,jdbcType=TINYINT},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update rcc_gray_rule
+        set id = #{record.id,jdbcType=BIGINT},
+        gray_version_id = #{record.grayVersionId,jdbcType=BIGINT},
+        rule_id = #{record.ruleId,jdbcType=BIGINT},
+        rule_content = #{record.ruleContent,jdbcType=VARCHAR},
+        deleted = #{record.deleted,jdbcType=TINYINT},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.baidu.brcc.domain.GrayRule">
+        update rcc_gray_rule
+        <set>
+            <if test="grayVersionId != null">
+                gray_version_id = #{grayVersionId,jdbcType=BIGINT},
+            </if>
+            <if test="ruleId != null">
+                rule_id = #{ruleId,jdbcType=BIGINT},
+            </if>
+            <if test="ruleContent != null">
+                rule_content = #{ruleContent,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.baidu.brcc.domain.GrayRule">
+    update rcc_gray_rule
+    set gray_version_id = #{grayVersionId,jdbcType=BIGINT},
+      rule_id = #{ruleId,jdbcType=BIGINT},
+      rule_content = #{ruleContent,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=TINYINT},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

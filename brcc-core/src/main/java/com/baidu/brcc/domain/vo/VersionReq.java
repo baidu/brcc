@@ -23,7 +23,7 @@ import lombok.Data;
 @Data
 public class VersionReq {
 
-    // 版本ID
+    // 主版本ID
     private Long id;
 
     // 版本名称
@@ -34,5 +34,8 @@ public class VersionReq {
 
     // 环境ID
     private Long environmentId;
+
+    // 灰度版本ID
+    private Long grayVersionId;
 
 }

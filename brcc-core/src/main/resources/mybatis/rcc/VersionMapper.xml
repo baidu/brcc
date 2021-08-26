@@ -14,6 +14,8 @@
     <result column="deleted" jdbcType="TINYINT" property="deleted" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="gray_flag" jdbcType="TINYINT" property="grayFlag" />
+    <result column="main_version_id" jdbcType="BIGINT" property="mainVersionId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -129,7 +131,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, name, product_id, memo, project_id, environment_id, check_sum, check_sum_date,
-    check_sum_enable, deleted, update_time, create_time
+    check_sum_enable, deleted, update_time, create_time, gray_flag, main_version_id
   </sql>
   <select id="selectByExample" parameterType="com.baidu.brcc.domain.VersionExample" resultMap="BaseResultMap">
     select
@@ -182,11 +184,11 @@
     insert into rcc_version (name, product_id, memo,
       project_id, environment_id, check_sum,
       check_sum_date, check_sum_enable, deleted,
-      update_time, create_time)
+      update_time, create_time, gray_flag, main_version_id)
     values (#{name,jdbcType=VARCHAR}, #{productId,jdbcType=BIGINT}, #{memo,jdbcType=VARCHAR},
       #{projectId,jdbcType=BIGINT}, #{environmentId,jdbcType=BIGINT}, #{checkSum,jdbcType=VARCHAR},
       #{checkSumDate,jdbcType=TIMESTAMP}, #{checkSumEnable,jdbcType=TINYINT}, #{deleted,jdbcType=TINYINT},
-      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{grayFlag,jdbcType=TINYINT}, #{mainVersionId,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="com.baidu.brcc.domain.Version">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -227,6 +229,12 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="grayFlag != null">
+        gray_flag,
+      </if>
+      <if test="mainVersionId != null">
+        main_version_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="name != null">
@@ -261,6 +269,12 @@
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="grayFlag != null">
+        #{grayFlag,jdbcType=TINYINT},
+      </if>
+      <if test="mainVersionId != null">
+        #{mainVersionId,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -309,6 +323,12 @@
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.grayFlag != null">
+        gray_flag = #{grayFlag,jdbcType=TINYINT},
+      </if>
+      <if test="record.mainVersionId != null">
+        main_version_id = #{mainVersionId,jdbcType=BIGINT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -327,7 +347,9 @@
       check_sum_enable = #{record.checkSumEnable,jdbcType=TINYINT},
       deleted = #{record.deleted,jdbcType=TINYINT},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      gray_flag = #{record.grayFlag,jdbcType=TINYINT},
+      main_version_id = #{record.mainVersionId,jdbcType=BIGINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -368,6 +390,12 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="grayFlag != null">
+        gray_flag = #{grayFlag,jdbcType=TINYINT},
+      </if>
+      <if test="mainVersionId != null">
+        main_version_id = #{mainVersionId,jdbcType=BIGINT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -383,7 +411,9 @@
       check_sum_enable = #{checkSumEnable,jdbcType=TINYINT},
       deleted = #{deleted,jdbcType=TINYINT},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      gray_flag = #{grayFlag,jdbcType=TINYINT},
+      main_version_id = #{mainVersionId,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

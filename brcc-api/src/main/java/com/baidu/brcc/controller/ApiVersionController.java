@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,20 +18,14 @@
  */
 package com.baidu.brcc.controller;
 
-import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_EXISTS_MSG;
-import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_STATUS;
-import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_MSG;
-import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NAME_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NAME_NOT_EXISTS_STATUS;
-import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
-import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_MSG;
@@ -49,29 +43,35 @@ import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.baidu.brcc.annotation.SaveLog;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigGroupExample;
 import com.baidu.brcc.domain.Environment;
-import com.baidu.brcc.domain.EnvironmentExample;
-import com.baidu.brcc.domain.User;
+import com.baidu.brcc.domain.GrayInfo;
+import com.baidu.brcc.domain.GrayRule;
 import com.baidu.brcc.domain.Version;
 import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.Deleted;
+import com.baidu.brcc.domain.em.GrayFlag;
 import com.baidu.brcc.domain.exception.BizException;
 import com.baidu.brcc.domain.meta.MetaConfigGroup;
-import com.baidu.brcc.domain.meta.MetaEnvironment;
 import com.baidu.brcc.domain.meta.MetaVersion;
 import com.baidu.brcc.domain.vo.ApiGroupVo;
 import com.baidu.brcc.domain.vo.ConfigGroupReq;
 import com.baidu.brcc.domain.vo.VersionReq;
+import com.baidu.brcc.rule.GrayExcutor;
+import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.EnvironmentService;
+import com.baidu.brcc.service.GrayInfoService;
+import com.baidu.brcc.service.GrayRuleService;
 import com.baidu.brcc.utils.time.DateTimeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -79,6 +79,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.brcc.domain.ApiToken;
@@ -91,6 +92,9 @@ import com.baidu.brcc.service.VersionService;
 @RestController
 @RequestMapping("api")
 public class ApiVersionController {
+
+    @Autowired
+    private GrayExcutor grayExcutor;
 
     @Autowired
     ApiTokenCacheService apiTokenCacheService;
@@ -106,6 +110,15 @@ public class ApiVersionController {
 
     @Autowired
     private EnvironmentService environmentService;
+
+    @Autowired
+    private GrayRuleService grayRuleService;
+
+    @Autowired
+    private GrayInfoService grayInfoService;
+
+    @Autowired
+    private BrccInstanceService brccInstanceService;
 
     /**
      * @param token
@@ -141,8 +154,79 @@ public class ApiVersionController {
         return R.ok(versionVo);
     }
 
+    @GetMapping("v2/version/{versionName}")
+    public R<ApiVersionVo> getGrayVersion(
+            @RequestParam(name = "token") String token,
+            @RequestParam(name = "environmentId") Long environmentId,
+            @RequestParam(name = "containerId", required = false, defaultValue = "") String containerId,
+            @RequestParam(name = "idc", required = false, defaultValue = "") String idc,
+            @RequestParam(name = "ip", required = false, defaultValue = "") String ip,
+            @RequestParam(name = "enableGray", required = false) Boolean enableGray,
+            @PathVariable("versionName") String name) {
+        // 1、从数据库里根据grayversionid拿到rule 列表
+        // 2、根据rule对象获得 spring的GrayHitRule列表
+        if (isBlank(token)) {
+            return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
+        }
+        if (environmentId == null || environmentId <= 0) {
+            return R.error(ENVIRONMENT_ID_NOT_EXISTS_STATUS, ENVIRONMENT_ID_NOT_EXISTS_MSG);
+        }
+        if (isBlank(name)) {
+            return R.error(VERSION_NAME_NOT_EXISTS_STATUS, VERSION_NAME_NOT_EXISTS_MSG);
+        }
+        ApiToken apiToken = apiTokenCacheService.getApiToken(token);
+        if (apiToken == null) {
+            return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
+        }
+        Version version = versionService.selectByProjectIdAndEnvironmentIdAndName(apiToken.getProjectId(), environmentId
+                , name);
+        if (version == null || version.getDeleted().equals(Deleted.DELETE.getValue())) {
+            return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        Map<String, String> contentMap = new HashMap<>();
+        contentMap.put("count", "");
+        contentMap.put("ip", ip);
+        contentMap.put("idc", idc);
+        contentMap.put("containerId", containerId);
+        ApiVersionVo versionVo = new ApiVersionVo();
+        versionVo.setVersionName(version.getName());
+        versionVo.setCheckSum(version.getCheckSum());
+        versionVo.setEnvironmentId(version.getEnvironmentId());
+        versionVo.setProjectId(version.getProjectId());
+        versionVo.setVersionId(version.getId());
+        // 判断是否灰度
+        if (enableGray != null && enableGray && version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
+            // 获取灰度版本
+            Long mainVersionId = version.getId();
+            Version grayVersion = versionService.selectByMainVersionId(mainVersionId);
+            Long grayVersionId = grayVersion.getId();
+            // 获取灰度规则
+            List<GrayRule> grayRules = grayRuleService.selectByGrayVersionId(grayVersionId);
+            if (grayRules != null && !grayRules.isEmpty()) {
+                List<Long> ids = new ArrayList<>();
+                for (GrayRule grayRule : grayRules) {
+                    ids.add(grayRule.getRuleId());
+                }
+                // 获取灰度规则内容
+                List<GrayInfo> grayInfos = grayInfoService.selectByIds(ids);
+                if (grayExcutor.hit(grayInfos, grayVersionId, contentMap)) {
+                    // 若命中，则返回灰度版本
+                    versionVo.setVersionName(grayVersion.getName());
+                    versionVo.setCheckSum(grayVersion.getCheckSum());
+                    versionVo.setEnvironmentId(grayVersion.getEnvironmentId());
+                    versionVo.setProjectId(grayVersion.getProjectId());
+                    versionVo.setVersionId(grayVersion.getId());
+                    // 命中后修改实例的灰度信息
+                    brccInstanceService.updateInstance(ip, idc, containerId, grayVersionId);
+                }
+            }
+        }
+        return R.ok(versionVo);
+    }
+
     /**
      * 获取环境下所有版本
+     *
      * @param token         api token
      * @param environmentId 环境ID
      * @return
@@ -169,6 +253,7 @@ public class ApiVersionController {
 
     /**
      * list all groups by versionId
+     *
      * @param token
      * @param versionId
      * @return
@@ -191,7 +276,7 @@ public class ApiVersionController {
         // get all groups by versionId
         List<ConfigGroup> configGroupList = configGroupService.listAllGroupByVersionId(apiToken.getProjectId(), versionId);
         List<ApiGroupVo> apiGroupVos = new ArrayList<>();
-        for (ConfigGroup item: configGroupList) {
+        for (ConfigGroup item : configGroupList) {
             ApiGroupVo vo = new ApiGroupVo();
             vo.setGroupId(item.getId());
             vo.setGroupName(item.getName());
@@ -205,11 +290,12 @@ public class ApiVersionController {
 
     /**
      * add new group by versionId
+     *
      * @param token
      * @param configGroupReq
      * @return
      */
-    @SaveLog(scene = "增加分组",
+    @SaveLog(scene = "0005",
             paramsIdxes = {1},
             params = {"configGroupReq"})
     @PostMapping("groupAdd")
@@ -268,11 +354,12 @@ public class ApiVersionController {
 
     /**
      * add new version by environmentId
+     *
      * @param token
      * @param
      * @return
      */
-    @SaveLog(scene = "增加版本",
+    @SaveLog(scene = "0015",
             paramsIdxes = {1},
             params = {"versionReq"})
     @PostMapping("versionAdd")

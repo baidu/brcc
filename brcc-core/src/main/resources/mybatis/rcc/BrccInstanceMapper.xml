@@ -17,6 +17,8 @@
     <result column="net_cost" jdbcType="INTEGER" property="netCost" />
     <result column="heartbeat_time" jdbcType="TIMESTAMP" property="heartbeatTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="gray_flag" jdbcType="TINYINT" property="grayFlag" />
+    <result column="gray_version_id" jdbcType="BIGINT" property="grayVersionId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -133,7 +135,7 @@
   <sql id="Base_Column_List">
     id, idc, container_id, app_name, ip, client_version, enable_update_callback, last_checksum, 
     last_checksum_time, current_checksum, current_checksum_time, version_id, net_cost, 
-    heartbeat_time, create_time
+    heartbeat_time, create_time, gray_flag, gray_version_id
   </sql>
   <select id="selectByExample" parameterType="com.baidu.brcc.domain.BrccInstanceExample" resultMap="BaseResultMap">
     select
@@ -187,12 +189,12 @@
       ip, client_version, enable_update_callback, 
       last_checksum, last_checksum_time, current_checksum, 
       current_checksum_time, version_id, net_cost, 
-      heartbeat_time, create_time)
+      heartbeat_time, create_time, gray_flag, gray_version_id)
     values (#{idc,jdbcType=VARCHAR}, #{containerId,jdbcType=VARCHAR}, #{appName,jdbcType=VARCHAR}, 
       #{ip,jdbcType=VARCHAR}, #{clientVersion,jdbcType=VARCHAR}, #{enableUpdateCallback,jdbcType=TINYINT}, 
       #{lastChecksum,jdbcType=VARCHAR}, #{lastChecksumTime,jdbcType=TIMESTAMP}, #{currentChecksum,jdbcType=VARCHAR}, 
       #{currentChecksumTime,jdbcType=TIMESTAMP}, #{versionId,jdbcType=BIGINT}, #{netCost,jdbcType=INTEGER}, 
-      #{heartbeatTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+      #{heartbeatTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{grayFlag,jdbcType=TINYINT}, #{grayVersionId,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="com.baidu.brcc.domain.BrccInstance">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -242,6 +244,12 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="grayFlag != null">
+        gray_flag,
+      </if>
+      <if test="grayVersionId != null">
+        gray_version_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="idc != null">
@@ -285,6 +293,12 @@
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="grayFlag != null">
+        #{grayFlag,jdbcType=TINYINT},
+      </if>
+      <if test="grayVersionId != null">
+        #{grayVersionId,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -342,6 +356,12 @@
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.grayFlag != null">
+        gray_flag = #{record.grayFlag,jdbcType=TINYINT},
+      </if>
+      <if test="record.grayVersionId != null">
+        gray_version_id = #{record.grayVersionId,jdbcType=BIGINT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -363,7 +383,9 @@
       version_id = #{record.versionId,jdbcType=BIGINT},
       net_cost = #{record.netCost,jdbcType=INTEGER},
       heartbeat_time = #{record.heartbeatTime,jdbcType=TIMESTAMP},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      gray_flag = #{record.grayFlag,jdbcType=TINYINT},
+      gray_version_id = #{record.grayVersionId,jdbcType=BIGINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -413,6 +435,12 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="grayFlag != null">
+        gray_flag = #{grayFlag,jdbcType=TINYINT},
+      </if>
+      <if test="grayVersionId != null">
+        gray_version_id = #{grayVersionId,jdbcType=BIGINT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -431,7 +459,9 @@
       version_id = #{versionId,jdbcType=BIGINT},
       net_cost = #{netCost,jdbcType=INTEGER},
       heartbeat_time = #{heartbeatTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      gray_flag = #{grayFlag,jdbcType=TINYINT},
+      gray_version_id = #{grayVersionId,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

@@ -92,6 +92,11 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
     private boolean enableInterruptService = true;
 
     /**
+     * set if enable gray publish
+     */
+    private boolean enableGray = false;
+
+    /**
      * set if enable update call back
      */
     private boolean enableUpdateCallback = false;
@@ -201,6 +206,10 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
 
     public void setEnableInterruptService(boolean enableInterruptService) {
         this.enableInterruptService = enableInterruptService;
+    }
+
+    public void setEnableGray(boolean enableGray) {
+        this.enableGray = enableGray;
     }
     /**
      * set server url
@@ -404,7 +413,8 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
                     connectionTimeout,
                     readTimeout,
                     callbackInteval,
-                    enableInterruptService
+                    enableInterruptService,
+                    enableGray
             );
         }
 

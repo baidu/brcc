@@ -19,6 +19,11 @@
 package com.baidu.brcc.controller;
 
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_NOT_SET_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_CHANGE_LOG_END_TIME_EMPTY_STATUS;
@@ -32,6 +37,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_SRC_NOT_EXISTS_STATUS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyVararg;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,6 +48,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.brcc.domain.GrayInfo;
+import com.baidu.brcc.domain.GrayRule;
+import com.baidu.brcc.domain.em.Deleted;
+import com.baidu.brcc.domain.em.GrayFlag;
+import com.baidu.brcc.domain.vo.GrayAddReq;
+import com.baidu.brcc.domain.vo.GrayRuleReq;
+import com.baidu.brcc.domain.vo.GrayRuleVo;
+import com.baidu.brcc.domain.vo.GrayVersionRuleVo;
+import com.baidu.brcc.service.GrayInfoService;
+import com.baidu.brcc.service.GrayRuleService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,6 +107,10 @@ public class VersionControllerTest {
     ConfigItemService configItemService;
     @InjectMocks
     VersionController versionController;
+    @Mock
+    GrayRuleService grayRuleService;
+    @Mock
+    GrayInfoService grayInfoService;
 
     @Before
     public void setUp() {
@@ -145,6 +166,8 @@ public class VersionControllerTest {
         result = versionController.deleteVersion(ID, user);
         Assert.assertEquals(PRIV_MIS_STATUS.intValue(), result.getStatus());
 
+        version.setGrayFlag(GrayFlag.NOT.getValue());
+        when(versionService.selectByPrimaryKey(any())).thenReturn(version);
         when(projectUserService.checkAuth(any(), any(), any())).thenReturn(true);
         result = versionController.deleteVersion(ID, user);
         Assert.assertEquals(OK, result.getStatus());
@@ -265,6 +288,91 @@ public class VersionControllerTest {
 
         when(versionService.checkAuth(any(), any(), any())).thenReturn(true);
         result = versionController.copyConfigItemsByVersionId(dto, user);
+        Assert.assertEquals(OK, result.getStatus());
+    }
+
+    @Test
+    public void testSaveGrayVersion() {
+        VersionReq versionReq = new VersionReq();
+        R<Long> result = versionController.saveGrayVersion(versionReq, null);
+        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
+
+        result = versionController.saveGrayVersion(versionReq, user);
+        Assert.assertEquals(MAIN_VERSION_ID_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        versionReq.setId(1L);
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(null);
+        result = versionController.saveGrayVersion(versionReq, user);
+        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        versionReq.setGrayVersionId(1L);
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(new Version());
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(null);
+        result = versionController.saveGrayVersion(versionReq, user);
+        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        Version version = new Version();
+        version.setMainVersionId(1L);
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(new Version());
+        when(versionService.selectByPrimaryKey(anyLong())).thenReturn(version);
+        result = versionController.saveGrayVersion(versionReq, user);
+        Assert.assertEquals(0, result.getStatus());
+    }
+
+    @Test
+    public void testDeleteGrayVersion() {
+        VersionReq versionReq = new VersionReq();
+        R result = versionController.deleteGrayVersion(ID, null);
+        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
+
+        result = versionController.deleteGrayVersion(null, user);
+        Assert.assertEquals(GRAY_VERSION_ID_NOT_EXIST_STATUS.intValue(), result.getStatus());
+
+        when(versionService.selectByPrimaryKey(ID)).thenReturn(null);
+        result = versionController.deleteGrayVersion(ID, user);
+        Assert.assertEquals(VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+    }
+
+    @Test
+    public void testSaveGrayRule() {
+        GrayAddReq grayAddReq = new GrayAddReq();
+        R<List<GrayRuleVo>> result = versionController.saveGrayRule(grayAddReq, null);
+        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
+
+        result = versionController.saveGrayRule(grayAddReq, user);
+        Assert.assertEquals(GRAY_VERSION_ID_NOT_EXIST_STATUS.intValue(), result.getStatus());
+
+        grayAddReq.setGrayVersionId(ID);
+        when(versionService.selectByPrimaryKey(ID)).thenReturn(new Version());
+        result = versionController.saveGrayRule(grayAddReq, user);
+        Assert.assertEquals(GRAY_RULE_NOT_SET_STATUS.intValue(), result.getStatus());
+
+        List<GrayRuleReq> grayRuleReqs = new ArrayList<>();
+        grayAddReq.setGrayRuleReqs(grayRuleReqs);
+        when(versionService.selectByPrimaryKey(ID)).thenReturn(new Version());
+        result = versionController.saveGrayRule(grayAddReq, user);
+        Assert.assertEquals(OK, result.getStatus());
+    }
+
+    @Test
+    public void testListGrayRules() {
+        R<List<GrayVersionRuleVo>> result = versionController.listGrayRules(ID, null);
+        Assert.assertEquals(NON_LOGIN_STATUS, result.getStatus());
+
+        result = versionController.listGrayRules(null, user);
+        Assert.assertEquals(GRAY_VERSION_ID_NOT_EXIST_STATUS.intValue(), result.getStatus());
+
+        when(versionService.selectByPrimaryKey(ID)).thenReturn(null);
+        result = versionController.listGrayRules(ID, user);
+        Assert.assertEquals(GRAY_VERSION_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(versionService.selectByPrimaryKey(ID)).thenReturn(new Version());
+        List<GrayRule> grayRules = new ArrayList<>();
+        when(grayRuleService.selectByGrayVersionId(ID)).thenReturn(grayRules);
+        List<Long> ids = new ArrayList<>();
+        List<GrayInfo> grayInfos = new ArrayList<>();
+        when(grayInfoService.selectByIds(ids)).thenReturn(grayInfos);
+        result = versionController.listGrayRules(ID, user);
         Assert.assertEquals(OK, result.getStatus());
     }
 }

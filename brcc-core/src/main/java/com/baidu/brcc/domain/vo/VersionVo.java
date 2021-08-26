@@ -35,4 +35,10 @@ public class VersionVo {
     // 环境ID
     private Long environmentId;
 
+    // 是否灰度
+    private Byte grayFlag;
+
+    // 关联的主版本ID
+    private Long mainVersionId;
+
 }

@@ -18,13 +18,31 @@
  */
 package com.baidu.brcc.controller;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_STATUS;
+import static org.apache.commons.lang3.StringUtils.trim;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import com.baidu.brcc.domain.EnvironmentExample;
+import com.baidu.brcc.domain.em.Deleted;
+import com.baidu.brcc.domain.meta.MetaEnvironment;
+import com.baidu.brcc.domain.vo.EnvironmentReq;
+import com.baidu.brcc.service.ProjectService;
+import com.baidu.brcc.utils.time.DateTimeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +66,8 @@ public class ApiEnvironmentControllerTest {
     EnvironmentService environmentService;
     @Mock
     RccCache rccCache;
+    @Mock
+    ProjectService projectService;
     @InjectMocks
     ApiEnvironmentController apiEnvironmentController;
 
@@ -82,4 +102,52 @@ public class ApiEnvironmentControllerTest {
         R<List<ApiEnvironmentVo>> result = apiEnvironmentController.getAllEnvironment("token");
         Assert.assertEquals(0, result.getStatus());
     }
+
+    @Test
+    public void testAddEnvironment() {
+        R<Long> result = apiEnvironmentController.addEnvironment(null, null);
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        String token = "token";
+        EnvironmentReq environmentReq = new EnvironmentReq();
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(null);
+        result = apiEnvironmentController.addEnvironment(token, environmentReq);
+        Assert.assertEquals(PROJECT_API_TOKEN_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        environmentReq.setName("");
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(new ApiToken());
+        result = apiEnvironmentController.addEnvironment(token, environmentReq);
+        Assert.assertEquals(ENVIRONMENT_NAME_NOT_EMPTY_STATUS.intValue(), result.getStatus());
+
+        environmentReq.setName("name");
+        ApiToken apiToken = new ApiToken();
+        apiToken.setProjectId(1L);
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(apiToken);
+        when(projectService.selectByPrimaryKey(apiToken.getProjectId())).thenReturn(null);
+        result = apiEnvironmentController.addEnvironment(token, environmentReq);
+        Assert.assertEquals(PROJECT_NOT_EXISTS_STATUS.intValue(), result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(apiToken);
+        when(projectService.selectByPrimaryKey(apiToken.getProjectId())).thenReturn(new Project());
+        Environment environment = Environment.newBuilder().build();
+        environment.setId(1L);
+        environment.setName("na");
+        environment.setCreateTime(DateTimeUtils.now());
+        environment.setDeleted(Deleted.OK.getValue());
+        environment.setProductId(1L);
+        environment.setProjectId(2L);
+        when(environmentService.selectOneByExample(EnvironmentExample.newBuilder().build().createCriteria().toExample())).thenReturn(environment);
+        result = apiEnvironmentController.addEnvironment(token, environmentReq);
+        Assert.assertEquals(0, result.getStatus());
+
+        when(apiTokenCacheService.getApiToken(token)).thenReturn(apiToken);
+        when(projectService.selectByPrimaryKey(apiToken.getProjectId())).thenReturn(new Project());
+        when(environmentService.selectOneByExample(EnvironmentExample.newBuilder().build().createCriteria().toExample())).thenReturn(null);
+        result = apiEnvironmentController.addEnvironment(token, environmentReq);
+        Assert.assertEquals(0, result.getStatus());
+
+    }
+
+
+
 }

@@ -25,14 +25,14 @@ import lombok.Data;
 public class ItemReq {
 
     // 配置项名称
-    @ApiModelProperty(value = "配置项名称", position = 2)
+    @ApiModelProperty(value = "配置项名称", position = 0)
     private String name;
 
     // 配置项描述
-    @ApiModelProperty(value = "配置项描述", position = 3)
+    @ApiModelProperty(value = "配置项描述", position = 1)
     private String memo;
 
     // 配置值
-    @ApiModelProperty(value = "配置值", position = 4)
+    @ApiModelProperty(value = "配置值", position = 2)
     private String val;
 }

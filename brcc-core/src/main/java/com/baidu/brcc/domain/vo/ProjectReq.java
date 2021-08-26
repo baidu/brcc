@@ -32,9 +32,6 @@ public class ProjectReq {
     // 工程名称
     private String name;
 
-    // API密码
-    private String apiPassword;
-
     // 邮件接收
     private String mailReceiver;
 

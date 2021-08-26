@@ -115,7 +115,7 @@ public class EnvironmentController {
      *
      * @return
      */
-    @SaveLog(scene = "修改环境",
+    @SaveLog(scene = "0003",
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping(value = "save")
@@ -217,7 +217,7 @@ public class EnvironmentController {
      *
      * @return
      */
-    @SaveLog(scene = "删除环境",
+    @SaveLog(scene = "0004",
             paramsIdxes = {0},
             params = {"envId"})
     @PostMapping(value = "delete/{envId}")

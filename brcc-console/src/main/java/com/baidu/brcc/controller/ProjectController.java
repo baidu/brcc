@@ -161,15 +161,12 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "修改工程",
+    @SaveLog(scene = "0009",
             paramsIdxes = {0},
-            params = {"req"},
-            masks = @MaskLog(paramsIdx = 0,
-                    fields = "apiPassword"
-            )
+            params = {"req"}
     )
     @PostMapping("save")
-    public R addProject(@RequestBody ProjectReq req, @LoginUser User user) {
+    public R addProject(@RequestBody ProjectReq req, @RequestParam(defaultValue = "0") String apiPassword, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
@@ -247,7 +244,6 @@ public class ProjectController {
             if (isBlank(name)) {
                 return R.error(PROJECT_NAME_NOT_EXISTS_STATUS, PROJECT_NAME_NOT_EXISTS_MSG);
             }
-            String apiPassword = req.getApiPassword();
             if (isBlank(apiPassword)) {
                 return R.error(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS, PROJECT_API_PASSWORD_NOT_EXISTS_MSG);
             }
@@ -307,7 +303,7 @@ public class ProjectController {
      * @param projectId
      * @return
      */
-    @SaveLog(scene = "重置工程的api密码",
+    @SaveLog(scene = "0010",
             paramsIdxes = {0},
             params = {"projectId"}
             )
@@ -371,7 +367,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "删除工程",
+    @SaveLog(scene = "0011",
             paramsIdxes = {0},
             params = {"projectId"})
     @PostMapping("delete/{projectId}")
@@ -478,7 +474,7 @@ public class ProjectController {
         return R.ok(pagination, ext);
     }
 
-    @SaveLog(scene = "修改工程依赖",
+    @SaveLog(scene = "0012",
             paramsIdxes = {0, 1},
             params = {"projectId", "refProjectDto"})
     @PostMapping(value = "/{projectId}/ref")
@@ -535,7 +531,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "新增工程成员",
+    @SaveLog(scene = "0013",
             paramsIdxes = {0, 1, 2},
             params = {"productId", "projectId", "projectUserDto"})
     @PostMapping("addMember/{productId}/{projectId}")
@@ -646,7 +642,7 @@ public class ProjectController {
      *
      * @return
      */
-    @SaveLog(scene = "删除工程成员",
+    @SaveLog(scene = "0014",
             paramsIdxes = {0, 1, 2},
             params = {"productId", "projectId", "userIds"})
     @Transactional

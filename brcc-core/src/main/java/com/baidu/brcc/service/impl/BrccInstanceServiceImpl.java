@@ -21,6 +21,8 @@ package com.baidu.brcc.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.baidu.brcc.domain.em.GrayFlag;
+import com.baidu.brcc.domain.exception.BizException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ import com.baidu.brcc.domain.meta.MetaBrccInstance;
 import com.baidu.brcc.dto.InstanceInfoEventDto;
 import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.base.GenericServiceImpl;
+
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_STATUS;
 
 @Service("brccInstanceService")
 public class BrccInstanceServiceImpl extends GenericServiceImpl<BrccInstance, Long, BrccInstanceExample>
@@ -59,6 +64,56 @@ public class BrccInstanceServiceImpl extends GenericServiceImpl<BrccInstance, Lo
     @Override
     public BrccInstanceExample newIdInExample(List<Long> ids) {
         return BrccInstanceExample.newBuilder().build().createCriteria().andIdIn(ids).toExample();
+    }
+
+//    @Override
+//    public int batchUpdateGrayRule(Long versionId, Long grayVersionId, List<String> containerIds) {
+//        int result = 0;
+//        for(int i=0; i<containerIds.size(); i++) {
+//            BrccInstance brccInstanceUpdate = BrccInstance.newBuilder()
+//                    .grayFlag(GrayFlag.GRAY.getValue())
+//                    .grayVersionId(grayVersionId)
+//                    .build();
+//            BrccInstanceExample brccInstanceExample = BrccInstanceExample.newBuilder()
+//                    .build()
+//                    .createCriteria()
+//                    .andVersionIdEqualTo(versionId)
+//                    .andContainerIdEqualTo(containerIds.get(i))
+//                    .toExample();
+//            result = updateByExampleSelective(brccInstanceUpdate, brccInstanceExample);
+//        }
+//        return result;
+//    }
+
+    @Override
+    public Long countByGrayVersionId(Long grayVersionId) {
+        if (grayVersionId == null || grayVersionId <= 0) {
+            throw new BizException(GRAY_VERSION_ID_NOT_EXIST_STATUS, GRAY_VERSION_ID_NOT_EXIST_MSG);
+        }
+        BrccInstanceExample brccInstanceExample = BrccInstanceExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andGrayVersionIdEqualTo(grayVersionId)
+                .andGrayFlagEqualTo(GrayFlag.GRAY.getValue())
+                .toExample();
+        Long count = countByExample(brccInstanceExample);
+        return count;
+    }
+
+    @Override
+    public void updateInstance(String ip, String idc, String containerId, Long grayVersionId) {
+        BrccInstance brccInstanceUpdate = BrccInstance.newBuilder()
+                    .grayVersionId(grayVersionId)
+                    .grayFlag(GrayFlag.GRAY.getValue())
+                    .build();
+        BrccInstanceExample brccInstanceExample = BrccInstanceExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andIpEqualTo(ip)
+                .andIdcEqualTo(idc)
+                .andContainerIdEqualTo(containerId)
+                .toExample();
+        updateByExampleSelective(brccInstanceUpdate, brccInstanceExample);
     }
 
     @Override

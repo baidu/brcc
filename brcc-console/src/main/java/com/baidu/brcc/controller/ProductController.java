@@ -85,7 +85,7 @@ public class ProductController {
      *
      * @return
      */
-    @SaveLog(scene = "修改产品线",
+    @SaveLog(scene = "0007",
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("save")
@@ -160,7 +160,7 @@ public class ProductController {
      * @param user
      * @return
      */
-    @SaveLog(scene = "修改产品成员",
+    @SaveLog(scene = "0008",
             paramsIdxes = {0, 1},
             params = {"members", "productId"})
     @PostMapping("addMember/{productId}")

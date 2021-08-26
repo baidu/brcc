@@ -40,6 +40,12 @@ public class ApiVersionVo {
     // checkSum
     private String checkSum;
 
+    // grayFlag
+    private Byte grayFlag;
+
+    // mainVersionId
+    private Long mainVersionId;
+
     public ApiVersionVo copyFrom(Version v) {
         if (v == null) {
             return this;
@@ -49,6 +55,8 @@ public class ApiVersionVo {
         setVersionId(v.getId());
         setVersionName(v.getName());
         setCheckSum(v.getCheckSum());
+        setGrayFlag(v.getGrayFlag());
+        setMainVersionId(v.getMainVersionId());
         return this;
     }
 }

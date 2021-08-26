@@ -246,8 +246,9 @@ public class ApiConfigItemController {
      *  itemAddReqVo.groupId 分组ID
      *  itemAddReqVo.memo 配置简介
      * @return
+     * ？
      */
-    @SaveLog(scene = "增加配置",
+    @SaveLog(scene = "0000",
             paramsIdxes = {1},
             params = {"itemAddReqVo"})
     @PostMapping("itemAdd")
@@ -349,7 +350,7 @@ public class ApiConfigItemController {
      *@return
      *
      */
-    @SaveLog(scene = "删除配置",
+    @SaveLog(scene = "0002",
             paramsIdxes = {1},
             params = {"apiItemDeleteVo"})
     @PostMapping("itemDelete")
@@ -413,7 +414,7 @@ public class ApiConfigItemController {
      *   apiItemEditVo.memo 配置简介
      * @return
      */
-    @SaveLog(scene = "修改配置",
+    @SaveLog(scene = "0000",
             paramsIdxes = {1},
             params = {"apiItemEditVo"})
     @PostMapping("itemEdit")
@@ -501,7 +502,7 @@ public class ApiConfigItemController {
      *  batchEditItemVo.items 分组下的配置列表
      * @return
      */
-    @SaveLog(scene = "批量新增或修改配置",
+    @SaveLog(scene = "0001",
             paramsIdxes = {0},
             params = {"itemReq"})
     @PostMapping("batchSave")

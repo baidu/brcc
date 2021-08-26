@@ -140,7 +140,7 @@ public class ConfigItemController {
      *
      * @return
      */
-    @SaveLog(scene = "修改配置",
+    @SaveLog(scene = "0000",
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("save")
@@ -281,7 +281,7 @@ public class ConfigItemController {
      *
      * @return
      */
-    @SaveLog(scene = "批量修改配置",
+    @SaveLog(scene = "0001",
             paramsIdxes = {0},
             params = {"itemReq"})
     @PostMapping("batchSave")
@@ -325,7 +325,7 @@ public class ConfigItemController {
      *
      * @return
      */
-    @SaveLog(scene = "删除配置",
+    @SaveLog(scene = "0002",
             paramsIdxes = {0},
             params = {"itemId"})
     @PostMapping("delete/{itemId}")

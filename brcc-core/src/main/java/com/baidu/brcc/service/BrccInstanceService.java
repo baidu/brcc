@@ -23,6 +23,14 @@ import com.baidu.brcc.domain.BrccInstanceExample;
 import com.baidu.brcc.dto.InstanceInfoEventDto;
 import com.baidu.brcc.service.base.GenericService;
 
+import java.util.List;
+
 public interface BrccInstanceService extends GenericService<BrccInstance, Long, BrccInstanceExample> {
     void submitEvent(InstanceInfoEventDto event);
+
+    Long countByGrayVersionId(Long grayVersionId);
+
+    void updateInstance(String ip, String idc, String containerId, Long grayVersionId);
+
+
 }
