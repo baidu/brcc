@@ -1,16 +1,16 @@
 - [Quick Start](#quick-start)
   - [Deploy BRCC](#deploy-brcc)
-  - [Add Configuration](#add-configuration)
+  - [Create Configuration](#Create-configuration)
     - [Login](#login)
-    - [Add Product](#add-product)
-    - [Add Project](#add-project)
-    - [Add Environment](#add-environment)
-    - [Add Version](#add-version)
-    - [Add Group](#add-group)
-    - [Add Configuration](#add-configuration-1)
+    - [Create Product](#Create-product)
+    - [Create Project](#Create-project)
+    - [Create Environment](#Create-environment)
+    - [Create Version](#Create-version)
+    - [Create Group](#Create-group)
+    - [Create Configuration](#Create-configuration-1)
   - [JAVA-SDK](#java-sdk)
-    - [Add BRCC Dependency](#add-brcc-dependency)
-    - [Add BRCC Configuration](#add-brcc-configuration)
+    - [Create BRCC Dependency](#Create-brcc-dependency)
+    - [Create BRCC Configuration](#Create-brcc-configuration)
     - [Check Configuration](#check-configuration)
     - [Use Configuration](#use-configuration)
   - [Go-SDK](#go-sdk)
@@ -25,48 +25,48 @@
 ## Quick Start
 ### Deploy BRCC
 &ensp;&ensp;&ensp;&ensp;Please click <[Deploy Guide](./deploy-guide.md)> to see how to deploy BRCC server. Assume that the server URL is http://127.0.0.1:8080
-### Add Configuration
+### Create Configuration
 #### Login
 http://127.0.0.1:8080/#/login
 
-![Login](./img/en-login.png "login")
+![Login](img/login_en.png "login")
 
 - *\*Administrator account: admin password: admin*
 
-#### Add Product
+#### Create Product
 &ensp;&ensp;&ensp;&ensp;Product line entrance: Home Page[All ProductLines], [My ProductLine] in personal information menu
 
-![ProductLines](./img/en-product_entry.png)
+![ProductLines](img/product_entry_en.png)
 
-Add Product: test
+Create Product: test
 
-![Create Product](./img/en-product_create.png)
+![Create Product](img/product_create_en.png)
 Click 'test' to enter the project
-#### Add Project
+#### Create Project
 &ensp;&ensp;&ensp;&ensp;
-![Project Manage](./img/en-project-manage.png)
-Click 'Create Project' to add a new project 'example', set the API password. Click 'example' to enter the project.
-#### Add Environment
-Click 'Create Environment' to add a new environment 'dev'.
-![Environment Manage](./img/en-environment.png)
+![Project Manage](img/project-manage_en.png)
+Click 'Create Project' to Create a new project 'example', set the API password. Click 'example' to enter the project.
+#### Create Environment
+Click 'Create Environment' to Create a new environment 'dev'.
+![Environment Manage](img/environment_en.png)
 Click 'dev' to enter the environment.
-#### Add Version
+#### Create Version
 Click 'Create Version': 1.0, click "1.0" to enter the version. 
-![Version Manage](./img/en-version-list.png)
-#### Add Group
-Click 'Create Group' to add a new group 'g1', click 'g1' to enter the group.
-![Group Manage](./img/en-group-list.png)
-#### Add Configuration
-Add Configuration：
+![Version Manage](img/version-list_en.png)
+#### Create Group
+Click 'Create Group' to Create a new group 'g1', click 'g1' to enter the group.
+![Group Manage](img/group-list_en.png)
+#### Create Configuration
+Create Configuration：
 ```
 a=5
 b=34
 c=xx13
 ```
-![Configuration Manage](./img/en-config-batch.png)
+![Configuration Manage](img/config-batch_en.png)
 ### JAVA-SDK
 #### Add BRCC Dependency
-Create a springboot application and add the following dependencies to the pom file:
+Create a springboot application and Create the following dependencies to the pom file:
 ```xml
 <dependency>
     <groupId>com.baidu.mapp</groupId>
