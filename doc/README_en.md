@@ -6,7 +6,7 @@
 [![brcc sdk starter](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter)
 
 ----------------------------------------
-English | 简体中文(./README.md)
+English | 简体中文(./brcc/README.md)
 # Description
 Better Remote Config Center(BRCC) is a distributed config center, which is used to uniformly manage the configuration information of application services, avoid the spread of  resources in various projects, and simplify the maintenance cost of resources. As a lightweight solution, BRCC is simple to deploy, supports multi-environment, multi-version, multi-role resource management, and can seamlessly switch and take real-time configuration information without changing the source code.
 BRCC consists of three parts: console, server and SDK:<br/>
