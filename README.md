@@ -70,11 +70,8 @@
 [Go SDK 使用手册](./doc/go-sdk-guide.md)
 
 ## 维护者
-- [shinansheng](https://github.com/sns1988)
-- [zengqingyong](https://github.com/ghzengqy568)
 - [xiemalin](https://github.com/jhunters)
 - [caolei](https://github.com/hubeicaolei)
-- [liangchanchan](https://github.com/lena2liang)
 - [shiminyan](https://github.com/aroundpie)
 
 ## 贡献
