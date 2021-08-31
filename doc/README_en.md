@@ -51,12 +51,12 @@ BRCC consists of three parts: console, server and SDK:<br/>
 ## User Guide
 You can learn how to use BRCC by these guides.
 
-[Quick Start](./doc/en-quick-start.md)
+[Quick Start](en-quick-start.md)
 
-[Deploy Guide](./doc/en-deploy-guide.md)
+[Deploy Guide](en-deploy-guide.md)
 
-[Open API Guide](./doc/en-open-api.md)
+[Open API Guide](en-open-api.md)
 
-[Java SDK Guide](./doc/en-java-sdk-guide.md)
+[Java SDK Guide](en-java-sdk-guide.md)
 
-[Go SDK Guide](./doc/en-go-sdk-guide.md)
+[Go SDK Guide](en-go-sdk-guide.md)
