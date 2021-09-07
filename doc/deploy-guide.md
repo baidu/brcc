@@ -66,7 +66,7 @@ source doc/database/data.sql
 1. cd到项目根目录
 2. 执行：sh compile.sh
 
-注意： 观察编译有为报错
+注意： 观察编译有无报错
 ```
 
 ## 2.4 运行
