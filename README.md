@@ -73,7 +73,7 @@
 - [xiemalin](https://github.com/jhunters)
 - [caolei](https://github.com/hubeicaolei)
 - [shiminyan](https://github.com/aroundpie)
-- [zhaofakai]()
+- [zhaofakai](https://github.com/fkzhao)
 
 ## 贡献
 issues贡献： 如在使用中遇到问题，请在 https://github.com/baidu/brcc/issues 新建 issues 反馈问题。
