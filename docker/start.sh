@@ -12,12 +12,6 @@ fi
 if [ "$REDIS_PASSWORD" != "" ]; then
     JAVA_OPT="$JAVA_OPT -Dspring.redis.password=$REDIS_PASSWORD"
 fi
-if [ "$REDIS_PORT" != "" ]; then
-    JAVA_OPT="$JAVA_OPT -Dredis.port=$REDIS_PORT"
-fi
-if [ "$REDIS_PASSWORD" != "" ]; then
-    JAVA_OPT="$JAVA_OPT -Dredis.password=$REDIS_PASSWORD"
-fi
 if [ "$DB_HOST" != "" ]; then
     JAVA_OPT="$JAVA_OPT -Ddb.host=$DB_HOST"
 fi

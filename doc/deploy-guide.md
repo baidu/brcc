@@ -88,3 +88,7 @@ sh start.sh
 管理端访问入口
 http://ip:port 其中IP为服务启动的IP，Port为web服务监听端口，例如 http://localhost:8080/
 
+# 三、 容器化部署
+- [制作Docker镜像](./docker-guide.md)
+
+- [Kubernetes](./k8s-guide.md)
