@@ -6,8 +6,7 @@
 [![brcc sdk starter](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu.mapp/brcc-sdk-starter)
 
 ----------------------------------------
-## English Version
-[README](./doc/README_en.md)
+[English](./doc/README_en.md) | 简体中文
 # 简介
 &ensp;&ensp;BRCC是一个分布式配置中心，用于统一管理应用服务的配置信息，避免各类资源散落在各个项目中，简化资源配置的维护成本。作为一种轻量级的解决方案，部署简单，同时支持多环境、多版本、多角色的资源管理，可以在不改变应用源码的情况下无缝切换和实时生效配置信息。
 
@@ -71,12 +70,10 @@
 [Go SDK 使用手册](./doc/go-sdk-guide.md)
 
 ## 维护者
-- [shinansheng](https://github.com/sns1988)
-- [zengqingyong](https://github.com/ghzengqy568)
 - [xiemalin](https://github.com/jhunters)
 - [caolei](https://github.com/hubeicaolei)
-- [liangchanchan](https://github.com/lena2liang)
 - [shiminyan](https://github.com/aroundpie)
+- [zhaofakai](https://github.com/fkzhao)
 
 ## 贡献
 issues贡献： 如在使用中遇到问题，请在 https://github.com/baidu/brcc/issues 新建 issues 反馈问题。

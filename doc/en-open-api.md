@@ -143,6 +143,14 @@
     - [Request example](#request-example-17)
     - [Return parameters](#return-parameters-17)
     - [Return example](#return-example-17)
+  - [19. Push configuration changes](#19-push-configuration-changes)
+    - [Description](#description-18)
+    - [Request type](#request-type-18)
+    - [Request URL](#request-url-18)
+    - [Request parameters（query string）](#request-parametersquery-string-17)
+    - [Request example](#request-example-18)
+    - [Return parameters](#return-parameters-18)
+    - [Return example](#return-example-18)
   
 # Open API Guide
 
@@ -1101,6 +1109,50 @@ items[i].val | String | body | N | configuration value
   }
     ]  
 }
+```
+
+### Return parameters
+
+Name | Type | Description
+---|---|---
+cnt | Long | count
+
+### Return example
+
+```json
+{
+  "status":0,
+  "msg":"success",
+  "data":1
+}
+```
+
+## 19. Push configuration changes
+
+### Description
+
+Push configuration changes 
+
+### Request type
+
+POST
+
+### Request URL
+
+/api/version/pushChange
+
+### Request parameters（query string）
+
+Name | Type | Parameter form | Required | Description
+---|---|---|---|---
+token | String | query | Y | api token
+versionId | Long | query | Y | version ID
+
+### Request example
+
+```shell
+curl --request POST -sL \
+     --url 'http://ip:port/api/version/pushChange?token=03ecc4c8910b926f80948&versionId=3'
 ```
 
 ### Return parameters
