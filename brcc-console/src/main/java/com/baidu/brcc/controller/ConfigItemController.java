@@ -291,6 +291,9 @@ public class ConfigItemController {
             return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
         }
         ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
+        if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
+            return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
+        }
         if (!CollectionUtils.isEmpty(itemReq.getItems())) {
             for (ItemReq req : itemReq.getItems()) {
                 String name = req.getName();
@@ -302,9 +305,6 @@ public class ConfigItemController {
                     return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
                 }
             }
-        }
-        if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
-            return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
         }
         if (!environmentUserService.checkAuth(configGroup.getProductId(), configGroup.getProjectId(),
                 configGroup.getEnvironmentId(), user)) {

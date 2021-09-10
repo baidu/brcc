@@ -18,6 +18,10 @@
  */
 package com.baidu.brcc.service.impl;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.COPY_CONFIG_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.COPY_CONFIG_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.COPY_GROUP_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.COPY_GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NAME_NOT_EMPTY_MSG;
@@ -32,6 +36,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_RELETED_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_RELETED_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
@@ -54,8 +60,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 import com.baidu.brcc.domain.VersionExample;
+import com.baidu.brcc.domain.meta.MetaConfigGroup;
+import com.baidu.brcc.domain.meta.MetaConfigItem;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -283,11 +292,11 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
     @Override
     public Version selectByMainVersionId(Long mainVersionId) {
         List<Version> grayVersions = selectByExample(VersionExample.newBuilder()
-                        .build()
-                        .createCriteria()
-                        .andDeletedEqualTo(Deleted.OK.getValue())
-                        .andMainVersionIdEqualTo(mainVersionId)
-                        .toExample()
+                .build()
+                .createCriteria()
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .andMainVersionIdEqualTo(mainVersionId)
+                .toExample()
         );
         if (grayVersions == null) {
             throw new BizException(GRAY_VERSION_NOT_EXISTS_STATUS, GRAY_VERSION_NOT_EXISTS_MSG);
@@ -380,6 +389,27 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                         .andDeletedEqualTo(Deleted.OK.getValue())
                         .toExample());
 
+        // find all groups by destVerId
+        Map<String, ConfigGroup> destMap =
+                configGroupService.selectMapByExample(ConfigGroupExample.newBuilder()
+                                .build()
+                                .createCriteria()
+                                .andVersionIdEqualTo(destVerId)
+                                .andDeletedEqualTo(Deleted.OK.getValue())
+                                .toExample(),
+                        ConfigGroup::getName,
+                        Function.identity(),
+                        MetaConfigGroup.COLUMN_NAME_ID,
+                        MetaConfigGroup.COLUMN_NAME_NAME
+                );
+        // if groupName exist
+        if (!CollectionUtils.isEmpty(configGroupList)) {
+            for (ConfigGroup configGroup : configGroupList) {
+                if (!CollectionUtils.isEmpty(destMap) && destMap.get(configGroup.getName()) != null) {
+                    throw new BizException(COPY_GROUP_EXISTS_STATUS, COPY_GROUP_EXISTS_MSG);
+                }
+            }
+        }
         Date now = new Date();
         for (ConfigGroup configGroup : configGroupList) {
             Long srcGroupId = configGroup.getId();
@@ -412,6 +442,28 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                 .andGroupIdEqualTo(srcGroupId)
                 .andDeletedEqualTo(Deleted.OK.getValue())
                 .toExample());
+
+        // find configItems by destGroup
+        Map<String, ConfigItem> destMap =
+                configItemService.selectMapByExample(ConfigItemExample.newBuilder()
+                                .build()
+                                .createCriteria()
+                                .andVersionIdEqualTo(destGroup.getVersionId())
+                                .andDeletedEqualTo(Deleted.OK.getValue())
+                                .toExample(),
+                        ConfigItem :: getName,
+                        Function.identity(),
+                        MetaConfigItem.COLUMN_NAME_ID,
+                        MetaConfigItem.COLUMN_NAME_NAME,
+                        MetaConfigItem.COLUMN_NAME_VAL
+                );
+        if (!CollectionUtils.isEmpty(srcConfigItems)) {
+            for (ConfigItem configItem : srcConfigItems) {
+                if (!CollectionUtils.isEmpty(destMap) && destMap.get(configItem.getName()) != null) {
+                    throw new BizException(COPY_CONFIG_EXISTS_STATUS, COPY_CONFIG_EXISTS_MSG);
+                }
+            }
+        }
         for (ConfigItem srcConfigItem : srcConfigItems) {
             srcConfigItem.setId(null);
             srcConfigItem.setMemo("");

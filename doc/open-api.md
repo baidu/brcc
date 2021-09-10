@@ -143,6 +143,14 @@
     - [请求示例](#请求示例-17)
     - [返回参数](#返回参数-17)
     - [返回样例](#返回样例-17)
+  - [19. 推送变更](#19-推送变更)
+    - [描述](#描述-18)
+    - [请求类型](#请求类型-18)
+    - [请求URL](#请求url-18)
+    - [请求参数（query string）](#请求参数query-string-17)
+    - [请求示例](#请求示例-18)
+    - [返回参数](#返回参数-18)
+    - [返回样例](#返回样例-18)
   
 # open api 对外接口文档
 
@@ -1102,6 +1110,51 @@ items[i].val | String | body | N | 配置项值
   }
     ]  
 }
+```
+
+### 返回参数
+
+参数名称 | 类型 | 说明
+---|---|---
+cnt | Long | 影响行数
+
+### 返回样例
+
+```json
+{
+  "status":0,
+  "msg":"success",
+  "data":1
+}
+```
+
+## 19. 推送变更
+
+### 描述
+
+推送配置项变更
+
+### 请求类型
+
+POST
+
+### 请求URL
+
+/api/version/pushChange
+
+### 请求参数（query string）
+
+参数名称 | 类型 | 方式 | 必填 | 说明
+---|---|---|---|---
+
+token | String | query | Y | api token
+versionId | Long | query | Y | 版本ID
+
+### 请求示例
+
+```shell
+curl --request POST -sL \
+     --url 'http://ip:port/api/version/pushChange?token=03ecc4c8910b926f8fe1f0948&versionId=3'
 ```
 
 ### 返回参数

@@ -324,15 +324,27 @@ public class NetUtils {
     }
 
     public static String getSdkVersion() {
+        if (!SDK_VERSION.equals("")) {
+            return SDK_VERSION;
+        }
+        InputStream is = null;
         try {
+            is = LOGGER.getClass().getResourceAsStream("/META-INF/maven/com.baidu.mapp/brcc-sdk/pom.properties");
             Properties p = new Properties();
-            InputStream is = LOGGER.getClass().getResourceAsStream("/META-INF/maven/com.baidu.mapp/brcc-sdk/pom.properties");
             if (is != null) {
                 p.load(is);
                 SDK_VERSION = p.getProperty("version", "");
             }
         } catch (IOException e) {
             LOGGER.error("Cannot get SDK version:", e);
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error("Cannot get SDK version:", ex);
+            }
         }
         return SDK_VERSION;
     }
