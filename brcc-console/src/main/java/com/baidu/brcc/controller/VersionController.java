@@ -18,6 +18,10 @@
  */
 package com.baidu.brcc.controller;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_ITEM_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_ITEM_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_KEY_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_KEY_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
 
@@ -28,6 +32,10 @@ import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_MSG
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_ID_NOT_EXIST_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_VERSION_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_ID_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
@@ -69,17 +77,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.GrayInfo;
 import com.baidu.brcc.domain.GrayRule;
 import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.GrayFlag;
+import com.baidu.brcc.domain.vo.ApiItemVo;
+import com.baidu.brcc.domain.vo.BatchConfigItemReq;
 import com.baidu.brcc.domain.vo.GrayAddReq;
 import com.baidu.brcc.domain.vo.GrayRuleReq;
 import com.baidu.brcc.domain.vo.GrayRuleVo;
 import com.baidu.brcc.domain.vo.GrayVersionRuleVo;
+import com.baidu.brcc.domain.vo.ItemReq;
 import com.baidu.brcc.service.BrccInstanceService;
+import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.GrayInfoService;
 import com.baidu.brcc.service.GrayRuleService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -119,8 +133,6 @@ import com.baidu.brcc.service.ProjectUserService;
 import com.baidu.brcc.service.RccCache;
 import com.baidu.brcc.service.VersionService;
 
-import javax.xml.crypto.Data;
-
 /**
  * 管理端版本相关接口
  */
@@ -155,6 +167,12 @@ public class VersionController {
 
     @Autowired
     private GrayInfoService grayInfoService;
+
+    @Autowired
+    private BrccInstanceService brccInstanceService;
+
+    @Autowired
+    private ConfigGroupService groupService;
 
     /**
      * 新增或修改版本
@@ -718,6 +736,55 @@ public class VersionController {
                 .toExample());
 
         return R.ok(configItemList);
+    }
+
+    /**
+     * 配置回滚
+     *
+     * @param
+     * @param user
+     * @return
+     */
+    @PostMapping("rollBack/{versionId}")
+    public R rollBack(@PathVariable("versionId") Long versionId,
+                      @RequestBody BatchConfigItemReq batchConfigItemReq, @LoginUser User user) {
+        Version version = versionService.selectByPrimaryKey(versionId);
+        if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
+            return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        if (!environmentUserService.checkAuth(version.getProductId(), version.getProjectId(),
+                version.getEnvironmentId(), user)) {
+            return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        Long groupId = batchConfigItemReq.getGroupId();
+        if (groupId == null || groupId <= 0) {
+            return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
+        }
+        ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
+        if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
+            return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
+        }
+        if (!CollectionUtils.isEmpty(batchConfigItemReq.getItems())) {
+            for (ItemReq req : batchConfigItemReq.getItems()) {
+                String name = req.getName();
+                if (StringUtils.isBlank(name)) {
+                    return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
+                }
+                ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
+                if (apiItemVo !=null && !apiItemVo.getGroupId().equals(groupId)) {
+                    return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
+                }
+            }
+        }
+        if (!environmentUserService.checkAuth(configGroup.getProductId(), configGroup.getProjectId(),
+                configGroup.getEnvironmentId(), user)) {
+            return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        int cnt = configItemService.batchSave(user, batchConfigItemReq, configGroup);
+
+        // 失效版本下的配置
+        rccCache.evictConfigItem(configGroup.getVersionId());
+        return R.ok(cnt);
     }
 
 }

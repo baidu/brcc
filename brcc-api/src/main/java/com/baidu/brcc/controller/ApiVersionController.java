@@ -42,6 +42,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -415,5 +416,46 @@ public class ApiVersionController {
         versionService.insertSelective(insert);
         rccCache.evictVersion(versionReq.getEnvironmentId());
         return R.ok(insert.getId());
+    }
+
+    /**
+     * push configuration changes, change checkSum
+     *
+     * @param versionId
+     * @param token
+     * @return
+     */
+    @SaveLog(scene = "0020",
+            paramsIdxes = {0},
+            params = {"versionId"})
+    @PostMapping("version/pushChange")
+    public R pushChange(String token, Long versionId) {
+        // check token
+        if (isBlank(token)) {
+            return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
+        }
+        // check apiToken valid
+        ApiToken apiToken = apiTokenCacheService.getApiToken(token);
+        if (apiToken == null) {
+            return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
+        }
+        if (versionId == null || versionId <= 0) {
+            return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
+        }
+        // check version
+        Version version = versionService.selectByPrimaryKey(versionId);
+        if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
+            return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        Version update = new Version();
+        update.setId(versionId);
+        update.setCheckSum(UUID.randomUUID().toString());
+        update.setCheckSumDate(new Date());
+        update.setUpdateTime(new Date());
+        int cnt = versionService.updateByPrimaryKeySelective(update);
+        rccCache.evictVersion(version.getEnvironmentId());
+        // 失效id->version的缓存
+        rccCache.evictVersionById(Arrays.asList(versionId));
+        return R.ok(cnt);
     }
 }

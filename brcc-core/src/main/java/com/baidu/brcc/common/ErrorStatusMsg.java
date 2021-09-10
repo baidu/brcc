@@ -290,4 +290,12 @@ public class ErrorStatusMsg {
     // 配置项不存在
     public static final Integer CONFIG_ITEM_NOT_EXISTS_STATUS = 100215;
     public static final String CONFIG_ITEM_NOT_EXISTS_MSG = "配置项不存在";
+
+    // 复制版本时分组已存在
+    public static final Integer COPY_GROUP_EXISTS_STATUS = 100224;
+    public static final String COPY_GROUP_EXISTS_MSG = "该版本下存在相同分组，无法复制，请检查";
+
+    // 复制版本时配置已存在
+    public static final Integer COPY_CONFIG_EXISTS_STATUS = 100225;
+    public static final String COPY_CONFIG_EXISTS_MSG = "该版本下存在相同配置，无法复制，请检查";
 }

@@ -19,13 +19,16 @@
 package com.baidu.brcc.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +38,8 @@ public class NetUtils {
     private static final String DEFAULT_LOCAL_IP = "127.0.0.1";
     private static final String DEFAULT_LOCAL_HOSTNAME = "localhost";
 
-    // TODO 每次发版SDK前检查SDK版本有无更新
-    public static final String SDK_VERSION = "1.0.0";
+    // SDK版本
+    private static String SDK_VERSION = "";
 
     // IP 信息
     private static String localIp = null;
@@ -320,4 +323,29 @@ public class NetUtils {
         return appName;
     }
 
+    public static String getSdkVersion() {
+        if (!SDK_VERSION.equals("")) {
+            return SDK_VERSION;
+        }
+        InputStream is = null;
+        try {
+            is = LOGGER.getClass().getResourceAsStream("/META-INF/maven/com.baidu.mapp/brcc-sdk/pom.properties");
+            Properties p = new Properties();
+            if (is != null) {
+                p.load(is);
+                SDK_VERSION = p.getProperty("version", "");
+            }
+        } catch (IOException e) {
+            LOGGER.error("Cannot get SDK version:", e);
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error("Cannot get SDK version:", ex);
+            }
+        }
+        return SDK_VERSION;
+    }
 }

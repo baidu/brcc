@@ -265,7 +265,7 @@ public class ConfigLoader {
         header.put(HEADER_IDC, NetUtils.getIdc());
         header.put(HEADER_CONTAINER_ID, NetUtils.getContainerId());
         header.put(HEADER_VERSION_ID, versionId == null ? "" : versionId.toString());
-        header.put(HEADER_SDK_VERSION, NetUtils.SDK_VERSION);
+        header.put(HEADER_SDK_VERSION, NetUtils.getSdkVersion());
         header.put(HEADER_ENABLE_UPDATE_CALLBACK, enableUpdateCallback ? "1" : "0");
         header.put(HEADER_NET_COST, netCost == null ? "-1" : netCost.toString());
 
