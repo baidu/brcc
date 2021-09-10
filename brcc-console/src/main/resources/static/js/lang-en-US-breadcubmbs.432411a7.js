@@ -1,1 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["lang-en-US-breadcubmbs"],{"87f3":function(n,e,s){"use strict";s.r(e),e["default"]={crumbs:{index:"Homepage",productLine:"Productline",project:"Projects",permission:"Permission",env:"Environments",version:"Versions",group:"Groups",instance:"Instances",config:"Configs",log:"Logs"},header:{title:"BRCC"}}}}]);
