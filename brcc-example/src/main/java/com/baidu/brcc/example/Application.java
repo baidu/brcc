@@ -18,17 +18,30 @@
  */
 package com.baidu.brcc.example;
 
+import com.baidu.brcc.example.config.ExampleConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
+@RestController
 public class Application {
+    @Autowired
+    private ExampleConfiguration exampleConfiguration;
+
     public static void main(String[] args) {
         new SpringApplicationBuilder()
                 .sources(Application.class)
                 .web(WebApplicationType.SERVLET)
                 .registerShutdownHook(true)
                 .build().run(args);
+    }
+
+    @GetMapping("/get")
+    public String get() {
+        return "return is " + exampleConfiguration.getA();
     }
 }
