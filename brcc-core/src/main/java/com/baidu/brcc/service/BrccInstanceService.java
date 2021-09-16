@@ -30,7 +30,9 @@ public interface BrccInstanceService extends GenericService<BrccInstance, Long, 
 
     Long countByGrayVersionId(Long grayVersionId);
 
-    void updateInstance(String ip, String idc, String containerId, Long grayVersionId);
+    void updateInstance(String ip, String idc, String containerId, Long mainVersionId, Long grayVersionId);
+
+    void updateInvalidGrayInstance(String ip, String idc, String containerId, Long mainVersionId, Long grayVersionId);
 
 
 }

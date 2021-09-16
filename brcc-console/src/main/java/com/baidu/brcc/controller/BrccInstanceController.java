@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.baidu.brcc.domain.em.GrayFlag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,10 +92,10 @@ public class BrccInstanceController {
         AtomicInteger active = new AtomicInteger(0);
         AtomicInteger notActive = new AtomicInteger(0);
         List<BrccInstanceDto> brccInstances = brccInstanceService.selectByExample(BrccInstanceExample.newBuilder()
-                .build()
-                .createCriteria()
-                .andVersionIdEqualTo(versionId)
-                .toExample(),
+                        .build()
+                        .createCriteria()
+                        .andVersionIdEqualTo(versionId)
+                        .toExample(),
                 bo -> {
                     BrccInstanceDto dto = BrccInstance.copyFrom(bo, new BrccInstanceDto());
                     if (StringUtils.equals(bo.getCurrentChecksum(), version.getCheckSum())) {

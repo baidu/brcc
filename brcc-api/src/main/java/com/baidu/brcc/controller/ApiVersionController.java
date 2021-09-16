@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.baidu.brcc.annotation.SaveLog;
+import com.baidu.brcc.common.InstanceEventType;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigGroupExample;
 import com.baidu.brcc.domain.Environment;
@@ -66,6 +67,7 @@ import com.baidu.brcc.domain.meta.MetaVersion;
 import com.baidu.brcc.domain.vo.ApiGroupVo;
 import com.baidu.brcc.domain.vo.ConfigGroupReq;
 import com.baidu.brcc.domain.vo.VersionReq;
+import com.baidu.brcc.dto.InstanceInfoEventDto;
 import com.baidu.brcc.rule.GrayExcutor;
 import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.ConfigGroupService;
@@ -195,10 +197,10 @@ public class ApiVersionController {
         versionVo.setEnvironmentId(version.getEnvironmentId());
         versionVo.setProjectId(version.getProjectId());
         versionVo.setVersionId(version.getId());
+        Long mainVersionId = version.getId();
         // 判断是否灰度
         if (enableGray != null && enableGray && version.getGrayFlag().equals(GrayFlag.GRAY.getValue())) {
             // 获取灰度版本
-            Long mainVersionId = version.getId();
             Version grayVersion = versionService.selectByMainVersionId(mainVersionId);
             Long grayVersionId = grayVersion.getId();
             // 获取灰度规则
@@ -218,10 +220,14 @@ public class ApiVersionController {
                     versionVo.setProjectId(grayVersion.getProjectId());
                     versionVo.setVersionId(grayVersion.getId());
                     // 命中后修改实例的灰度信息
-                    brccInstanceService.updateInstance(ip, idc, containerId, grayVersionId);
+                    brccInstanceService.updateInstance(ip, idc, containerId, mainVersionId, grayVersionId);
+                }else{
+                    // 把versionId改为主版本的ID
+                    brccInstanceService.updateInvalidGrayInstance(ip, idc, containerId, mainVersionId, grayVersionId);
                 }
             }
         }
+        brccInstanceService.updateInstance(ip, idc, containerId, mainVersionId, 0L);
         return R.ok(versionVo);
     }
 
