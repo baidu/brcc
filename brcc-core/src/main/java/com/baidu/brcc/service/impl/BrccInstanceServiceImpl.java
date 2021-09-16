@@ -101,19 +101,50 @@ public class BrccInstanceServiceImpl extends GenericServiceImpl<BrccInstance, Lo
     }
 
     @Override
-    public void updateInstance(String ip, String idc, String containerId, Long grayVersionId) {
-        BrccInstance brccInstanceUpdate = BrccInstance.newBuilder()
-                    .grayVersionId(grayVersionId)
-                    .grayFlag(GrayFlag.GRAY.getValue())
-                    .build();
-        BrccInstanceExample brccInstanceExample = BrccInstanceExample.newBuilder()
-                .build()
-                .createCriteria()
-                .andIpEqualTo(ip)
-                .andIdcEqualTo(idc)
-                .andContainerIdEqualTo(containerId)
-                .toExample();
-        updateByExampleSelective(brccInstanceUpdate, brccInstanceExample);
+    public void updateInstance(String ip, String idc, String containerId, Long mainVersionId, Long grayVersionId) {
+        BrccInstance brccInstance = selectOneByExample(BrccInstanceExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andVersionIdEqualTo(mainVersionId)
+                        .andIpEqualTo(ip)
+                        .toExample(),
+                MetaBrccInstance.COLUMN_NAME_ID,
+                MetaBrccInstance.COLUMN_NAME_CURRENTCHECKSUM,
+                MetaBrccInstance.COLUMN_NAME_CURRENTCHECKSUMTIME
+        );
+        if (brccInstance == null) {
+            return;
+        }
+        if (grayVersionId > 0L) {
+            brccInstance.setGrayFlag(GrayFlag.GRAY.getValue());
+            brccInstance.setGrayVersionId(grayVersionId);
+            brccInstance.setVersionId(grayVersionId);
+        } else {
+            brccInstance.setGrayFlag(GrayFlag.NOT.getValue());
+            brccInstance.setGrayVersionId(0L);
+        }
+        updateByPrimaryKeySelective(brccInstance);
+    }
+
+    @Override
+    public void updateInvalidGrayInstance(String ip, String idc, String containerId, Long mainVersionId, Long grayVersionId) {
+        BrccInstance brccInstance = selectOneByExample(BrccInstanceExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andVersionIdEqualTo(grayVersionId)
+                        .andIpEqualTo(ip)
+                        .toExample(),
+                MetaBrccInstance.COLUMN_NAME_ID,
+                MetaBrccInstance.COLUMN_NAME_CURRENTCHECKSUM,
+                MetaBrccInstance.COLUMN_NAME_CURRENTCHECKSUMTIME
+        );
+        if (brccInstance == null) {
+            return;
+        }
+        brccInstance.setGrayFlag(GrayFlag.NOT.getValue());
+        brccInstance.setGrayVersionId(0L);
+        brccInstance.setVersionId(mainVersionId);
+        updateByPrimaryKeySelective(brccInstance);
     }
 
     @Override
