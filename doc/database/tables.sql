@@ -266,6 +266,8 @@ CREATE TABLE `rcc_version` (
   `deleted` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '删除标志，1-已删除',
   `update_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '更新时间',
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
+  `gray_flag` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '灰度标识',
+  `main_version_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '关联的主版本',
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name`) USING BTREE,
   KEY `idx_envid` (`environment_id`) USING BTREE,
@@ -305,6 +307,37 @@ CREATE TABLE `rcc_instance` (
   `net_cost` int(11) NOT NULL DEFAULT '-1' COMMENT '上一次网络开销',
   `heartbeat_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '最后心跳时间',
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '创建时间',
+  `gray_flag` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '灰度标识',
+  `gray_version_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '灰度版本ID',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_version_id` (`version_id`,`ip`) USING BTREE
+  UNIQUE KEY `idx_version_id` (`version_id`,`ip`,`app_name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='实例信息'
+
+-- /******************************************/
+-- /*   数据库全名 = brcc   */
+-- /*   表名称 = rcc_gray_info   */
+-- /******************************************/
+CREATE TABLE `rcc_gray_info` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `rule_name` varchar(120) NOT NULL DEFAULT '' COMMENT '灰度名称',
+  `rule_content` varchar(200) NOT NULL DEFAULT '' COMMENT '灰度规则内容',
+  `rule_bean` varchar(40) NOT NULL DEFAULT '' COMMENT '规则sring bean name',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='灰度规则内容';
+
+-- /******************************************/
+-- /*   数据库全名 = brcc   */
+-- /*   表名称 = rcc_gray_rule   */
+-- /******************************************/
+CREATE TABLE `rcc_gray_rule` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `gray_version_id` bigint(16) NOT NULL DEFAULT '0' COMMENT '灰度版本id',
+  `rule_id` bigint(16) NOT NULL DEFAULT '0' COMMENT '灰度规则ID',
+  `rule_content` varchar(120) NOT NULL DEFAULT '' COMMENT '灰度规则内容',
+  `deleted` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0-未删除，1-删除',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='灰度规则信息';
