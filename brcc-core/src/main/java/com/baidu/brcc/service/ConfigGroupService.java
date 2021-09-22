@@ -71,4 +71,6 @@ public interface ConfigGroupService extends GenericService<ConfigGroup, Long, Co
     List<TreeNode> findTreeInfo(@LoginUser User user);
 
     List<ConfigGroup> listAllGroupByVersionId (Long projectId, Long versionId);
+
+    Long updateGroupByImportType(Byte type, ConfigGroup configGroup, String groupName);
 }

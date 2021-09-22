@@ -137,7 +137,6 @@ public class ConfigItemController {
      *
      * @param req  req.id > 0 表示修改配置，否则新增
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "0000",
@@ -278,7 +277,6 @@ public class ConfigItemController {
      *
      * @param itemReq
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "0001",
@@ -300,8 +298,17 @@ public class ConfigItemController {
                 if (StringUtils.isBlank(name)) {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
-               ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
-                if (apiItemVo !=null && !apiItemVo.getGroupId().equals(groupId)) {
+                ConfigItem configItem = configItemService.selectOneByExample(ConfigItemExample.newBuilder()
+                                .build()
+                                .createCriteria()
+                                .andDeletedEqualTo(Deleted.OK.getValue())
+                                .andVersionIdEqualTo(configGroup.getVersionId())
+                                .andGroupIdNotEqualTo(groupId)
+                                .andNameEqualTo(name)
+                                .toExample(),
+                        MetaConfigItem.COLUMN_NAME_ID
+                );
+                if (configItem != null) {
                     return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
                 }
             }
@@ -313,7 +320,9 @@ public class ConfigItemController {
         int cnt = configItemService.batchSave(user, itemReq, configGroup);
 
         // 失效版本下的配置
-        rccCache.evictConfigItem(configGroup.getVersionId());
+        if (configGroup.getVersionId() != null && configGroup.getVersionId() >= 0) {
+            rccCache.evictConfigItem(configGroup.getVersionId());
+        }
         return R.ok(cnt);
     }
 
@@ -322,7 +331,6 @@ public class ConfigItemController {
      *
      * @param itemId
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "0002",
@@ -384,7 +392,6 @@ public class ConfigItemController {
      *
      * @param groupId
      * @param user
-     *
      * @return
      */
     @GetMapping("list")
@@ -438,7 +445,6 @@ public class ConfigItemController {
      * @param pageNo
      * @param pageSize
      * @param user
-     *
      * @return
      */
     @GetMapping("query")

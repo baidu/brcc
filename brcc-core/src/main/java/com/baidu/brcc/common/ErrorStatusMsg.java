@@ -298,4 +298,17 @@ public class ErrorStatusMsg {
     // 复制版本时配置已存在
     public static final Integer COPY_CONFIG_EXISTS_STATUS = 100225;
     public static final String COPY_CONFIG_EXISTS_MSG = "该版本下存在相同配置，无法复制，请检查";
+
+    // convert properties to string fail
+    public static final Integer CONVERT_TO_STRING_STATUS = 100226;
+    public static final String CONVERT_TO_STRING_MSG = "配置转换失败";
+
+    // file empty error
+    public static final Integer FILE_IS_EMPTY_STATUS = 100227;
+    public static final String FILE_IS_EMPTY_MSG = "文件为空";
+
+    // file name invalid
+    public static final Integer FILE_NAME_INVALID_STATUS = 100228;
+    public static final String FILE_NAME_INVALID_MSG = "文件名字不符合规范";
+
 }

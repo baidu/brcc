@@ -25,6 +25,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_KEY_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.FILE_IS_EMPTY_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.FILE_IS_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_NOT_SET_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_NOT_SET_STATUS;
 
@@ -69,21 +71,29 @@ import static com.baidu.brcc.utils.collections.CollectionUtils.toMapList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.GrayInfo;
 import com.baidu.brcc.domain.GrayRule;
 import com.baidu.brcc.domain.VersionExample;
+import com.baidu.brcc.domain.em.FileFormat;
 import com.baidu.brcc.domain.em.GrayFlag;
+import com.baidu.brcc.domain.meta.MetaConfigItem;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
+import com.baidu.brcc.domain.vo.ConfigItemForGroupVo;
 import com.baidu.brcc.domain.vo.GrayAddReq;
 import com.baidu.brcc.domain.vo.GrayRuleReq;
 import com.baidu.brcc.domain.vo.GrayRuleVo;
@@ -93,8 +103,13 @@ import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.GrayInfoService;
 import com.baidu.brcc.service.GrayRuleService;
+import com.baidu.brcc.utils.FileFormat.FileFormatUtils;
+import com.baidu.brcc.utils.convert.ConvertFileUtil;
+import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -132,6 +147,9 @@ import com.baidu.brcc.service.EnvironmentUserService;
 import com.baidu.brcc.service.ProjectUserService;
 import com.baidu.brcc.service.RccCache;
 import com.baidu.brcc.service.VersionService;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 管理端版本相关接口
@@ -770,8 +788,8 @@ public class VersionController {
                 if (StringUtils.isBlank(name)) {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
-                ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
-                if (apiItemVo !=null && !apiItemVo.getGroupId().equals(groupId)) {
+                ApiItemVo apiItemVo = configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
+                if (apiItemVo != null && !apiItemVo.getGroupId().equals(groupId)) {
                     return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
                 }
             }
@@ -787,4 +805,105 @@ public class VersionController {
         return R.ok(cnt);
     }
 
+    /**
+     * configuration export
+     *
+     * @param
+     * @param user
+     * @param versionId
+     * @return
+     */
+    @SaveLog(scene = "0022",
+            paramsIdxes = {0},
+            params = {"groupId"})
+    @PostMapping("export/{versionId}")
+    public void export(@PathVariable("versionId") Long versionId, @LoginUser User user, HttpServletResponse res) throws IOException {
+        // check version
+        Version version = versionService.selectByPrimaryKey(versionId);
+        if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
+            throw new BizException(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        // authentication
+        if (!environmentUserService.checkAuth(version.getProductId(), version.getProjectId(),
+                version.getEnvironmentId(), user)) {
+            throw new BizException(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        // list all groups by versionId
+        List<ConfigGroup> configGroupList = groupService.listAllGroupByVersionId(version.getProjectId(), versionId);
+        // check group list
+        if (configGroupList.isEmpty()) {
+            throw new BizException(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
+        }
+        // define file
+        String fileName = version.getName() + ".properties";
+        String fileContent = "";
+        for (ConfigGroup configGroup : configGroupList) {
+            // find all configurations
+            List<ConfigItemForGroupVo> items =
+                    configItemService.selectByExample(ConfigItemExample.newBuilder()
+                                    .build()
+                                    .createCriteria()
+                                    .andDeletedEqualTo(Deleted.OK.getValue())
+                                    .andGroupIdEqualTo(configGroup.getId())
+                                    .toExample(),
+                            item -> {
+                                ConfigItemForGroupVo vo = new ConfigItemForGroupVo();
+                                vo.setName(item.getName());
+                                vo.setVal(item.getVal());
+                                return vo;
+                            },
+                            MetaConfigItem.COLUMN_NAME_ID,
+                            MetaConfigItem.COLUMN_NAME_NAME,
+                            MetaConfigItem.COLUMN_NAME_MEMO,
+                            MetaConfigItem.COLUMN_NAME_VAL
+                    );
+            res.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName);
+            // get fileContent
+            String tem = ConvertFileUtil.convert2FileContent(items, configGroup.getName());
+            fileContent = tem + fileContent;
+        }
+        try {
+            // write content
+            res.getOutputStream().write(fileContent.getBytes());
+        } catch (Exception e) {
+            throw new IOException("export configurations failed:{}", e);
+        }
+    }
+
+    /**
+     * configuration import
+     *
+     * @param
+     * @param user
+     * @return
+     */
+    @SaveLog(scene = "0023",
+            paramsIdxes = {0},
+            params = {"groupId"})
+    @PostMapping("import/{versionId}")
+    public R importFile(@PathVariable("versionId") Long versionId,
+                        @RequestParam Byte type,
+                        @RequestParam("file") MultipartFile file,
+                        @LoginUser User user) throws IOException {
+        // check version
+        Version version = versionService.selectByPrimaryKey(versionId);
+        if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
+            throw new BizException(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        // authentication
+        if (!environmentUserService.checkAuth(version.getProductId(), version.getProjectId(),
+                version.getEnvironmentId(), user)) {
+            throw new BizException(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        // check file
+        FileFormatUtils.checkFile(file);
+        ConfigGroup configGroup = new ConfigGroup();
+        configGroup.setVersionId(versionId);
+        configGroup.setEnvironmentId(version.getEnvironmentId());
+        configGroup.setProductId(version.getProductId());
+        configGroup.setProjectId(version.getProjectId());
+        // read file
+        configItemService.parseProFile(file, configGroup, type);
+        return R.ok();
+    }
 }
