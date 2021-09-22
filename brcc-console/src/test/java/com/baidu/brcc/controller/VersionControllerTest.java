@@ -351,7 +351,7 @@ public class VersionControllerTest {
         grayAddReq.setGrayRuleReqs(grayRuleReqs);
         when(versionService.selectByPrimaryKey(ID)).thenReturn(new Version());
         result = versionController.saveGrayRule(grayAddReq, user);
-        Assert.assertEquals(OK, result.getStatus());
+        Assert.assertEquals(GRAY_RULE_NOT_SET_STATUS.intValue(), result.getStatus());
     }
 
     @Test

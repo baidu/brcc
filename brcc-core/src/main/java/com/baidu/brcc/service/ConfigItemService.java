@@ -18,6 +18,7 @@
  */
 package com.baidu.brcc.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import com.baidu.brcc.domain.vo.ApiItemVo;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
 import com.baidu.brcc.domain.vo.ConfigItemVo;
 import com.baidu.brcc.service.base.GenericService;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ConfigItemService extends GenericService<ConfigItem, Long, ConfigItemExample> {
 
@@ -64,4 +66,5 @@ public interface ConfigItemService extends GenericService<ConfigItem, Long, Conf
 
     Pagination<ConfigItemVo> pagination(Integer offset, Integer pageSize, Long productId, Long projectId, String key,
                                         String val, User user);
+    void parseProFile(MultipartFile file, ConfigGroup configGroup, Byte type) throws IOException;
 }

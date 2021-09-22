@@ -18,12 +18,22 @@
  */
 package com.baidu.brcc.service.impl;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_ITEM_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_ITEM_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.CONVERT_TO_STRING_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CONVERT_TO_STRING_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.utils.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +42,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.baidu.brcc.domain.ConfigGroupExample;
+import com.baidu.brcc.domain.em.FileImportType;
+import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,6 +100,7 @@ import com.baidu.brcc.service.VersionService;
 import com.baidu.brcc.service.base.GenericServiceImpl;
 import com.baidu.brcc.utils.collections.CollectionUtils;
 import com.baidu.brcc.utils.time.DateTimeUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service("configItemService")
 public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, ConfigItemExample>
@@ -189,7 +204,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                                 .andGroupIdEqualTo(groupId)
                                 .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
-                        ConfigItem :: getName,
+                        ConfigItem::getName,
                         Function.identity(),
                         MetaConfigItem.COLUMN_NAME_ID,
                         MetaConfigItem.COLUMN_NAME_NAME,
@@ -339,8 +354,8 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         .andDeletedEqualTo(Deleted.OK.getValue())
                         .andGroupIdEqualTo(groupId)
                         .toExample(),
-                ConfigItem :: getName,
-                ConfigItem :: getVal,
+                ConfigItem::getName,
+                ConfigItem::getVal,
                 MetaConfigItem.COLUMN_NAME_NAME,
                 MetaConfigItem.COLUMN_NAME_VAL
         );
@@ -382,8 +397,8 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         .andDeletedEqualTo(Deleted.OK.getValue())
                         .andVersionIdEqualTo(versionId)
                         .toExample(),
-                ConfigItem :: getName,
-                ConfigItem :: getVal,
+                ConfigItem::getName,
+                ConfigItem::getVal,
                 MetaConfigItem.COLUMN_NAME_NAME,
                 MetaConfigItem.COLUMN_NAME_VAL
         );
@@ -571,35 +586,35 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         if (pagination != null && !CollectionUtils.isEmpty(pagination.getDataList())) {
             Map<Long, Product> productMap = productService.selectMapByPrimaryKeys(
                     productIds,
-                    Product :: getId,
+                    Product::getId,
                     MetaProduct.COLUMN_NAME_ID,
                     MetaProduct.COLUMN_NAME_NAME
             );
 
             Map<Long, Project> projectMap = projectService.selectMapByPrimaryKeys(
                     projectIds,
-                    Project :: getId,
+                    Project::getId,
                     MetaProject.COLUMN_NAME_ID,
                     MetaProject.COLUMN_NAME_NAME
             );
 
             Map<Long, Environment> environmentMap = environmentService.selectMapByPrimaryKeys(
                     environmentIds,
-                    Environment :: getId,
+                    Environment::getId,
                     MetaEnvironment.COLUMN_NAME_ID,
                     MetaEnvironment.COLUMN_NAME_NAME
             );
 
             Map<Long, Version> versionMap = versionService.selectMapByPrimaryKeys(
                     versionIds,
-                    Version :: getId,
+                    Version::getId,
                     MetaVersion.COLUMN_NAME_ID,
                     MetaVersion.COLUMN_NAME_NAME
             );
 
             Map<Long, ConfigGroup> groupMap = configGroupService.selectMapByPrimaryKeys(
                     groupIds,
-                    ConfigGroup :: getId,
+                    ConfigGroup::getId,
                     MetaConfigGroup.COLUMN_NAME_ID,
                     MetaConfigGroup.COLUMN_NAME_NAME
             );
@@ -684,5 +699,81 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
             map.put(MetaEnvironmentUser.COLUMN_NAME_ENVIRONMENTID, environmentIds);
         }
         return map;
+    }
+
+    @Override
+    public void parseProFile(MultipartFile file, ConfigGroup configGroup, Byte type) throws IOException {
+        Long groupId = 0L;
+        InputStream in = file.getInputStream();
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            Date now = DateTimeUtils.now();
+            String fileContent = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            List<String> conList = Splitter.on("\n").splitToList(fileContent);
+            String memo = "";
+            for (String content : conList) {
+                if (content.trim().equals("")) {
+                    continue;
+                } else if (content.trim().startsWith("#") && content.charAt(1) != '*') {
+                    memo = content.substring(1);
+                } else if (content.trim().startsWith("#*")) {
+                    groupId = configGroupService.updateGroupByImportType(type, configGroup, content.substring(2));
+                } else {
+                    // add a default group
+                    List<String> configItem = Splitter.on("=").splitToList(content);
+                    if (configItem.size() < 2) {
+                        throw new BizException(CONVERT_TO_STRING_STATUS, CONVERT_TO_STRING_MSG);
+                    }
+                    if (groupId == 0L) {
+                        groupId = configGroupService.updateGroupByImportType(type, configGroup, "default");
+                    }
+                    ConfigItem configItemInsert = ConfigItem.newBuilder()
+                            .createTime(now)
+                            .deleted(Deleted.OK.getValue())
+                            .environmentId(configGroup.getEnvironmentId())
+                            .name(configItem.get(0))
+                            .groupId(groupId)
+                            .memo(memo)
+                            .projectId(configGroup.getProjectId())
+                            .productId(configGroup.getProductId())
+                            .updateTime(now)
+                            .val(trim(configItem.get(1)))
+                            .versionId(configGroup.getVersionId())
+                            .build();
+                    // check whether configuration exist
+                    ConfigItem item = selectOneByExample(ConfigItemExample.newBuilder()
+                                    .build()
+                                    .createCriteria()
+                                    .andDeletedEqualTo(Deleted.OK.getValue())
+                                    .andVersionIdEqualTo(configGroup.getVersionId())
+                                    .andNameEqualTo(configItemInsert.getName())
+                                    .toExample(),
+                            MetaConfigGroup.COLUMN_NAME_ID
+                    );
+                    if (item != null) {
+                        if (type.equals(FileImportType.STOP.getValue())) {
+                            configGroupService.deleteByPrimaryKey(groupId);
+                            throw new BizException(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
+                        } else {
+                            // overwrite
+                            item.setVal(configItemInsert.getVal());
+                            item.setMemo(memo);
+                            item.setGroupId(groupId);
+                            updateByPrimaryKeySelective(item);
+                            memo = "";
+                        }
+                    } else {
+                        // add configuration
+                        insertSelective(configItemInsert);
+                        memo = "";
+                    }
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            throw new IOException("Parse file failed:{}", e);
+        } finally {
+            in.close();
+        }
     }
 }
