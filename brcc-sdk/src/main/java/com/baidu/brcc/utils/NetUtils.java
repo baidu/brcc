@@ -333,7 +333,7 @@ public class NetUtils {
             Properties p = new Properties();
             if (is != null) {
                 p.load(is);
-                SDK_VERSION = p.getProperty("version", "");
+                SDK_VERSION = p.getProperty("version", "unknown");
             }
         } catch (IOException e) {
             LOGGER.error("Cannot get SDK version:", e);
