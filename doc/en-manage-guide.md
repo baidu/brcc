@@ -1,4 +1,4 @@
-# Manage Guide
+# Console Guide
 
 # 1.Account
 
