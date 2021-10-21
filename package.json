@@ -1,0 +1,15 @@
+{
+  "name": "brcc-docs",
+  "version": "1.0.0",
+  "description": "BRCC文档",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "author": "SPRD",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.8.2"
+  }
+}
