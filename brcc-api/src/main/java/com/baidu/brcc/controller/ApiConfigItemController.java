@@ -526,7 +526,11 @@ public class ApiConfigItemController {
         if (groupId == null || groupId <= 0) {
             return R.error(GROUP_ID_NOT_EXISTS_STATUS, GROUP_ID_NOT_EXISTS_MSG);
         }
+        // 鉴定分组是否存在
         ConfigGroup configGroup = groupService.selectByPrimaryKey(groupId);
+        if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
+            return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
+        }
         // 鉴定配置项信息
         if (!CollectionUtils.isEmpty(batchEditItemVo.getItems())) {
             for (ItemReq req : batchEditItemVo.getItems()) {
@@ -534,14 +538,7 @@ public class ApiConfigItemController {
                 if (StringUtils.isBlank(name)) {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
-                ApiItemVo apiItemVo =  configItemService.getByVersionIdAndName(configGroup.getProjectId(), configGroup.getVersionId(), name);
-                if (apiItemVo !=null && !apiItemVo.getGroupId().equals(groupId)) {
-                    return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
-                }
             }
-        }
-        if (configGroup == null || Deleted.DELETE.getValue().equals(configGroup.getDeleted())) {
-            return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
         }
         Date now = DateTimeUtils.now();
         User user= new User();

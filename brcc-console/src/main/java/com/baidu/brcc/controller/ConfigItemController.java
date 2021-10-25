@@ -298,19 +298,6 @@ public class ConfigItemController {
                 if (StringUtils.isBlank(name)) {
                     return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
                 }
-                ConfigItem configItem = configItemService.selectOneByExample(ConfigItemExample.newBuilder()
-                                .build()
-                                .createCriteria()
-                                .andDeletedEqualTo(Deleted.OK.getValue())
-                                .andVersionIdEqualTo(configGroup.getVersionId())
-                                .andGroupIdNotEqualTo(groupId)
-                                .andNameEqualTo(name)
-                                .toExample(),
-                        MetaConfigItem.COLUMN_NAME_ID
-                );
-                if (configItem != null) {
-                    return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
-                }
             }
         }
         if (!environmentUserService.checkAuth(configGroup.getProductId(), configGroup.getProjectId(),

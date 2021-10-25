@@ -201,14 +201,15 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 selectMapByExample(ConfigItemExample.newBuilder()
                                 .build()
                                 .createCriteria()
-                                .andGroupIdEqualTo(groupId)
+                                .andVersionIdEqualTo(configGroup.getVersionId())
                                 .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
                         ConfigItem::getName,
                         Function.identity(),
                         MetaConfigItem.COLUMN_NAME_ID,
                         MetaConfigItem.COLUMN_NAME_NAME,
-                        MetaConfigItem.COLUMN_NAME_VAL
+                        MetaConfigItem.COLUMN_NAME_VAL,
+                        MetaConfigItem.COLUMN_NAME_GROUPID
                 );
 
         List<ItemReq> items = itemReq.getItems();
@@ -239,6 +240,10 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 } else {
                     // 需要更新的
                     ConfigItem configItem = itemMap.get(name);
+                    // 如果不同分组已存在相同配置
+                    if(!configItem.getGroupId().equals(groupId)) {
+                        throw new BizException(CONFIG_ITEM_EXISTS_MSG, CONFIG_ITEM_EXISTS_STATUS);
+                    }
                     ConfigItem configItemUpdate = ConfigItem.newBuilder()
                             .id(configItem.getId())
                             .memo(trim(req.getMemo()))
