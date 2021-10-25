@@ -66,6 +66,9 @@ public class UriCostFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         String uri = httpServletRequest.getRequestURI();
+        if (uri.endsWith(".js") || uri.endsWith(".css") || uri.startsWith("/img/") || uri.startsWith("/index/")) {
+            return;
+        }
         if (StringUtils.startsWith(uri, "//")) {
             uri = uri.substring(1);
         }
