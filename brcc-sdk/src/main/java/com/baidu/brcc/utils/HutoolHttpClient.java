@@ -123,26 +123,26 @@ public class HutoolHttpClient implements HttpClient{
 
     private Map<String, Long> header(HttpResponse response) {
         Map<String, Long> header = new HashMap();
-        String rccTs = response.header("Rcc-Ts");
-        String serverInTs = response.header("Rcc-Server-In-Ts");
-        String serverOutTs = response.header("Rcc-Server-Out-Ts");
+        String rccTs = response.header(HEADER_RCC_TS);
+        String serverInTs = response.header(HEADER_RCC_SERVER_IN_TS);
+        String serverOutTs = response.header(HEADER_RCC_SERVER_OUT_TS);
 
         try {
             if (!StringUtils.isBlank(rccTs)) {
-                header.put("Rcc-Ts", Long.valueOf(rccTs));
+                header.put(HEADER_RCC_TS, Long.valueOf(rccTs));
             }
 
             if (!StringUtils.isBlank(serverInTs)) {
-                header.put("Rcc-Server-In-Ts", Long.valueOf(serverInTs));
+                header.put(HEADER_RCC_SERVER_IN_TS, Long.valueOf(serverInTs));
             }
 
             if (!StringUtils.isBlank(serverOutTs)) {
-                header.put("Rcc-Server-Out-Ts", Long.valueOf(serverOutTs));
+                header.put(HEADER_RCC_SERVER_OUT_TS, Long.valueOf(serverOutTs));
             }
         } catch (Exception var7) {
         }
 
-        header.put("Rcc-Out-Ts", System.currentTimeMillis());
+        header.put(HEADER_RCC_OUT_TS, System.currentTimeMillis());
         return header;
     }
 }
