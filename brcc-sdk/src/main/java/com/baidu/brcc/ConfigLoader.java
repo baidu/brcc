@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import com.baidu.brcc.utils.HttpClient;
+import com.baidu.brcc.utils.HutoolHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -40,7 +42,6 @@ import com.baidu.brcc.model.R;
 import com.baidu.brcc.model.RList;
 import com.baidu.brcc.model.VersionVo;
 import com.baidu.brcc.utils.NetUtils;
-import com.baidu.brcc.utils.OkHttpClientUtils;
 import com.baidu.brcc.utils.StringUtils;
 import com.baidu.brcc.utils.gson.GsonUtils;
 
@@ -84,7 +85,7 @@ public class ConfigLoader {
     private Long envId;
     private Long versionId;
     private String lastCheckSum;
-    private OkHttpClientUtils okHttpClientUtils;
+    private HttpClient httpClient;
     private Long netCost;
 
     private Collection<ConfigItemChangedCallable> changedCallable;
@@ -103,7 +104,7 @@ public class ConfigLoader {
         this.enableInterruptService = enableInterruptService;
         this.enableGray = enableGray;
 
-        okHttpClientUtils = new OkHttpClientUtils(readTimeOut, connectionTimeOut);
+        this.httpClient = new HutoolHttpClient((int)readTimeOut, (int)connectionTimeOut);
 
         init();
     }
@@ -129,7 +130,7 @@ public class ConfigLoader {
         Map<String, String> body = new HashMap<>();
         body.put("projectName", projectName);
         body.put("apiPassword", apiPassword);
-        R<AuthVo> vo = okHttpClientUtils.postJson(authUrl, AuthVo.class, GsonUtils.toJsonString(body), null, null);
+        R<AuthVo> vo = this.httpClient.postJson(authUrl, AuthVo.class, GsonUtils.toJsonString(body), null, null);
         if (vo == null || vo.getData() == null || vo.getStatus() != 0) {
             String msg = null;
             if (vo == null) {
@@ -155,7 +156,7 @@ public class ConfigLoader {
         String envUrl = ccServerUrl.concat(MessageFormat.format(ENV_API, envName));
         Map<String, Object> param = new HashMap<>();
         param.put("token", currentToken);
-        R<EnvVo> result = okHttpClientUtils.get(envUrl, EnvVo.class, param, null);
+        R<EnvVo> result = this.httpClient.get(envUrl, EnvVo.class, param, null);
         if (result == null || result.getData() == null || result.getStatus() != 0) {
             String msg = null;
             if (result == null) {
@@ -195,7 +196,7 @@ public class ConfigLoader {
         param.put("idc", header.get(HEADER_IDC));
         param.put("enableGray", enableGray);
         R<VersionVo> result = null;
-        result = okHttpClientUtils.get(versionUrl, VersionVo.class, param, header);
+        result = this.httpClient.get(versionUrl, VersionVo.class, param, header);
         if (result == null || result.getData() == null || result.getStatus() != 0) {
             String msg = null;
             if (result == null) {
@@ -243,7 +244,7 @@ public class ConfigLoader {
         // 获取头部信息
         Map<String, String> header = getHeaderInfo();
 
-        RList<ItemVo> r = okHttpClientUtils.getList(itemUrl, ItemVo.class, param, header);
+        RList<ItemVo> r = this.httpClient.getList(itemUrl, ItemVo.class, param, header);
         // 计算netCost
         netCost(r);
         Map<String, String> map = new HashMap<>();

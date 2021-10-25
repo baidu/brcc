@@ -8,7 +8,8 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.baidu.brcc.utils.OkHttpClientUtils;
+
+import com.baidu.brcc.utils.HttpClient;
 import org.apache.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class ConfigLoaderTest {
     @Mock
     Logger LOGGER;
     @Mock
-    OkHttpClientUtils okHttpClientUtils;
+    HttpClient httpClient;
     @Mock
     Environment environment;
     @Mock
@@ -69,7 +70,7 @@ public class ConfigLoaderTest {
     public void testLogin() throws Exception {
         String authUrl = "abc";
         R<AuthVo> vo = null;
-        vo = okHttpClientUtils.postJson(anyString(), any(), any(), anyMap(), anyMap());
+        vo = httpClient.postJson(anyString(), any(), any(), anyMap(), anyMap());
         String res = configLoader.login();
         Assert.assertEquals(null, res);
 
