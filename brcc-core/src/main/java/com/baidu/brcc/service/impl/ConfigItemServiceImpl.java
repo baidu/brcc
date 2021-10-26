@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -195,7 +196,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Override
     @Transactional
     public Integer batchSave(User user, BatchConfigItemReq itemReq, ConfigGroup configGroup) {
-        int result = 0;
+        final AtomicInteger result = new AtomicInteger(0);
         Long groupId = itemReq.getGroupId();
         Map<String, ConfigItem> itemMap =
                 selectMapByExample(ConfigItemExample.newBuilder()
@@ -214,11 +215,10 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
 
         List<ItemReq> items = itemReq.getItems();
         Map<String, ItemReq> itemReqMap = CollectionUtils.toMap(items, ItemReq :: getName);
-
         Date now = DateTimeUtils.now();
         if (!CollectionUtils.isEmpty(items)) {
             boolean itemMapEmpty = CollectionUtils.isEmpty(itemMap);
-            for (ItemReq req : items) {
+            items.parallelStream().forEach(req -> {
                 String name = trim(req.getName());
                 if (itemMapEmpty || itemMap.get(name) == null) {
                     // 新增的
@@ -236,7 +236,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                             .versionId(configGroup.getVersionId())
                             .build();
                     insertSelective(configItemInsert);
-                    result++;
+                    result.incrementAndGet();
                 } else {
                     // 需要更新的
                     ConfigItem configItem = itemMap.get(name);
@@ -251,10 +251,10 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                             .val(trim(req.getVal()))
                             .build();
                     updateByPrimaryKeySelective(configItemUpdate);
-                    result++;
+                    result.incrementAndGet();
                 }
+            });
             }
-        }
         if (!CollectionUtils.isEmpty(itemMap)) {
             boolean isItemsMapEmpty = CollectionUtils.isEmpty(itemReqMap);
             for (ConfigItem item : itemMap.values()) {
@@ -268,7 +268,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                             .deleted(Deleted.DELETE.getValue())
                             .build();
                     updateByPrimaryKeySelective(configItemUpdate);
-                    result++;
+                    result.incrementAndGet();
                 }
             }
         }
@@ -288,7 +288,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         }
         configChangeLogService.saveLogWithBackground(user.getId(), user.getName(), groupId, oldConfigMap, newConfigMap,
                 new Date());
-        return result;
+        return result.get();
     }
 
     @Override
