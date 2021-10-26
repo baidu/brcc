@@ -66,9 +66,6 @@ public class UriCostFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         String uri = httpServletRequest.getRequestURI();
-        if (uri.endsWith(".js") || uri.endsWith(".css") || uri.startsWith("/img/") || uri.startsWith("/index/")) {
-            return;
-        }
         if (StringUtils.startsWith(uri, "//")) {
             uri = uri.substring(1);
         }
@@ -88,7 +85,8 @@ public class UriCostFilter implements Filter {
                 LOGGER.error("parseLong [{}] error.", frontStartTs);
             }
         }
-        if (LOGGER.isDebugEnabled() && !StringUtils.startsWith(uri, "/actuator")) {
+        if (LOGGER.isDebugEnabled() && !StringUtils.startsWith(uri, "/actuator") && !uri.endsWith(".js") && !uri.endsWith(".css") && !uri.startsWith("/img/")
+                && !uri.startsWith("/index/") && !uri.endsWith(".png")) {
             try {
                 chain.doFilter(request, response);
             } finally {
