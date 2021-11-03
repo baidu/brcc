@@ -41,14 +41,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.baidu.brcc.domain.ConfigGroupExample;
 import com.baidu.brcc.domain.em.FileImportType;
+import com.baidu.brcc.utils.NameTreadFactory;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,9 +111,13 @@ import com.baidu.brcc.utils.collections.CollectionUtils;
 import com.baidu.brcc.utils.time.DateTimeUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PreDestroy;
+
 @Service("configItemService")
 public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, ConfigItemExample>
         implements ConfigItemService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigItemServiceImpl.class);
 
     @Autowired
     private ConfigItemMapper configItemMapper;
@@ -139,6 +151,9 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
 
     @Autowired
     private RccCache rccCache;
+
+    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors()*2
+            , 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NameTreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
 
     @Override
     public BaseMapper<ConfigItem, Long, ConfigItemExample> getMapper() {
@@ -196,6 +211,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Override
     @Transactional
     public Integer batchSave(User user, BatchConfigItemReq itemReq, ConfigGroup configGroup) {
+        long start = System.currentTimeMillis();
         final AtomicInteger result = new AtomicInteger(0);
         Long groupId = itemReq.getGroupId();
         Map<String, ConfigItem> itemMap =
@@ -212,66 +228,76 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         MetaConfigItem.COLUMN_NAME_VAL,
                         MetaConfigItem.COLUMN_NAME_GROUPID
                 );
+        LOGGER.info("query itemMap cost{}", (System.currentTimeMillis()-start));
 
         List<ItemReq> items = itemReq.getItems();
-        Map<String, ItemReq> itemReqMap = CollectionUtils.toMap(items, ItemReq :: getName);
+        Map<String, ItemReq> itemReqMap = CollectionUtils.toMap(items, ItemReq::getName);
         Date now = DateTimeUtils.now();
         if (!CollectionUtils.isEmpty(items)) {
             boolean itemMapEmpty = CollectionUtils.isEmpty(itemMap);
-            items.parallelStream().forEach(req -> {
+            items.forEach(req -> {
+                // 如果不同分组已存在相同配置,返回错误
                 String name = trim(req.getName());
-                if (itemMapEmpty || itemMap.get(name) == null) {
-                    // 新增的
-                    ConfigItem configItemInsert = ConfigItem.newBuilder()
-                            .createTime(now)
-                            .deleted(Deleted.OK.getValue())
-                            .memo(trim(req.getMemo()))
-                            .environmentId(configGroup.getEnvironmentId())
-                            .name(name)
-                            .groupId(groupId)
-                            .projectId(configGroup.getProjectId())
-                            .productId(configGroup.getProductId())
-                            .updateTime(now)
-                            .val(trim(req.getVal()))
-                            .versionId(configGroup.getVersionId())
-                            .build();
-                    insertSelective(configItemInsert);
-                    result.incrementAndGet();
-                } else {
-                    // 需要更新的
-                    ConfigItem configItem = itemMap.get(name);
-                    // 如果不同分组已存在相同配置
-                    if(!configItem.getGroupId().equals(groupId)) {
+                if (!itemMapEmpty && itemMap.get(name) != null) {
+                    if (!itemMap.get(name).getGroupId().equals(groupId)) {
                         throw new BizException(CONFIG_ITEM_EXISTS_MSG, CONFIG_ITEM_EXISTS_STATUS);
                     }
-                    ConfigItem configItemUpdate = ConfigItem.newBuilder()
-                            .id(configItem.getId())
-                            .memo(trim(req.getMemo()))
-                            .updateTime(now)
-                            .val(trim(req.getVal()))
-                            .build();
-                    updateByPrimaryKeySelective(configItemUpdate);
-                    result.incrementAndGet();
                 }
+                executor.execute(() -> {
+                    if (itemMapEmpty || itemMap.get(name) == null) {
+                        // 新增的
+                        ConfigItem configItemInsert = ConfigItem.newBuilder()
+                                .createTime(now)
+                                .deleted(Deleted.OK.getValue())
+                                .memo(trim(req.getMemo()))
+                                .environmentId(configGroup.getEnvironmentId())
+                                .name(name)
+                                .groupId(groupId)
+                                .projectId(configGroup.getProjectId())
+                                .productId(configGroup.getProductId())
+                                .updateTime(now)
+                                .val(trim(req.getVal()))
+                                .versionId(configGroup.getVersionId())
+                                .build();
+                        insertSelective(configItemInsert);
+                        result.incrementAndGet();
+
+                    } else {
+                        // 需要更新的
+                        ConfigItem configItem = itemMap.get(name);
+                        ConfigItem configItemUpdate = ConfigItem.newBuilder()
+                                .id(configItem.getId())
+                                .memo(trim(req.getMemo()))
+                                .updateTime(now)
+                                .val(trim(req.getVal()))
+                                .build();
+                        updateByPrimaryKeySelective(configItemUpdate);
+                        result.incrementAndGet();
+                    }
+                });
             });
-            }
+        }
+        LOGGER.info("update Item cost{}", (System.currentTimeMillis()-start));
         if (!CollectionUtils.isEmpty(itemMap)) {
             boolean isItemsMapEmpty = CollectionUtils.isEmpty(itemReqMap);
             for (ConfigItem item : itemMap.values()) {
                 Long id = item.getId();
                 String name = trim(item.getName());
                 if (isItemsMapEmpty || itemReqMap.get(name) == null) {
-                    // 需要删除的
-                    ConfigItem configItemUpdate = ConfigItem.newBuilder()
-                            .id(id)
-                            .updateTime(now)
-                            .deleted(Deleted.DELETE.getValue())
-                            .build();
-                    updateByPrimaryKeySelective(configItemUpdate);
-                    result.incrementAndGet();
+                    // 若现存和新增的分组ID相同，需要删除
+                    if (item.getGroupId().equals(groupId)) {
+                        ConfigItem configItemUpdate = ConfigItem.newBuilder()
+                                .id(id)
+                                .updateTime(now)
+                                .deleted(Deleted.DELETE.getValue())
+                                .build();
+                        updateByPrimaryKeySelective(configItemUpdate);
+                        result.incrementAndGet();
+                    }
                 }
             }
         }
+        LOGGER.info("delete item cost{}", (System.currentTimeMillis()-start));
 
         // 记录changeLog
         Map<String, String> oldConfigMap = new HashMap<>();
@@ -288,7 +314,16 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         }
         configChangeLogService.saveLogWithBackground(user.getId(), user.getName(), groupId, oldConfigMap, newConfigMap,
                 new Date());
+        LOGGER.info("change lop cost{}", (System.currentTimeMillis()-start));
         return result.get();
+    }
+
+    @PreDestroy
+    public void stop() {
+        LOGGER.info("destroy configItemService executor thread pool.");
+        if (executor != null) {
+            executor.shutdown();
+        }
     }
 
     @Override
