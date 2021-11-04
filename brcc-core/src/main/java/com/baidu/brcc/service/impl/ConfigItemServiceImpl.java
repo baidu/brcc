@@ -152,7 +152,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Autowired
     private RccCache rccCache;
 
-    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors()*2
+    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 2
             , 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NameTreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
 
     @Override
@@ -228,7 +228,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         MetaConfigItem.COLUMN_NAME_VAL,
                         MetaConfigItem.COLUMN_NAME_GROUPID
                 );
-        LOGGER.info("query itemMap cost{}", (System.currentTimeMillis()-start));
+        LOGGER.info("query itemMap cost{}", (System.currentTimeMillis() - start));
 
         List<ItemReq> items = itemReq.getItems();
         Map<String, ItemReq> itemReqMap = CollectionUtils.toMap(items, ItemReq::getName);
@@ -244,40 +244,44 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                     }
                 }
                 executor.execute(() -> {
-                    if (itemMapEmpty || itemMap.get(name) == null) {
-                        // 新增的
-                        ConfigItem configItemInsert = ConfigItem.newBuilder()
-                                .createTime(now)
-                                .deleted(Deleted.OK.getValue())
-                                .memo(trim(req.getMemo()))
-                                .environmentId(configGroup.getEnvironmentId())
-                                .name(name)
-                                .groupId(groupId)
-                                .projectId(configGroup.getProjectId())
-                                .productId(configGroup.getProductId())
-                                .updateTime(now)
-                                .val(trim(req.getVal()))
-                                .versionId(configGroup.getVersionId())
-                                .build();
-                        insertSelective(configItemInsert);
-                        result.incrementAndGet();
-
-                    } else {
-                        // 需要更新的
-                        ConfigItem configItem = itemMap.get(name);
-                        ConfigItem configItemUpdate = ConfigItem.newBuilder()
-                                .id(configItem.getId())
-                                .memo(trim(req.getMemo()))
-                                .updateTime(now)
-                                .val(trim(req.getVal()))
-                                .build();
-                        updateByPrimaryKeySelective(configItemUpdate);
-                        result.incrementAndGet();
-                    }
-                });
+                            try {
+                                if (itemMapEmpty || itemMap.get(name) == null) {
+                                    // 新增的
+                                    ConfigItem configItemInsert = ConfigItem.newBuilder()
+                                            .createTime(now)
+                                            .deleted(Deleted.OK.getValue())
+                                            .memo(trim(req.getMemo()))
+                                            .environmentId(configGroup.getEnvironmentId())
+                                            .name(name)
+                                            .groupId(groupId)
+                                            .projectId(configGroup.getProjectId())
+                                            .productId(configGroup.getProductId())
+                                            .updateTime(now)
+                                            .val(trim(req.getVal()))
+                                            .versionId(configGroup.getVersionId())
+                                            .build();
+                                    insertSelective(configItemInsert);
+                                    result.incrementAndGet();
+                                } else {
+                                    // 需要更新的
+                                    ConfigItem configItem = itemMap.get(name);
+                                    ConfigItem configItemUpdate = ConfigItem.newBuilder()
+                                            .id(configItem.getId())
+                                            .memo(trim(req.getMemo()))
+                                            .updateTime(now)
+                                            .val(trim(req.getVal()))
+                                            .build();
+                                    updateByPrimaryKeySelective(configItemUpdate);
+                                    result.incrementAndGet();
+                                }
+                            } catch (Throwable e) {
+                                LOGGER.error("batchSave error.", e);
+                            }
+                        }
+                );
             });
         }
-        LOGGER.info("update Item cost{}", (System.currentTimeMillis()-start));
+        LOGGER.info("update Item cost{}", (System.currentTimeMillis() - start));
         if (!CollectionUtils.isEmpty(itemMap)) {
             boolean isItemsMapEmpty = CollectionUtils.isEmpty(itemReqMap);
             for (ConfigItem item : itemMap.values()) {
@@ -297,7 +301,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 }
             }
         }
-        LOGGER.info("delete item cost{}", (System.currentTimeMillis()-start));
+        LOGGER.info("delete item cost{}", (System.currentTimeMillis() - start));
 
         // 记录changeLog
         Map<String, String> oldConfigMap = new HashMap<>();
@@ -314,13 +318,13 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         }
         configChangeLogService.saveLogWithBackground(user.getId(), user.getName(), groupId, oldConfigMap, newConfigMap,
                 new Date());
-        LOGGER.info("change lop cost{}", (System.currentTimeMillis()-start));
+        LOGGER.info("change lop cost{}", (System.currentTimeMillis() - start));
         return result.get();
     }
 
     @PreDestroy
     public void stop() {
-        LOGGER.info("destroy configItemService executor thread pool.");
+        LOGGER.info("destory configItemService executor thread pool.");
         if (executor != null) {
             executor.shutdown();
         }
