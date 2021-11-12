@@ -311,5 +311,4 @@ public class ErrorStatusMsg {
     public static final Integer FILE_NAME_INVALID_STATUS = 100228;
     public static final String FILE_NAME_INVALID_MSG = "文件名字不符合规范";
     
-
 }
