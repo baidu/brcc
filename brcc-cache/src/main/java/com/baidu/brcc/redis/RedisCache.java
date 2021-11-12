@@ -54,8 +54,8 @@ public class RedisCache implements Cache {
     @Value("${rcc.cache.enable:true}")
     private boolean cacheEnable;
 
-    // 缓存过期时间，默认2小时
-    @Value("${rcc.cache.default.expire: 7200}")
+    // 缓存过期时间，默认30s
+    @Value("${rcc.cache.default.expire: 30}")
     private long expireTime;
 
     @Autowired
