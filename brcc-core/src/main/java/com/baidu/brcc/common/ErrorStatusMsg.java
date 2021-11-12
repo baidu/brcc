@@ -310,9 +310,6 @@ public class ErrorStatusMsg {
     // file name invalid
     public static final Integer FILE_NAME_INVALID_STATUS = 100228;
     public static final String FILE_NAME_INVALID_MSG = "文件名字不符合规范";
-
-    //
-    public static final Integer REDIS_ERROR_STATUS = 100229;
-    public static final String REDIS_ERROR_MSG = "缓存失效错误";
+    
 
 }
