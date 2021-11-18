@@ -113,6 +113,7 @@ public class ProductServiceImpl extends GenericServiceImpl<Product, Long, Produc
         boolean isAdmin = UserRole.SYSADMIN.getValue().equals(user.getRole());
 
         Set<Long> productIds = null;
+        // 不是系统管理员
         if (!isAdmin) {
             List<ProductUser> products = productUserService.selectByExample(ProductUserExample.newBuilder()
                             .build()

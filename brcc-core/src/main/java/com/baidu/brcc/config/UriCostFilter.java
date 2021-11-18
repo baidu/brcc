@@ -29,6 +29,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.baidu.brcc.utils.LogFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,21 +86,24 @@ public class UriCostFilter implements Filter {
                 LOGGER.error("parseLong [{}] error.", frontStartTs);
             }
         }
-        if (LOGGER.isDebugEnabled() && !StringUtils.startsWith(uri, "/actuator") && !uri.endsWith(".js") && !uri.endsWith(".css") && !uri.startsWith("/img/")
-                && !uri.startsWith("/index/") && !uri.endsWith(".png")) {
+        if (LOGGER.isDebugEnabled() && !StringUtils.startsWith(uri, "/actuator")) {
             try {
                 chain.doFilter(request, response);
             } finally {
                 long end = System.currentTimeMillis();
                 // doFilter后写header将无效
                 // httpServletResponse.setHeader(HEADER_RCC_SERVER_OUT_TS, end + "");
-                LOGGER.debug(
-                        "request_uri\t[{}]\tnet_cost[{}]\tserver_cost[{}]\tremote_addr[{}]",
-                        uri,
-                        rccTs > 0 ? start - rccTs : -1,
-                        end - start,
-                        request.getRemoteAddr()
-                );
+                if(!uri.endsWith(".js") && !uri.endsWith(".css") && !uri.startsWith("/img/")
+                        && !uri.startsWith("/index/") && !uri.endsWith(".png")) {
+                    uri = LogFilter.getUrl(request);
+                    LOGGER.debug(
+                            "request_uri\t[{}]\tnet_cost[{}]\tserver_cost[{}]\tremote_addr[{}]",
+                            uri,
+                            rccTs > 0 ? start - rccTs : -1,
+                            end - start,
+                            request.getRemoteAddr()
+                    );
+                }
             }
         } else {
             chain.doFilter(request, response);

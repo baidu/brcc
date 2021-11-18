@@ -70,6 +70,7 @@ public class RetryActionWithThrParam<P1, P2, P3, R> {
                 );
             } catch (Exception ex) {
                 log.error("{} arg0[{}] arg1[{}] arg2[{}] in redis fail.",
+                        actionName,
                         GsonUtils.toJsonString(p1),
                         GsonUtils.toJsonString(p2),
                         GsonUtils.toJsonString(p3),

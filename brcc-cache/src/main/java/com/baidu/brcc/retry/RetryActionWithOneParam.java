@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -61,7 +61,7 @@ public class RetryActionWithOneParam<P, R> {
                         ex
                 );
             } catch (Exception ex) {
-                log.error("{} arg0[{}] in redis fail.", GsonUtils.toJsonString(param), ex);
+                log.error("{} arg0[{}] in redis fail.", actionName, GsonUtils.toJsonString(param), ex);
                 break;
             }
         } while (times < retryTimes);

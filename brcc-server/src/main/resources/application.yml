@@ -16,7 +16,7 @@ spring:
       allow-pool-suspension: false
       connection-timeout: 30000
       idle-timeout: 600000
-      max-lifetime: 1800000
+      max-lifetime: 1200000
     name: rcc-datasource
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://${db.host}:${db.port}/brcc?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false

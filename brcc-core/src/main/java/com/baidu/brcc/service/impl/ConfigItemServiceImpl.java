@@ -152,7 +152,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Autowired
     private RccCache rccCache;
 
-    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 2
+    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors()*2
             , 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NameTreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
 
     @Override
@@ -211,7 +211,6 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Override
     @Transactional
     public Integer batchSave(User user, BatchConfigItemReq itemReq, ConfigGroup configGroup) {
-        long start = System.currentTimeMillis();
         final AtomicInteger result = new AtomicInteger(0);
         Long groupId = itemReq.getGroupId();
         Map<String, ConfigItem> itemMap =
@@ -228,7 +227,6 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                         MetaConfigItem.COLUMN_NAME_VAL,
                         MetaConfigItem.COLUMN_NAME_GROUPID
                 );
-        LOGGER.info("query itemMap cost{}", (System.currentTimeMillis() - start));
 
         List<ItemReq> items = itemReq.getItems();
         Map<String, ItemReq> itemReqMap = CollectionUtils.toMap(items, ItemReq::getName);
@@ -244,7 +242,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                     }
                 }
                 executor.execute(() -> {
-                            try {
+                            try{
                                 if (itemMapEmpty || itemMap.get(name) == null) {
                                     // 新增的
                                     ConfigItem configItemInsert = ConfigItem.newBuilder()
@@ -262,6 +260,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                                             .build();
                                     insertSelective(configItemInsert);
                                     result.incrementAndGet();
+
                                 } else {
                                     // 需要更新的
                                     ConfigItem configItem = itemMap.get(name);
@@ -274,14 +273,13 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                                     updateByPrimaryKeySelective(configItemUpdate);
                                     result.incrementAndGet();
                                 }
-                            } catch (Throwable e) {
+                            }catch (Throwable e){
                                 LOGGER.error("batchSave error.", e);
                             }
                         }
                 );
             });
         }
-        LOGGER.info("update Item cost{}", (System.currentTimeMillis() - start));
         if (!CollectionUtils.isEmpty(itemMap)) {
             boolean isItemsMapEmpty = CollectionUtils.isEmpty(itemReqMap);
             for (ConfigItem item : itemMap.values()) {
@@ -301,7 +299,6 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 }
             }
         }
-        LOGGER.info("delete item cost{}", (System.currentTimeMillis() - start));
 
         // 记录changeLog
         Map<String, String> oldConfigMap = new HashMap<>();
@@ -318,7 +315,6 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
         }
         configChangeLogService.saveLogWithBackground(user.getId(), user.getName(), groupId, oldConfigMap, newConfigMap,
                 new Date());
-        LOGGER.info("change lop cost{}", (System.currentTimeMillis() - start));
         return result.get();
     }
 
