@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -57,6 +58,8 @@ public class RedisCache implements Cache {
     // 缓存过期时间，默认30s
     @Value("${rcc.cache.default.expire: 30}")
     private long expireTime;
+
+    private Random random = new Random();
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -154,7 +157,7 @@ public class RedisCache implements Cache {
 
     @Override
     public Boolean put(String key, Object value) throws DataAccessException {
-        return put(key, value, null);
+        return put(key, value, expireTime + random.nextInt(10));
     }
 
     @Override

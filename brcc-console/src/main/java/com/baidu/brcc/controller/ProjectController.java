@@ -474,6 +474,14 @@ public class ProjectController {
         return R.ok(pagination, ext);
     }
 
+    /**
+     * add project dependency
+     *
+     * @param refProjectDto
+     * @param user
+     * @param projectId
+     * @return
+     */
     @SaveLog(scene = "0012",
             paramsIdxes = {0, 1},
             params = {"projectId", "refProjectDto"})
