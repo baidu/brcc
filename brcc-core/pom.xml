@@ -112,4 +112,16 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>mybatis/**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
 </project>
