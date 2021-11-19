@@ -20,6 +20,7 @@ package com.baidu.brcc.config;
 
 import java.util.List;
 
+import com.baidu.brcc.interceptor.ApiCountInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -27,6 +28,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.baidu.brcc.service.BrccInstanceService;
@@ -43,6 +45,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${rcc.user.type.default}")
     private byte defaultUserType;
 
+    /**
+     * 是否开启api调用次数统计
+     */
+    @Value("${rcc.enableApiCount:false}")
+    private boolean enableApiCount;
+
     @Autowired
     UserCache userCache;
 
@@ -51,6 +59,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     BrccInstanceService brccInstanceService;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(apiCountInterceptor()).addPathPatterns("/api/**");
+        WebMvcConfigurer.super.addInterceptors(registry);
+    }
+
+    @Bean(initMethod = "init", destroyMethod = "destroy")
+    public ApiCountInterceptor apiCountInterceptor() {
+        return new ApiCountInterceptor(this.enableApiCount);
+    }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
