@@ -72,4 +72,9 @@ public class ApiCountServiceImpl implements ApiCountService {
         return result == 1;
     }
 
+    @Override
+    public List<ApiCount> queryByProductCacheKeys(List<String> productCacheKeys) {
+        return apiCountMapper.queryByProductCacheKeys(productCacheKeys);
+    }
+
 }

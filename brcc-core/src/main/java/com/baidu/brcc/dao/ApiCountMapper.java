@@ -14,4 +14,6 @@ public interface ApiCountMapper {
     int updateApiCount(ApiCount apiCount);
 
     int insertApiCount(ApiCount apiCount);
+
+    List<ApiCount> queryByProductCacheKeys(@Param("productCacheKeys") List<String> productCacheKeys);
 }

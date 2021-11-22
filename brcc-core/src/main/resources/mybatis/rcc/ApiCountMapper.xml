@@ -40,4 +40,12 @@
         values (#{productName, jdbcType=VARCHAR}, #{productCount, jdbcType=BIGINT}, #{productCacheKey,jdbcType=VARCHAR}, #{version, jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP})
     </insert>
 
+    <select id="queryByProductCacheKeys" parameterType="java.util.List" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from rcc_api_count where product_cache_key in
+        <foreach collection="productCacheKeys" item="productCacheKey" index="index" open="(" close=")" separator=",">
+            #{productCacheKey, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
 </mapper>
