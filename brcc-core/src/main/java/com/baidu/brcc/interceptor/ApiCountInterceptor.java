@@ -85,7 +85,11 @@ public class ApiCountInterceptor implements HandlerInterceptor {
             });
         }
         scheduledThreadPoolExecutor.scheduleWithFixedDelay(() -> {
-            insertOrUpdateApiCountInfo();
+            try {
+                insertOrUpdateApiCountInfo();
+            } catch (Exception e) {
+                logger.warn("thread exception throw, due to {}", e.getMessage(), e);
+            }
         }, interval, interval, TimeUnit.MINUTES);
     }
 
