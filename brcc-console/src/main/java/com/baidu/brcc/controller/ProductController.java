@@ -30,6 +30,7 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_STATUS;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -89,67 +90,15 @@ public class ProductController {
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("save")
-    public R saveProduct(@RequestBody ProductReq req, @LoginUser User user) {
+    public R<Long> saveProduct(@RequestBody ProductReq req, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
-        Long id = req.getId();
-        String name = trim(req.getName());
-        Date now = DateTimeUtils.now();
-        if (id != null && id > 0) {
-            // 修改
-            Product product = productService.selectByPrimaryKey(id);
-            if (product == null) {
-                return R.error(PRODUCT_NOT_EXISTS_STATUS, PRODUCT_NOT_EXISTS_MSG);
-            }
-            if (!productUserService.checkAuth(id, user)) {
-                return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
-            }
-            Product update = new Product();
-            update.setId(id);
-            update.setUpdateTime(now);
-            if (StringUtils.isNotBlank(name)) {
-                Product exists = productService.selectOneByExample(ProductExample.newBuilder()
-                                .build()
-                                .createCriteria()
-                                .andIdNotEqualTo(id)
-                                .andNameEqualTo(name)
-                                .toExample(),
-                        MetaProduct.COLUMN_NAME_ID
-                );
-                if (exists != null) {
-                    return R.error(PRODUCT_EXISTS_STATUS, PRODUCT_EXISTS_MSG);
-                }
-                update.setName(name);
-            }
-            update.setMemo(req.getMemo());
-            productService.updateByPrimaryKeySelective(update);
-        } else {
-            if (!UserRole.SYSADMIN.getValue().equals(user.getRole())) {
-                return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
-            }
-            // 新增
-            if (StringUtils.isBlank(name)) {
-                return R.error(PRODUCT_NAME_EMPTY_STATUS, PRODUCT_NAME_EMPTY_MSG);
-            }
-            Product product = productService.selectOneByExample(ProductExample.newBuilder()
-                            .build()
-                            .createCriteria()
-                            .andNameEqualTo(name)
-                            .toExample(),
-                    MetaProject.COLUMN_NAME_ID
-            );
-            if (product != null) {
-                return R.error(PRODUCT_EXISTS_STATUS, PRODUCT_EXISTS_MSG);
-            }
-            Product insert = new Product();
-            insert.setUpdateTime(now);
-            insert.setCreateTime(now);
-            insert.setName(name);
-            insert.setMemo(req.getMemo());
-            productService.insertSelective(insert);
-            id = insert.getId();
-        }
+        Product product = new Product();
+        product.setId(req.getId());
+        product.setName(req.getName());
+        product.setMemo(req.getMemo());
+        Long id = productService.saveProduct(product, user);
         return R.ok(id);
     }
 

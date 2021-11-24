@@ -39,4 +39,6 @@ public interface ProductService extends GenericService<Product, Long, ProductExa
     void addMember(List<String> members, Long productId);
 
     Product selectByName(String name);
+
+    Long saveProduct(Product product, User user);
 }
