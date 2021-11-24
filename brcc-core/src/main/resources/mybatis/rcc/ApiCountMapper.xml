@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baidu.brcc.dao.ApiCountMapper">
+    <resultMap id="BaseResultMap" type="com.baidu.brcc.domain.ApiCount">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="product_count" jdbcType="BIGINT" property="productCount"/>
+        <result column="product_cache_key" jdbcType="VARCHAR" property="productCacheKey"/>
+        <result column="version" jdbcType="BIGINT" property="version"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    id, product_name, product_count, product_cache_key, version, update_time, create_time
+    </sql>
+
+    <select id="queryByProductCacheKey" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from rcc_api_count where product_cache_key = #{productCacheKey}
+    </select>
+
+    <update id="updateApiCount" parameterType="com.baidu.brcc.domain.ApiCount">
+        update rcc_api_count
+        <set>
+            <if test="version != null">
+                version = #{version, jdbcType=BIGINT} + 1,
+            </if>
+            <if test="productCount != null">
+                product_count = #{productCount, jdbcType=BIGINT}
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT} and product_cache_key = #{productCacheKey,jdbcType=VARCHAR} and version =
+        #{version, jdbcType=BIGINT}
+    </update>
+
+    <insert id="insertApiCount" parameterType="com.baidu.brcc.domain.ApiCount">
+        insert into rcc_api_count (product_name, product_count, product_cache_key, version, create_time)
+        values (#{productName, jdbcType=VARCHAR}, #{productCount, jdbcType=BIGINT}, #{productCacheKey,jdbcType=VARCHAR}, #{version, jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="queryByProductCacheKeys" parameterType="java.util.List" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from rcc_api_count where product_cache_key in
+        <foreach collection="productCacheKeys" item="productCacheKey" index="index" open="(" close=")" separator=",">
+            #{productCacheKey, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+</mapper>

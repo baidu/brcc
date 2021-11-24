@@ -8,3 +8,10 @@ rcc:
   enableUpdateCallback: true
   appName: example
 
+spring:
+  mvc:
+    servlet:
+      path: /
+server:
+  servlet:
+    context-path: /

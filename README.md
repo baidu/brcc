@@ -73,6 +73,7 @@
 - [xiemalin](https://github.com/jhunters)
 - [caolei](https://github.com/hubeicaolei)
 - [shiminyan](https://github.com/aroundpie)
+- [geyoujia](https://github.com/yogazx)
 - [zhaofakai](https://github.com/fkzhao)
 
 ## 贡献

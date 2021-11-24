@@ -55,6 +55,8 @@ You can learn how to use BRCC by these guides.
 
 [Deploy Guide](en-deploy-guide.md)
 
+[Console Guide](en-manage-guide.md)
+
 [Open API Guide](en-open-api.md)
 
 [Java SDK Guide](en-java-sdk-guide.md)

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,6 +20,8 @@ package com.baidu.brcc.example.config;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,18 +32,26 @@ import com.baidu.brcc.DefaultConfigItemChangedCallable;
 @Configuration
 public class ExampleConfiguration {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExampleConfiguration.class);
+
     @Value("${a}")
     private String a;
 
     @PostConstruct
     public void init() {
-        System.out.println("load properties a from rcc, the value is " + a);
+        LOGGER.info("load properties a from rcc, the value is {}", a);
     }
 
     @Bean
     public ConfigItemChangedCallable configItemChangedCallable() {
-        return new DefaultConfigItemChangedCallable();
+        return new ItemCallback();
     }
 
+    public String getA() {
+        return a;
+    }
 
+    public void setA(String a) {
+        this.a = a;
+    }
 }
