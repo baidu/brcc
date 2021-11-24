@@ -94,65 +94,11 @@ public class ProductController {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
-        Long id = req.getId();
-        String name = trim(req.getName());
-        Date now = DateTimeUtils.now();
-        if (id != null && id > 0) {
-            // 修改
-            Product product = productService.selectByPrimaryKey(id);
-            if (product == null) {
-                return R.error(PRODUCT_NOT_EXISTS_STATUS, PRODUCT_NOT_EXISTS_MSG);
-            }
-            if (!productUserService.checkAuth(id, user)) {
-                return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
-            }
-            Product update = new Product();
-            update.setId(id);
-            update.setUpdateTime(now);
-            if (StringUtils.isNotBlank(name)) {
-                Product exists = productService.selectOneByExample(ProductExample.newBuilder()
-                                .build()
-                                .createCriteria()
-                                .andIdNotEqualTo(id)
-                                .andNameEqualTo(name)
-                                .toExample(),
-                        MetaProduct.COLUMN_NAME_ID
-                );
-                if (exists != null) {
-                    return R.error(PRODUCT_EXISTS_STATUS, PRODUCT_EXISTS_MSG);
-                }
-                update.setName(name);
-            }
-            update.setMemo(req.getMemo());
-            int productId = productService.updateByPrimaryKeySelective(update);
-            id = (long) productId;
-        } else {
-            // 新增
-            if (StringUtils.isBlank(name)) {
-                return R.error(PRODUCT_NAME_EMPTY_STATUS, PRODUCT_NAME_EMPTY_MSG);
-            }
-            Product product = productService.selectOneByExample(ProductExample.newBuilder()
-                            .build()
-                            .createCriteria()
-                            .andNameEqualTo(name)
-                            .toExample(),
-                    MetaProject.COLUMN_NAME_ID
-            );
-            if (product != null) {
-                return R.error(PRODUCT_EXISTS_STATUS, PRODUCT_EXISTS_MSG);
-            }
-            Product insert = new Product();
-            insert.setUpdateTime(now);
-            insert.setCreateTime(now);
-            insert.setName(name);
-            insert.setMemo(req.getMemo());
-            productService.insertSelective(insert);
-            id = insert.getId();
-            // 给用户添加产品线管理员权限
-            List<String> member = new ArrayList<>();
-            member.add(user.getName());
-            productService.addMember(member, id);
-        }
+        Product product = new Product();
+        product.setId(req.getId());
+        product.setName(req.getName());
+        product.setMemo(req.getMemo());
+        Long id = productService.saveProduct(product, user);
         return R.ok(id);
     }
 
