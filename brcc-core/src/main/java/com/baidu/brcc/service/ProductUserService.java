@@ -18,6 +18,7 @@
  */
 package com.baidu.brcc.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baidu.brcc.service.base.GenericService;
@@ -32,4 +33,6 @@ public interface ProductUserService extends GenericService<ProductUser, Long, Pr
     Map<Long, ProductUser> queryProductUserByProductId(Long productId);
 
     boolean checkAuth(Long productId, User user);
+
+    String selectProductManagerByProductId(Long productId);
 }

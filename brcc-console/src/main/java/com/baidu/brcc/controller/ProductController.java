@@ -30,6 +30,7 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_NOT_EXISTS_STATUS;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +90,7 @@ public class ProductController {
             paramsIdxes = {0},
             params = {"req"})
     @PostMapping("save")
-    public R saveProduct(@RequestBody ProductReq req, @LoginUser User user) {
+    public R<Long> saveProduct(@RequestBody ProductReq req, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
@@ -123,11 +124,9 @@ public class ProductController {
                 update.setName(name);
             }
             update.setMemo(req.getMemo());
-            productService.updateByPrimaryKeySelective(update);
+            int productId = productService.updateByPrimaryKeySelective(update);
+            id = (long) productId;
         } else {
-            if (!UserRole.SYSADMIN.getValue().equals(user.getRole())) {
-                return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
-            }
             // 新增
             if (StringUtils.isBlank(name)) {
                 return R.error(PRODUCT_NAME_EMPTY_STATUS, PRODUCT_NAME_EMPTY_MSG);
@@ -149,6 +148,10 @@ public class ProductController {
             insert.setMemo(req.getMemo());
             productService.insertSelective(insert);
             id = insert.getId();
+            // 给用户添加产品线管理员权限
+            List<String> member = new ArrayList<>();
+            member.add(user.getName());
+            productService.addMember(member, id);
         }
         return R.ok(id);
     }

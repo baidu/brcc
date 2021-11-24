@@ -18,9 +18,12 @@
  */
 package com.baidu.brcc.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.brcc.domain.Product;
+import com.baidu.brcc.domain.exception.BizException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +78,7 @@ public class ProductUserServiceImpl extends GenericServiceImpl<ProductUser, Long
                         .createCriteria()
                         .andProductIdEqualTo(productId)
                         .toExample(),
-                ProductUser :: getUserId
+                ProductUser::getUserId
         );
     }
 
@@ -97,5 +100,23 @@ public class ProductUserServiceImpl extends GenericServiceImpl<ProductUser, Long
                 MetaProductUser.COLUMN_NAME_ID
         );
         return productUser != null;
+    }
+
+    @Override
+    public String selectProductManagerByProductId(Long productId) {
+        List<ProductUser> productUserList = selectByExample(ProductUserExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andProductIdEqualTo(productId)
+                .andIsAdminEqualTo(ProductUserAdmin.YES.getValue()).toExample());
+        if (productUserList == null || productUserList.size() <= 0) {
+            return null;
+        }
+        StringBuilder name = new StringBuilder();
+        for(ProductUser item : productUserList) {
+            name.append(item.getUserName());
+            name.append(',');
+        }
+        return name.substring(0,name.length() - 1);
     }
 }
