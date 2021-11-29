@@ -27,11 +27,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(scanBasePackages = {"com.baidu.brcc"})
 @MapperScan(annotationClass = org.apache.ibatis.annotations.Mapper.class, basePackages = "com.baidu.brcc.dao")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
+@EnableSwagger2
 public class RccApplication {
 
     static {
