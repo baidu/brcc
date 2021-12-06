@@ -158,7 +158,6 @@ public class ProjectController {
      * 保存工程
      *
      * @param req
-     *
      * @return
      */
     @SaveLog(scene = "0009",
@@ -166,7 +165,7 @@ public class ProjectController {
             params = {"req"}
     )
     @PostMapping("save")
-    public R addProject(@RequestBody ProjectReq req, @RequestParam(defaultValue = "0") String apiPassword, @LoginUser User user) {
+    public R addProject(@RequestBody ProjectReq req, @RequestParam(required = false) String apiPassword, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
@@ -180,6 +179,7 @@ public class ProjectController {
         }
         String cacheEvictProjectName = null;
         List<String> cacheEvictApiTokens = null;
+        String token = UUID.randomUUID().toString().replace("-", "");
         if (id != null && id > 0) {
             // 修改
             Project project = projectService.selectByPrimaryKey(id,
@@ -218,18 +218,28 @@ public class ProjectController {
             update.setMailReceiver(req.getMailReceiver());
             update.setMemo(req.getMemo());
             update.setProjectType(projectType);
+            if (isNotBlank(apiPassword)) {
+                update.setApiPassword(Md5Util.md5(apiPassword));
+                update.setApiToken(token);
+            }
             projectService.updateByPrimaryKeySelective(update);
 
             cacheEvictApiTokens = new ArrayList<>();
-            if (!StringUtils.equals(name, project.getName())) {
-                // 修改了名称
+            if (!StringUtils.equals(name, project.getName()) || isNotBlank(apiPassword)) {
                 List<ApiToken> apiTokens = apiTokenService.selectByProjectId(
                         project.getId(),
                         MetaApiToken.COLUMN_NAME_ID,
                         MetaApiToken.COLUMN_NAME_TOKEN
                 );
                 for (ApiToken apiToken : apiTokens) {
-                    apiToken.setProjectName(name);
+                    // 若修改了名称
+                    if (!StringUtils.equals(name, project.getName())) {
+                        apiToken.setProjectName(name);
+                    }
+                    // 若修改了API密码
+                    if (isNotBlank(apiPassword)) {
+                        apiToken.setToken(token);
+                    }
                     apiToken.setUpdateTime(new Date());
                     apiTokenService.updateByPrimaryKeySelective(apiToken);
                     cacheEvictApiTokens.add(apiToken.getToken());
@@ -244,7 +254,7 @@ public class ProjectController {
             if (isBlank(name)) {
                 return R.error(PROJECT_NAME_NOT_EXISTS_STATUS, PROJECT_NAME_NOT_EXISTS_MSG);
             }
-            if (isBlank(apiPassword)) {
+            if (apiPassword == null || isBlank(apiPassword)) {
                 return R.error(PROJECT_API_PASSWORD_NOT_EXISTS_STATUS, PROJECT_API_PASSWORD_NOT_EXISTS_MSG);
             }
             Product product = productService.selectByPrimaryKey(productId);
@@ -269,7 +279,6 @@ public class ProjectController {
             }
 
             String pwd = Md5Util.md5(apiPassword);
-            String token = UUID.randomUUID().toString().replace("-", "");
             Project insert = new Project();
             insert.setUpdateTime(now);
             insert.setCreateTime(now);
@@ -306,7 +315,7 @@ public class ProjectController {
     @SaveLog(scene = "0010",
             paramsIdxes = {0},
             params = {"projectId"}
-            )
+    )
     @PostMapping("/resetApiPassword/{projectId}")
     public R resetApiPassword(@PathVariable("projectId") Long projectId, @LoginUser User loginUser,
                               @RequestBody ResetApiPasswordVo resetApiPassword) {
@@ -395,7 +404,6 @@ public class ProjectController {
      * 获取工程list
      *
      * @param productId
-     *
      * @return
      */
     @GetMapping("list")
@@ -536,7 +544,6 @@ public class ProjectController {
      * @param projectId
      * @param projectUserDto
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "0013",
@@ -647,7 +654,6 @@ public class ProjectController {
      * @param projectId
      * @param userIds
      * @param user
-     *
      * @return
      */
     @SaveLog(scene = "0014",
@@ -687,7 +693,6 @@ public class ProjectController {
      * 获取成员列表
      *
      * @param projectId
-     *
      * @return
      */
     @GetMapping("getMemberList")

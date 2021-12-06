@@ -9,7 +9,7 @@
 
     <groupId>com.baidu.mapp</groupId>
     <artifactId>brcc-example</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.5-SNAPSHOT</version>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
