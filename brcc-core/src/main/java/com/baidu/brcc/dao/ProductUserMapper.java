@@ -23,7 +23,12 @@ import org.apache.ibatis.annotations.Mapper;
 import com.baidu.brcc.dao.base.BaseMapper;
 import com.baidu.brcc.domain.ProductUser;
 import com.baidu.brcc.domain.ProductUserExample;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface ProductUserMapper extends BaseMapper<ProductUser, Long, ProductUserExample> {
+
+    List<ProductUser> queryProductIdsByUserNameAndAdmin(@Param("username") String username, @Param("isAdmin") byte isAdmin);
 }
