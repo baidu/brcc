@@ -308,4 +308,10 @@
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="queryProductIdsByUserNameAndAdmin" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from rcc_product_user
+    where user_name = #{username, jdbcType=VARCHAR} and is_admin = #{isAdmin, jdbcType=TINYINT}
+  </select>
 </mapper>
