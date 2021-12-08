@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -95,59 +95,63 @@ public class UserAuthFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-
-        String uri = httpServletRequest.getRequestURI();
-        boolean noAuth = noAuth(uri);
-        User user = null;
-        if (!noAuth) {
-            String xtoken = httpServletRequest.getHeader(XTOKEN);
-            if (StringUtils.isBlank(xtoken)) {
-                xtoken = httpServletRequest.getParameter(XTOKEN);
-            }
-            R r = R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
-            try {
-                boolean flag = true;
-                if (StringUtils.isBlank(xtoken)) {
-                    String userName = httpServletRequest.getRemoteUser();
-                    if (StringUtils.isBlank(userName)) {
+        try {
+            String uri = httpServletRequest.getRequestURI();
+            boolean noAuth = noAuth(uri);
+            User user = null;
+            if (!noAuth) {
+                User currentUser = UserThreadLocal.currentUser();
+                if (null == currentUser) {
+                    String xtoken = httpServletRequest.getHeader(XTOKEN);
+                    if (StringUtils.isBlank(xtoken)) {
+                        xtoken = httpServletRequest.getParameter(XTOKEN);
+                    }
+                    R r = R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+                    try {
+                        boolean flag = true;
+                        if (StringUtils.isBlank(xtoken)) {
+                            String userName = httpServletRequest.getRemoteUser();
+                            if (StringUtils.isBlank(userName)) {
+                                write(httpServletResponse, r);
+                                return;
+                            }
+                            user = userCache.getUserByName(userName);
+                            if (user == null) {
+                                userService.addUserIfNotExist(userName, UserRole.NORMAL.getValue(), defaultUserType);
+                                user = userCache.getUserByName(userName);
+                            }
+                            flag = false;
+                        }
+                        if (flag) {
+                            user = userCache.getUserByToken(xtoken);
+                            if (user == null) {
+                                write(httpServletResponse, r);
+                                return;
+                            }
+                            // 禁用状态
+                            if (user.getStatus() != 0) {
+                                write(httpServletResponse, R.error(USER_NOT_AVAILABLE_STATUS, USER_NOT_AVAILABLE_MSG));
+                                return;
+                            }
+                        }
+                        UserThreadLocal.setUser(user);
+                    } catch (Exception e) {
+                        LOGGER.error("UserAuthFilter error", e);
                         write(httpServletResponse, r);
                         return;
                     }
-                    user = userCache.getUserByName(userName);
-                    if (user == null) {
-                        userService.addUserIfNotExist(userName, UserRole.NORMAL.getValue(), defaultUserType);
-                        user = userCache.getUserByName(userName);
-                    }
-                    flag = false;
-                }
-                if (flag) {
-                    user = userCache.getUserByToken(xtoken);
-                    if (user == null) {
-                        write(httpServletResponse, r);
-                        return;
-                    }
+                } else {
                     // 禁用状态
-                    if (user.getStatus() != 0) {
+                    if (currentUser.getStatus() != 0) {
                         write(httpServletResponse, R.error(USER_NOT_AVAILABLE_STATUS, USER_NOT_AVAILABLE_MSG));
                         return;
                     }
                 }
-                UserThreadLocal.setUser(user);
-            } catch (Exception e) {
-                LOGGER.error("UserAuthFilter error", e);
-                write(httpServletResponse, r);
-                return;
             }
+            chain.doFilter(request, response);
+        } finally {
+            UserThreadLocal.removeUser();
         }
-
-        if (!noAuth && user == null) {
-            String userName = httpServletRequest.getRemoteUser();
-            user = userCache.getUserByName(userName);
-            UserThreadLocal.setUser(user);
-        }
-
-        chain.doFilter(request, response);
-        UserThreadLocal.removeUser();
     }
 
     private void write(HttpServletResponse httpServletResponse, R r) throws IOException {
