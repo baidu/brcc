@@ -125,7 +125,7 @@ public class ProductUserServiceImpl extends GenericServiceImpl<ProductUser, Long
 
     @Override
     public List<Long> queryProductsByUserNameAndAdmin(String username, byte isAdmin) {
-        List<ProductUser> productUserList = productUserMapper.queryProductIdsByUserNameAndAdmin(username, Constants.IS_ADMIN);
+        List<ProductUser> productUserList = productUserMapper.queryProductIdsByUserNameAndAdmin(username, isAdmin);
         if (CollectionUtils.isEmpty(productUserList)) {
             return new ArrayList<>();
         }
