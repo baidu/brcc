@@ -448,7 +448,7 @@ public class ConfigItemController {
 
     ) {
         if (isBlank(val) && isBlank(key)) {
-            return R.error(CONFIG_KEY_VALUE_NOT_EXISTS_STATUS, CONFIG_KEY_VALUE_NOT_EXISTS_MSG);
+            return R.ok(new Pagination<ConfigItemVo>());
         }
         int offset = (pageNo - 1) * pageSize;
         Pagination<ConfigItemVo> pagination =

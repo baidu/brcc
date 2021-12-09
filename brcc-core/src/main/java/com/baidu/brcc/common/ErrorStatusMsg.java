@@ -311,4 +311,15 @@ public class ErrorStatusMsg {
     public static final Integer FILE_NAME_INVALID_STATUS = 100228;
     public static final String FILE_NAME_INVALID_MSG = "文件名字不符合规范";
 
+    // type can not be null
+    public static final Integer TYPE_NULL_STATUS = 100229;
+    public static final String TYPE_NULL_MSG = "类型不能为空";
+
+    // ID can not be null
+    public static final Integer ID_NULL_STATUS = 100230;
+    public static final String ID_NULL_MSG = "ID不能为空";
+
+    // name can not be null
+    public static final Integer NAME_NULL_STATUS = 100231;
+    public static final String NAME_NULL_MSG = "名称不能为空";
 }

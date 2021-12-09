@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -173,5 +173,15 @@ public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, Projec
                 .andNameEqualTo(name)
                 .toExample()
         );
+    }
+
+    @Override
+    public List<Project> selectByProductId(Long productId) {
+        return selectByExample(ProjectExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andProductIdEqualTo(productId)
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample());
     }
 }

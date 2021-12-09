@@ -18,6 +18,7 @@
  */
 package com.baidu.brcc.service.impl;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +29,9 @@ import java.util.Set;
 
 import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.FileImportType;
+import com.baidu.brcc.domain.em.LoadType;
 import com.baidu.brcc.domain.exception.BizException;
+import com.baidu.brcc.domain.vo.FindTreeInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -689,5 +692,68 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
             groupId = insert.getId();
         }
         return groupId;
+    }
+
+    @Override
+    public List<FindTreeInfoVo> loadTreeInfo(Long id, Byte type) {
+        List<FindTreeInfoVo> res = new ArrayList<>();
+        if (type.equals(LoadType.PROJECT.getValue())) {
+            // load project
+            List<Project> projects = projectService.selectByProductId(id);
+            if (projects == null || projects.size() == 0) {
+                return res;
+            }
+            for (Project item : projects) {
+                FindTreeInfoVo findTreeInfoVo = new FindTreeInfoVo();
+                findTreeInfoVo.setId(item.getId());
+                findTreeInfoVo.setName(item.getName());
+                res.add(findTreeInfoVo);
+            }
+        }
+        if (type.equals(LoadType.ENVIRONMENT.getValue())) {
+            // load environment
+            List<Environment> environments = environmentService.selectByProjectId(id);
+            if (environments == null || environments.size() == 0) {
+                return res;
+            }
+            for (Environment item : environments) {
+                FindTreeInfoVo findTreeInfoVo = new FindTreeInfoVo();
+                findTreeInfoVo.setId(item.getId());
+                findTreeInfoVo.setName(item.getName());
+                res.add(findTreeInfoVo);
+            }
+        }
+        if (type.equals(LoadType.VERSION.getValue())) {
+            // load version
+            List<Version> versions = versionService.selectByEnvironmentId(id);
+            if (versions == null || versions.size() == 0) {
+                return res;
+            }
+            for (Version item : versions) {
+                FindTreeInfoVo findTreeInfoVo = new FindTreeInfoVo();
+                findTreeInfoVo.setId(item.getId());
+                findTreeInfoVo.setName(item.getName());
+                res.add(findTreeInfoVo);
+            }
+        }
+        if (type.equals(LoadType.GROUP.getValue())) {
+            // load group
+            List<ConfigGroup> groups = selectByExample(ConfigGroupExample.newBuilder()
+                    .build()
+                    .createCriteria()
+                    .andVersionIdEqualTo(id)
+                    .andDeletedEqualTo(Deleted.OK.getValue())
+                    .toExample());
+            if (groups == null || groups.size() == 0) {
+                return res;
+            }
+            for (ConfigGroup item : groups) {
+                FindTreeInfoVo findTreeInfoVo = new FindTreeInfoVo();
+                findTreeInfoVo.setId(item.getId());
+                findTreeInfoVo.setName(item.getName());
+                res.add(findTreeInfoVo);
+            }
+        }
+        return res;
     }
 }
