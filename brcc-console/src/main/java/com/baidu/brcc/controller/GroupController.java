@@ -288,7 +288,7 @@ public class GroupController {
 //        return R.ok(groupService.findTreeInfo(user));
 //    }
 
-    @GetMapping(value = "/findTreeInfo")
+    @PostMapping(value = "/findTreeInfo")
     public R<List<FindTreeInfoVo>> findTreeInfo(@RequestBody FindTreeInfoReq req, @LoginUser User user) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
