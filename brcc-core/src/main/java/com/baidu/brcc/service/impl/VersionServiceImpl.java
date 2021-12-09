@@ -738,4 +738,14 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         }
         return versionVos;
     }
+
+    @Override
+    public List<Version> selectByEnvironmentId(Long environmentId) {
+        return selectByExample(VersionExample.newBuilder()
+        .build()
+        .createCriteria()
+        .andEnvironmentIdEqualTo(environmentId)
+        .andDeletedEqualTo(Deleted.OK.getValue())
+        .toExample());
+    }
 }

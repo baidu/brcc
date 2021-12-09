@@ -63,4 +63,6 @@ public interface VersionService extends GenericService<Version, Long, VersionExa
     ApiVersionVo getByEnvironmentAndNameInCache(Long projectId, Long environmentId, String versionName);
 
     List<ApiVersionVo> getAllByEnvironmentIdInCache(Long projectId, Long environmentId);
+
+    List<Version> selectByEnvironmentId(Long environmentId);
 }

@@ -16,28 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.brcc.service;
+package com.baidu.brcc.domain.vo;
 
-import com.baidu.brcc.service.base.GenericService;
-import com.baidu.brcc.domain.Project;
-import com.baidu.brcc.domain.ProjectExample;
+import lombok.Data;
 
-import java.util.List;
+@Data
+public class FindTreeInfoVo {
+    private Long id;
 
-public interface ProjectService extends GenericService<Project, Long, ProjectExample> {
-
-    /**
-     * 根据projectId删除本项目所有配置 env、version、config_group、config_item等全部.
-     *
-     * @param projectId projectId
-     * @return true/false
-     */
-
-    int deleteCascadeById(Long projectId);
-
-    Project selectByName(String name);
-
-    List<Project> selectByProductId(Long productId);
-
-
+    private String name;
 }

@@ -24,8 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.baidu.brcc.annotation.LoginUser;
+import com.baidu.brcc.domain.ProductUser;
+import com.baidu.brcc.domain.ProductUserExample;
+import com.baidu.brcc.domain.User;
+import com.baidu.brcc.domain.vo.CountVo;
+import com.baidu.brcc.service.ProductUserService;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,6 +53,9 @@ import com.google.common.cache.CacheBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+
 /**
  * 首页相关统计接口
  */
@@ -55,6 +66,9 @@ public class IndexController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    ProductUserService productUserService;
 
     @Autowired
     ProjectService projectService;
@@ -127,6 +141,29 @@ public class IndexController {
                 .build();
 
         return R.ok(noticeVo);
+    }
+
+    @GetMapping("count")
+    public R<CountVo> notice(@RequestBody List<Long> productIds) {
+        Long projectCnt = projectService.countByExample(ProjectExample.newBuilder()
+                    .build()
+                    .createCriteria()
+                    .andDeletedEqualTo(Deleted.OK.getValue())
+                    .andProductIdIn(productIds)
+                    .toExample()
+            );
+
+        Long configItemCnt = configItemService.countByExample(ConfigItemExample.newBuilder()
+                    .build()
+                    .createCriteria()
+                    .andDeletedEqualTo(Deleted.OK.getValue())
+                    .andProductIdIn(productIds)
+                    .toExample()
+            );
+        CountVo countVo = new CountVo();
+        countVo.setProjectCnt(projectCnt);
+        countVo.setConfigCnt(configItemCnt);
+        return R.ok(countVo);
     }
 
 }
