@@ -182,11 +182,5 @@ public class GroupControllerTest {
         result = groupController.pagination("id", "desc", ID, 0, 20, user);
         Assert.assertEquals(OK, result.getStatus());
     }
-
-    @Test
-    public void testFindTreeInfo() throws Exception {
-        when(groupService.findTreeInfo(any())).thenReturn(Arrays.asList(new TreeNode()));
-        R<List<TreeNode>> result = groupController.findTreeInfo(new User());
-        Assert.assertEquals(OK, result.getStatus());
-    }
+    
 }
