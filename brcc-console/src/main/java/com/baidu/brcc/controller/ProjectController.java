@@ -473,6 +473,10 @@ public class ProjectController {
                     ProjectListVo projectListVo = new ProjectListVo().copyFrom(item);
                     boolean isAdmin = adminProjectMap.containsKey(item.getId());
                     projectListVo.setAdmin(isAdmin ? Boolean.TRUE : canManage);
+                    projectListVo.setMembers(projectUserService.selectUsersByProjectIdAndType(item.getId(),
+                            ProjectUserAdmin.NO.getValue()));
+                    projectListVo.setManagers(projectUserService.selectUsersByProjectIdAndType(item.getId(),
+                            ProjectUserAdmin.YES.getValue()));
                     return projectListVo;
                 }
         );

@@ -22,12 +22,18 @@ import com.baidu.brcc.domain.Project;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ProjectListVo extends Project {
     /**
      * 是否管理员, 0-否，1-是
      */
     private Boolean admin;
+
+    private List<String> members;
+
+    private List<String> managers;
 
     public ProjectListVo copyFrom(Project project) {
         return Project.copyFrom(project, this);

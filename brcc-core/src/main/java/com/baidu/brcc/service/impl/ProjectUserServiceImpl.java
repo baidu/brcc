@@ -18,6 +18,7 @@
  */
 package com.baidu.brcc.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,5 +150,35 @@ public class ProjectUserServiceImpl extends GenericServiceImpl<ProjectUser, Long
                 .andIsAdminEqualTo(ProjectUserAdmin.YES.getValue())
                 .toExample()
         );
+    }
+
+    @Override
+    public List<String> selectUsersByProjectIdAndType(Long projectId, Byte type) {
+        List<String> users = new ArrayList<>();
+        List<ProjectUser> projectUsers = new ArrayList<>();
+        if (type.equals(ProjectUserAdmin.YES.getValue())) {
+            projectUsers = selectByExample(ProjectUserExample.newBuilder()
+                    .limit(10000)
+                    .build()
+                    .createCriteria()
+                    .andProjectIdEqualTo(projectId)
+                    .andIsAdminEqualTo(ProjectUserAdmin.YES.getValue())
+                    .toExample()
+            );
+        }
+        if (type.equals(ProjectUserAdmin.NO.getValue())) {
+            projectUsers = selectByExample(ProjectUserExample.newBuilder()
+                    .limit(10000)
+                    .build()
+                    .createCriteria()
+                    .andProjectIdEqualTo(projectId)
+                    .andIsAdminEqualTo(ProjectUserAdmin.NO.getValue())
+                    .toExample()
+            );
+        }
+        for (ProjectUser item : projectUsers) {
+            users.add(item.getUserName());
+        }
+        return users;
     }
 }
