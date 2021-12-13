@@ -37,4 +37,6 @@ public interface ProjectUserService extends GenericService<ProjectUser, Long, Pr
 
     ProjectUser selectAdminByUserIdAndProjectId(Long userId, Long projectId);
 
+    List<String> selectUsersByProjectIdAndType(Long projectId, Byte type);
+
 }
