@@ -56,7 +56,17 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<version>${spring.boot.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j-api</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<dependency>
+                	<groupId>org.apache.logging.log4j</groupId>
+                	<artifactId>log4j-api</artifactId>
+            	</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
