@@ -21,9 +21,12 @@ package com.baidu.brcc.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.baidu.brcc.common.Constants;
 import com.baidu.brcc.domain.Product;
 import com.baidu.brcc.domain.exception.BizException;
+import com.baidu.brcc.utils.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -119,4 +122,17 @@ public class ProductUserServiceImpl extends GenericServiceImpl<ProductUser, Long
         }
         return name.substring(0,name.length() - 1);
     }
+
+    @Override
+    public List<Long> queryProductsByUserNameAndAdmin(String username, byte isAdmin) {
+        List<ProductUser> productUserList = productUserMapper.queryProductIdsByUserNameAndAdmin(username, isAdmin);
+        if (CollectionUtils.isEmpty(productUserList)) {
+            return new ArrayList<>();
+        }
+        List<Long> productIds = productUserList.stream()
+                .map(ProductUser::getProductId)
+                .collect(Collectors.toList());
+        return productIds;
+    }
+
 }
