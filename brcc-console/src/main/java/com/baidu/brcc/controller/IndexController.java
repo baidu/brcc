@@ -25,11 +25,20 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.baidu.brcc.annotation.LoginUser;
+import com.baidu.brcc.domain.ConfigGroup;
+import com.baidu.brcc.domain.Environment;
 import com.baidu.brcc.domain.ProductUser;
 import com.baidu.brcc.domain.ProductUserExample;
+import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.User;
+import com.baidu.brcc.domain.Version;
+import com.baidu.brcc.domain.em.LoadType;
 import com.baidu.brcc.domain.vo.CountVo;
+import com.baidu.brcc.domain.vo.DetailInfoVo;
+import com.baidu.brcc.service.ConfigGroupService;
+import com.baidu.brcc.service.EnvironmentService;
 import com.baidu.brcc.service.ProductUserService;
+import com.baidu.brcc.service.VersionService;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +63,8 @@ import com.google.common.cache.CacheBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.ID_NULL_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.ID_NULL_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 
@@ -67,6 +78,15 @@ public class IndexController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    EnvironmentService environmentService;
+
+    @Autowired
+    VersionService versionService;
+
+    @Autowired
+    ConfigGroupService configGroupService;
 
     @Autowired
     ProductUserService productUserService;
@@ -167,4 +187,32 @@ public class IndexController {
         return R.ok(countVo);
     }
 
+    @GetMapping("detail/info")
+    public R<DetailInfoVo> findDetailInfo(Byte type, Long id) {
+        if (id == null || id < 0) {
+            return R.error(ID_NULL_STATUS, ID_NULL_MSG);
+        }
+        DetailInfoVo res = new DetailInfoVo();
+        if (type.equals(LoadType.PROJECT.getValue())) {
+            Project project = projectService.selectByPrimaryKey(id);
+            res.setName(project.getName());
+            res.setMemo(project.getMemo());
+        }
+        if (type.equals(LoadType.ENVIRONMENT.getValue())) {
+            Environment environment = environmentService.selectByPrimaryKey(id);
+            res.setName(environment.getName());
+            res.setMemo(environment.getMemo());
+        }
+        if (type.equals(LoadType.VERSION.getValue())) {
+            Version version = versionService.selectByPrimaryKey(id);
+            res.setName(version.getName());
+            res.setMemo(version.getMemo());
+        }
+        if (type.equals(LoadType.GROUP.getValue())) {
+            ConfigGroup group = configGroupService.selectByPrimaryKey(id);
+            res.setName(group.getName());
+            res.setMemo(group.getMemo());
+        }
+        return R.ok(res);
+    }
 }
