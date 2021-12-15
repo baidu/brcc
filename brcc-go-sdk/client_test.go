@@ -22,6 +22,27 @@ import (
 func TestNewClient(t *testing.T) {
 
 	Convey("test all api of create client", t, func() {
+		// do mock here
+		patches := ApplyMethod(reflect.TypeOf((*httpRequester)(nil)), "Post", func(_ *httpRequester, url string, _ interface{}, respData interface{}) error {
+			bodyBytes := []byte(fmt.Sprintf(`{"token":"%s"}`, Token))
+			json.Unmarshal(bodyBytes, respData)
+
+			return nil
+		})
+		defer patches.Reset()
+
+		// do mock here
+		patches2 := ApplyMethod(reflect.TypeOf((*httpRequester)(nil)), "Get", func(_ *httpRequester, url string, respData interface{}) error {
+			// mock env value
+			if strings.Contains(url, EnvAPI) {
+				bodyBytes := []byte(fmt.Sprintf(`{"environmentId":%d}`, EnvironmentId))
+				json.Unmarshal(bodyBytes, respData)
+				return nil
+			}
+
+			return nil
+		})
+		defer patches2.Reset()
 
 		Convey("test NewClientWithConfFile", func() {
 

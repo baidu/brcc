@@ -1,3 +1,8 @@
+/*
+ * @Author: Malin Xie
+ * @Description:
+ * @Date: 2021-06-10 20:53:33
+ */
 package rcc
 
 const (
@@ -8,7 +13,7 @@ const (
 	envName          = "dev"
 	versionName      = "1.0"
 	apiPassword      = "123456"
-	serverUrl        = "180.76.36.149"
+	serverUrl        = "localhost"
 	enableCallback   = true
 	callbackInterval = 1
 	requestTimeout   = 2
