@@ -35,4 +35,6 @@ public interface ProductUserService extends GenericService<ProductUser, Long, Pr
     boolean checkAuth(Long productId, User user);
 
     String selectProductManagerByProductId(Long productId);
+
+    List<Long> queryProductsByUserNameAndAdmin(String username, byte isAdmin);
 }
