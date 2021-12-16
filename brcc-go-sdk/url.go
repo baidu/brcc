@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-// rcc2.0 restApi文档：http://wiki.baidu.com/display/miniappb/Rest+Api
-// 以及 http://wiki.baidu.com/pages/viewpage.action?pageId=1245297709
 
 func httpUrl(ipOrAddr string) string {
 	if strings.HasPrefix(ipOrAddr, "http://") || strings.HasPrefix(ipOrAddr, "https://") {
