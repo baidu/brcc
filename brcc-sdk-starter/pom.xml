@@ -14,7 +14,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.baidu.mapp</groupId>
-	<version>1.5.5-SNAPSHOT</version>
+	<version>1.5.6-SNAPSHOT</version>
 	<artifactId>brcc-sdk-starter</artifactId>
 
 	<properties>
@@ -76,9 +76,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-                	<groupId>org.apache.logging.log4j</groupId>
-               		<artifactId>log4j-api</artifactId>
-            	</dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
 
 	</dependencies>
 
