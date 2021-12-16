@@ -295,6 +295,7 @@ public class ProductServiceImpl extends GenericServiceImpl<Product, Long, Produc
                     throw new BizException(PRODUCT_EXISTS_STATUS, PRODUCT_EXISTS_MSG);
                 }
             }
+            updateByPrimaryKeySelective(product);
         } else {
             // 新增
             if (StringUtils.isBlank(name)) {
