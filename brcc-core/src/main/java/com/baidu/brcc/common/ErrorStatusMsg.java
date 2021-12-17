@@ -326,4 +326,8 @@ public class ErrorStatusMsg {
     // name can not be null
     public static final Integer NAME_NULL_STATUS = 100231;
     public static final String NAME_NULL_MSG = "名称不能为空";
+
+    // name can not be Chinese
+    public static final Integer CHINESE_NOT_ALLOWED_STATUS = 100233;
+    public static final String CHINESE_NOT_ALLOWED_MSG = "名称不能包含中文";
 }

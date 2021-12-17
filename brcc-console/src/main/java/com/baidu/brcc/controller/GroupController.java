@@ -18,6 +18,8 @@
  */
 package com.baidu.brcc.controller;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_ID_NOT_EXISTS_MSG;
@@ -53,6 +55,7 @@ import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.vo.FindTreeInfoReq;
 import com.baidu.brcc.domain.vo.FindTreeInfoVo;
 import com.baidu.brcc.service.ProjectService;
+import com.baidu.brcc.utils.Name.NameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -117,6 +120,9 @@ public class GroupController {
         }
         Long id = req.getId();
         String name = trim(req.getName());
+        if (NameUtils.containsChinese(name)) {
+            return R.error(CHINESE_NOT_ALLOWED_STATUS, CHINESE_NOT_ALLOWED_MSG);
+        }
         Date now = DateTimeUtils.now();
         if (id != null && id > 0) {
             // 修改
