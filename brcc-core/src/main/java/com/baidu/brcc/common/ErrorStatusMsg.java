@@ -112,6 +112,10 @@ public class ErrorStatusMsg {
     public static final Integer PROJECT_EXISTS_STATUS = 100113;
     public static final String PROJECT_EXISTS_MSG = "工程已存在";
 
+    // 工程名已存在
+    public static final Integer PROJECT_NAME_EXISTS_STATUS = 100232;
+    public static final String PROJECT_NAME_EXISTS_MSG = "工程名已被占用！工程名在BRCC全局唯一";
+
     // 工程类型无效
     public static final Integer PROJECT_TYPE_NOT_AVAILABLE_STATUS = 100114;
     public static final String PROJECT_TYPE_NOT_AVAILABLE_MSG = "工程类型无效";
@@ -322,4 +326,8 @@ public class ErrorStatusMsg {
     // name can not be null
     public static final Integer NAME_NULL_STATUS = 100231;
     public static final String NAME_NULL_MSG = "名称不能为空";
+
+    // name can not be Chinese
+    public static final Integer CHINESE_NOT_ALLOWED_STATUS = 100233;
+    public static final String CHINESE_NOT_ALLOWED_MSG = "名称不能包含中文";
 }

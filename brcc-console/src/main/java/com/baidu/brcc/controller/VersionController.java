@@ -18,6 +18,8 @@
  */
 package com.baidu.brcc.controller;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_ITEM_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_ITEM_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.CONFIG_KEY_NOT_EXISTS_MSG;
@@ -104,6 +106,7 @@ import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.GrayInfoService;
 import com.baidu.brcc.service.GrayRuleService;
 import com.baidu.brcc.utils.FileFormat.FileFormatUtils;
+import com.baidu.brcc.utils.Name.NameUtils;
 import com.baidu.brcc.utils.convert.ConvertFileUtil;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -209,6 +212,9 @@ public class VersionController {
         }
         Long id = req.getId();
         String name = trim(req.getName());
+        if (NameUtils.containsChinese(name)) {
+            return R.error(CHINESE_NOT_ALLOWED_STATUS, CHINESE_NOT_ALLOWED_MSG);
+        }
         String memo = trim(req.getMemo());
         Long cacheEvictEnvironmentId = null;
 
@@ -248,6 +254,9 @@ public class VersionController {
         }
         Long mainVersionId = req.getId();
         String name = trim(req.getName());
+        if (NameUtils.containsChinese(name)) {
+            return R.error(CHINESE_NOT_ALLOWED_STATUS, CHINESE_NOT_ALLOWED_MSG);
+        }
         String memo = trim(req.getMemo());
         Long grayVersionId = req.getGrayVersionId();
         Long cacheEvictEnvironmentId = null;

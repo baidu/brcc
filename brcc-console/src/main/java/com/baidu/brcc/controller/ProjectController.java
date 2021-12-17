@@ -19,6 +19,8 @@
 package com.baidu.brcc.controller;
 
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
@@ -34,6 +36,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_MSG;
@@ -58,8 +62,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.baidu.brcc.domain.vo.ResetApiPasswordVo;
+import com.baidu.brcc.utils.Name.NameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,6 +177,9 @@ public class ProjectController {
         }
         Long id = req.getId();
         String name = trim(req.getName());
+        if (NameUtils.containsChinese(name)) {
+            return R.error(CHINESE_NOT_ALLOWED_STATUS, CHINESE_NOT_ALLOWED_MSG);
+        }
         Date now = DateTimeUtils.now();
         Byte projectType = req.getProjectType();
         if (projectType != null && !ProjectType.PRIVATE.getValue().equals(projectType) && !ProjectType.PUBLIC.getValue()
@@ -211,7 +220,7 @@ public class ProjectController {
                         MetaProject.COLUMN_NAME_ID
                 );
                 if (exists != null) {
-                    return R.error(PROJECT_EXISTS_STATUS, PROJECT_EXISTS_MSG);
+                    return R.error(PROJECT_NAME_EXISTS_STATUS, PROJECT_NAME_EXISTS_MSG);
                 }
                 update.setName(name);
             }
@@ -275,7 +284,7 @@ public class ProjectController {
                     MetaProject.COLUMN_NAME_ID
             );
             if (project != null) {
-                return R.error(PROJECT_EXISTS_STATUS, PROJECT_EXISTS_MSG);
+                return R.error(PROJECT_NAME_EXISTS_STATUS, PROJECT_NAME_EXISTS_MSG);
             }
 
             String pwd = Md5Util.md5(apiPassword);
