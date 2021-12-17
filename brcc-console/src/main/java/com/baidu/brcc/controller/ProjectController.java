@@ -34,6 +34,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NAME_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_NOT_EXISTS_MSG;
@@ -211,7 +213,7 @@ public class ProjectController {
                         MetaProject.COLUMN_NAME_ID
                 );
                 if (exists != null) {
-                    return R.error(PROJECT_EXISTS_STATUS, PROJECT_EXISTS_MSG);
+                    return R.error(PROJECT_NAME_EXISTS_STATUS, PROJECT_NAME_EXISTS_MSG);
                 }
                 update.setName(name);
             }
@@ -275,7 +277,7 @@ public class ProjectController {
                     MetaProject.COLUMN_NAME_ID
             );
             if (project != null) {
-                return R.error(PROJECT_EXISTS_STATUS, PROJECT_EXISTS_MSG);
+                return R.error(PROJECT_NAME_EXISTS_STATUS, PROJECT_NAME_EXISTS_MSG);
             }
 
             String pwd = Md5Util.md5(apiPassword);

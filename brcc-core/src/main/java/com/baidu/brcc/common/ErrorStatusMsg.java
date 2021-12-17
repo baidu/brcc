@@ -112,6 +112,10 @@ public class ErrorStatusMsg {
     public static final Integer PROJECT_EXISTS_STATUS = 100113;
     public static final String PROJECT_EXISTS_MSG = "工程已存在";
 
+    // 工程名已存在
+    public static final Integer PROJECT_NAME_EXISTS_STATUS = 100232;
+    public static final String PROJECT_NAME_EXISTS_MSG = "工程名已被占用！工程名在BRCC全局唯一";
+
     // 工程类型无效
     public static final Integer PROJECT_TYPE_NOT_AVAILABLE_STATUS = 100114;
     public static final String PROJECT_TYPE_NOT_AVAILABLE_MSG = "工程类型无效";
