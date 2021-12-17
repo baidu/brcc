@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,6 +21,8 @@ package com.baidu.brcc.config;
 import static com.baidu.brcc.common.ErrorStatusMsg.SERVER_ERROR_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.SERVER_ERROR_STATUS;
 
+import com.baidu.brcc.domain.exception.BrccException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,5 +47,12 @@ public class GlobalControllerAdvice {
     public R exceptionHandler(Exception e) {
         log.error("service error.", e);
         return R.error(SERVER_ERROR_STATUS, SERVER_ERROR_MSG);
+    }
+
+    @ExceptionHandler(BrccException.class)
+    @ResponseBody
+    public ResponseEntity customizeExceptionHandler(BrccException e) {
+        log.error("service customize error.", e);
+        return ResponseEntity.status(e.getRespCode()).body(e.getMsg());
     }
 }
