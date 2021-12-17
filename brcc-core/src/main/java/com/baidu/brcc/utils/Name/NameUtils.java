@@ -13,7 +13,7 @@ import static com.baidu.brcc.common.ErrorStatusMsg.NAME_NULL_STATUS;
 public class NameUtils {
     public static Boolean containsChinese(String name) {
         if (name == null || name.isEmpty()) {
-            throw new BizException(NAME_NULL_STATUS, NAME_NULL_MSG);
+            return false;
         }
         Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
         if (p.matcher(name).find()) {
