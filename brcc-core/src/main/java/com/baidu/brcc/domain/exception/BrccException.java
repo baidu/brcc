@@ -1,6 +1,6 @@
 package com.baidu.brcc.domain.exception;
 
-public class CustomizeException extends RuntimeException {
+public class BrccException extends RuntimeException {
 
     private String msg;
 
@@ -22,7 +22,7 @@ public class CustomizeException extends RuntimeException {
         this.respCode = respCode;
     }
 
-    public CustomizeException(String msg, int respCode) {
+    public BrccException(String msg, int respCode) {
         super(msg);
         this.msg = msg;
         this.respCode = respCode;

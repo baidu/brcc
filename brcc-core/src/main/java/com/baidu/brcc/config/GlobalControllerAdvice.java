@@ -21,7 +21,7 @@ package com.baidu.brcc.config;
 import static com.baidu.brcc.common.ErrorStatusMsg.SERVER_ERROR_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.SERVER_ERROR_STATUS;
 
-import com.baidu.brcc.domain.exception.CustomizeException;
+import com.baidu.brcc.domain.exception.BrccException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,9 +49,9 @@ public class GlobalControllerAdvice {
         return R.error(SERVER_ERROR_STATUS, SERVER_ERROR_MSG);
     }
 
-    @ExceptionHandler(CustomizeException.class)
+    @ExceptionHandler(BrccException.class)
     @ResponseBody
-    public ResponseEntity customizeExceptionHandler(CustomizeException e) {
+    public ResponseEntity customizeExceptionHandler(BrccException e) {
         log.error("service customize error.", e);
         return ResponseEntity.status(e.getRespCode()).body(e.getMsg());
     }
