@@ -18,6 +18,8 @@
  */
 package com.baidu.brcc.service.impl;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_EXISTS_MSG;
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
 import com.baidu.brcc.domain.base.R;
 import com.baidu.brcc.domain.exception.BizException;
 import com.baidu.brcc.domain.meta.MetaProject;
+import com.baidu.brcc.utils.Name.NameUtils;
 import com.baidu.brcc.utils.time.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -270,6 +273,9 @@ public class ProductServiceImpl extends GenericServiceImpl<Product, Long, Produc
     public Long saveProduct(Product product, User user) {
         Long id = product.getId();
         String name = trim(product.getName());
+        if (NameUtils.containsChinese(name)) {
+            throw new BizException(CHINESE_NOT_ALLOWED_STATUS, CHINESE_NOT_ALLOWED_MSG);
+        }
         Date now = DateTimeUtils.now();
         if (id != null && id > 0) {
             // 修改
