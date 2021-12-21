@@ -289,10 +289,10 @@ public class GroupController {
         return R.ok(pagination, ext);
     }
 
-//    @GetMapping(value = "/findTreeInfo")
-//    public R<List<TreeNode>> findTreeInfo(@LoginUser User user) {
-//        return R.ok(groupService.findTreeInfo(user));
-//    }
+    @GetMapping(value = "/treeDetail")
+    public R<List<TreeNode>> findTreeInfo(@LoginUser User user) {
+        return R.ok(groupService.findTreeInfo(user));
+    }
 
     @PostMapping(value = "/findTreeInfo")
     public R<List<FindTreeInfoVo>> findTreeInfo(@RequestBody FindTreeInfoReq req, @LoginUser User user) {
