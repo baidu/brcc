@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.COUNT_CAN_NOT_NEGATIVE_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.COUNT_CAN_NOT_NEGATIVE_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_EXIST_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GRAY_RULE_EXIST_STATUS;
 
@@ -82,6 +84,9 @@ public class GrayInfoServiceImpl extends GenericServiceImpl<GrayInfo, Long, Gray
         Long id = null;
         String ruleName = grayRuleReq.getRuleName();
         String ruleContent = grayRuleReq.getRuleContent();
+        if (ruleName.equals("count") && Long.parseLong(ruleContent) < 0) {
+            throw new BizException(COUNT_CAN_NOT_NEGATIVE_STATUS, COUNT_CAN_NOT_NEGATIVE_MSG);
+        }
         if (grayInfoId == null || grayInfoId <= 0) {
             // 新增
             Date now = DateTimeUtils.now();

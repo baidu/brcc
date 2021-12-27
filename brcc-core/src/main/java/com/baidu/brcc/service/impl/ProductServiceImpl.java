@@ -321,10 +321,6 @@ public class ProductServiceImpl extends GenericServiceImpl<Product, Long, Produc
             product.setCreateTime(now);
             insertSelective(product);
             id = product.getId();
-            // 给用户添加产品线管理员权限
-            List<String> member = new ArrayList<>();
-            member.add(user.getName());
-            addMember(member, id);
         }
         return id;
     }

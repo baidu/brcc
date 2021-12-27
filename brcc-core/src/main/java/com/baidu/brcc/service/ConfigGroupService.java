@@ -64,6 +64,7 @@ public interface ConfigGroupService extends GenericService<ConfigGroup, Long, Co
                          int step,
                          Map<Long, Product> productManageMap,
                          Map<Long, Project> projectManageMap,
+                         Map<Long, Project> projectMemberMap,
                          Map<Long, Environment> envAccessMap,
                          Map<Long, Version> versionAccessMap,
                          Map<Long, ConfigGroup> groupAccessMap

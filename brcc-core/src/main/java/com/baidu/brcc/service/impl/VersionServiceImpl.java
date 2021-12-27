@@ -485,6 +485,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
     public List<VersionNodeVo> myAllVersion(User user, Long productId, Long projectId) {
         Map<Long, Product> productManageMap = new HashMap<>();
         Map<Long, Project> projectManageMap = new HashMap<>();
+        Map<Long, Project> projectMemberMap = new HashMap<>();
         Map<Long, Environment> envAccessMap = new HashMap<>();
         Map<Long, Version> versionAccessMap = new HashMap<>();
         Map<Long, ConfigGroup> groupAccessMap = new HashMap<>();
@@ -494,6 +495,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                 ConfigGroupService.VERSION,
                 productManageMap,
                 projectManageMap,
+                projectMemberMap,
                 envAccessMap,
                 versionAccessMap,
                 groupAccessMap
