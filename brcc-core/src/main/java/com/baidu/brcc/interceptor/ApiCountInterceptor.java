@@ -122,6 +122,9 @@ public class ApiCountInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (enableApiCount) {
             String query = request.getQueryString();
+            if (StringUtils.isBlank(query)) {
+                return true;
+            }
             String[] queryParams = query.split("&");
             if (queryParams == null || queryParams.length == 0) {
                 return true;
