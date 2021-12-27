@@ -29,6 +29,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.ENVIRONMENT_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.NO_ENVIRONMENT_PRI_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.NO_ENVIRONMENT_PRI_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_MSG;
@@ -292,6 +294,9 @@ public class EnvironmentController {
                 for (EnvironmentUser environmentUser : environmentUsers) {
                     environmentIds.add(environmentUser.getEnvironmentId());
                 }
+            }
+            if (environmentIds.isEmpty()) {
+                return R.error(NO_ENVIRONMENT_PRI_STATUS, NO_ENVIRONMENT_PRI_MSG);
             }
         }
 

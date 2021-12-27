@@ -330,4 +330,10 @@ public class ErrorStatusMsg {
     // name can not be Chinese
     public static final Integer CHINESE_NOT_ALLOWED_STATUS = 100233;
     public static final String CHINESE_NOT_ALLOWED_MSG = "名称不能包含中文";
+
+    public static final Integer COUNT_CAN_NOT_NEGATIVE_STATUS = 100234;
+    public static final String COUNT_CAN_NOT_NEGATIVE_MSG = "数量不能为负";
+
+    public static final Integer NO_ENVIRONMENT_PRI_STATUS = 100235;
+    public static final String NO_ENVIRONMENT_PRI_MSG = "无任何环境权限";
 }

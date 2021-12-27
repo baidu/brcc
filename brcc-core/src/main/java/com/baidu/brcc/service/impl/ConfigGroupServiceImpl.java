@@ -210,6 +210,7 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
                                 int step,
                                 Map<Long, Product> productManageMap,
                                 Map<Long, Project> projectManageMap,
+                                Map<Long, Project> projectMemberMap,
                                 Map<Long, Environment> envAccessMap,
                                 Map<Long, Version> versionAccessMap,
                                 Map<Long, ConfigGroup> groupAccessMap
@@ -298,6 +299,32 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
                 );
                 if (!org.springframework.util.CollectionUtils.isEmpty(tmp)) {
                     projectManageMap.putAll(tmp);
+                }
+            }
+        }
+        {
+            // 工程成员
+            List<Long> projectIds = projectUserService.selectByExample(ProjectUserExample.newBuilder()
+                            .distinct(true)
+                            .build()
+                            .createCriteria()
+                            .andUserIdEqualTo(user.getId())
+                            .andIsAdminEqualTo(ProjectUserAdmin.NO.getValue())
+                            .toExample(),
+                    ProjectUser::getProjectId,
+                    MetaProjectUser.COLUMN_NAME_PROJECTID
+
+            );
+            if (!org.springframework.util.CollectionUtils.isEmpty(projectIds)) {
+                Map<Long, Project> tmp = projectService.selectMapByPrimaryKeys(
+                        projectIds,
+                        Project::getId,
+                        MetaProject.COLUMN_NAME_ID,
+                        MetaProject.COLUMN_NAME_NAME,
+                        MetaProject.COLUMN_NAME_PRODUCTID
+                );
+                if (!org.springframework.util.CollectionUtils.isEmpty(tmp)) {
+                    projectMemberMap.putAll(tmp);
                 }
             }
         }
@@ -414,6 +441,7 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
         long start = System.currentTimeMillis();
         Map<Long, Product> productManageMap = new HashMap<>();
         Map<Long, Project> projectManageMap = new HashMap<>();
+        Map<Long, Project> projectMemberMap = new HashMap<>();
         Map<Long, Environment> envAccessMap = new HashMap<>();
         Map<Long, Version> versionAccessMap = new HashMap<>();
         Map<Long, ConfigGroup> groupAccessMap = new HashMap<>();
@@ -423,6 +451,7 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
                 ConfigGroupService.GROUP,
                 productManageMap,
                 projectManageMap,
+                projectMemberMap,
                 envAccessMap,
                 versionAccessMap,
                 groupAccessMap
@@ -493,6 +522,11 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
                 }
             }
         }
+        for (Long projectId : projectMemberMap.keySet()) {
+            lostProjectIds.add(projectId);
+        }
+
+
 
         if (!org.springframework.util.CollectionUtils.isEmpty(lostProjectIds)) {
             List<Project> projects = projectService.selectByPrimaryKeys(
