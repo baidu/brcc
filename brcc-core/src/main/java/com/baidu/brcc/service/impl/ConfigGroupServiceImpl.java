@@ -358,8 +358,8 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
                             .createCriteria()
                             .andUserIdEqualTo(user.getId())
                             .toExample(),
-                    EnvironmentUser::getProjectId,
-                    MetaEnvironmentUser.COLUMN_NAME_PROJECTID
+                    EnvironmentUser::getEnvironmentId,
+                    MetaEnvironmentUser.COLUMN_NAME_ENVIRONMENTID
             );
 
             if (!org.springframework.util.CollectionUtils.isEmpty(environmentIds)) {
@@ -548,7 +548,7 @@ public class ConfigGroupServiceImpl extends GenericServiceImpl<ConfigGroup, Long
         if (!org.springframework.util.CollectionUtils.isEmpty(projectManageMap.values())) {
             for (Project project : projectManageMap.values()) {
                 Long productId = project.getProductId();
-                if (!projectManageMap.containsKey(productId)) {
+                if (!productManageMap.containsKey(productId)) {
                     lostProductIds.add(productId);
                 }
             }
