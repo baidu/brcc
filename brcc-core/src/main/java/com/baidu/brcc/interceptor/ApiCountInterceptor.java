@@ -111,9 +111,12 @@ public class ApiCountInterceptor implements HandlerInterceptor {
             try {
                 apiCountService.insertOrUpdateApiCount(productName, cacheKey, apiCountCache);
                 // 更新成功后重置计数
+                lock.lock();
                 apiCountCache.putIfAbsent(cacheKey, new AtomicLong(0));
             } catch (Exception e) {
                 logger.warn("{} insert or update api count failed, due to {}", cacheKey, e.getMessage(), e);
+            } finally {
+                lock.unlock();
             }
         }
     }
