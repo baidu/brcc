@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.brcc.domain.meta.MetaProject;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -392,6 +393,7 @@ public class ConfigItemController {
         }
         List<ConfigItemForGroupVo> items =
                 configItemService.selectByExample(ConfigItemExample.newBuilder()
+                                .orderByClause("id desc")
                                 .build()
                                 .createCriteria()
                                 .andDeletedEqualTo(Deleted.OK.getValue())
