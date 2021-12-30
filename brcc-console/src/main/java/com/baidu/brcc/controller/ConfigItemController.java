@@ -392,6 +392,7 @@ public class ConfigItemController {
         }
         List<ConfigItemForGroupVo> items =
                 configItemService.selectByExample(ConfigItemExample.newBuilder()
+                                .orderByClause("id desc")
                                 .build()
                                 .createCriteria()
                                 .andDeletedEqualTo(Deleted.OK.getValue())
