@@ -347,14 +347,15 @@ CREATE TABLE `rcc_gray_rule` (
 -- /*   表名称 = rcc_api_count   */
 -- /******************************************/
 CREATE TABLE `rcc_api_count` (
-    id                bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
-    product_name      varchar(200)        NOT NULL DEFAULT '' COMMENT '产品线名称',
-    product_count     bigint(20)          NOT NULL COMMENT 'api调用次数',
-    product_cache_key varchar(120)        NOT NULL DEFAULT '' COMMENT '缓存中的key',
-    version           bigint(20)          NOT NULL COMMENT '版本号',
-    create_time       datetime            NOT NULL COMMENT '创建时间',
-    update_time       datetime            NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (id),
-    key idx_product_name (product_name, product_cache_key, product_count, version),
-    unique key product_key (product_cache_key)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8 COMMENT ='产品线调用api次数统计表';
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `product_name` varchar(200) NOT NULL DEFAULT '' COMMENT '产品线名称',
+  `product_count` bigint(20) NOT NULL COMMENT 'api调用次数',
+  `product_cache_key` varchar(120) NOT NULL DEFAULT '' COMMENT '缓存中的key',
+  `version` bigint(20) NOT NULL COMMENT '版本号',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `product_cache_key` (`product_cache_key`),
+  KEY `idx_product_name` (`product_name`,`product_cache_key`,`product_count`,`version`),
+  KEY `idx_product_cache_key` (`product_cache_key`,`product_count`,`version`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8 COMMENT='产品线调用api次数统计';
