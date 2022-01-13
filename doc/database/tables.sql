@@ -300,18 +300,18 @@ CREATE TABLE `rcc_instance` (
   `client_version` varchar(32) NOT NULL DEFAULT '' COMMENT '客户端版本',
   `enable_update_callback` tinyint(3) NOT NULL DEFAULT '0' COMMENT '是否开启心跳功能',
   `last_checksum` varchar(64) NOT NULL DEFAULT '' COMMENT '上一次checksum值',
-  `last_checksum_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '上次生效时间',
+  `last_checksum_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '上次生效时间',
   `current_checksum` varchar(64) NOT NULL DEFAULT '' COMMENT '当前checksum值',
-  `current_checksum_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '当前生效时间',
+  `current_checksum_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '当前生效时间',
   `version_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '版本id',
   `net_cost` int(11) NOT NULL DEFAULT '-1' COMMENT '上一次网络开销',
-  `heartbeat_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '最后心跳时间',
-  `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00 00:00:00' COMMENT '创建时间',
-  `gray_flag` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '灰度标识',
-  `gray_version_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '灰度版本ID',
+  `heartbeat_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '最后心跳时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '创建时间',
+  `gray_flag` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '灰度标识',
+  `gray_version_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '灰度版本ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_version_id` (`version_id`,`ip`,`app_name`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='实例信息'
+) ENGINE=InnoDB AUTO_INCREMENT=7195 DEFAULT CHARSET=utf8 COMMENT='实例信息';
 
 -- /******************************************/
 -- /*   数据库全名 = brcc   */
