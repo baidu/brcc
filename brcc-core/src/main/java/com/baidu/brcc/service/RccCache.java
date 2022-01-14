@@ -19,8 +19,10 @@
 package com.baidu.brcc.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baidu.brcc.domain.ApiToken;
+import com.baidu.brcc.domain.ConfigItem;
 import com.baidu.brcc.domain.Environment;
 import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.User;
@@ -58,7 +60,7 @@ public interface RccCache {
     void evictVersion(Long environmentId);
 
     // 失效版本下的配置
-    void evictConfigItem(Long versionId);
+    void evictConfigItem(List<Long> versionId);
 
     // 失效版本
     void evictVersionById(List<Long> versionIds);
@@ -102,6 +104,8 @@ public interface RccCache {
     // 读取配置项
     List<ApiItemVo> getItems(Long versionId);
 
+    Map<String, ConfigItem> getItemMap(Long versionId);
+
     List<ApiItemVo> getItems(Long versionId, List<String> names);
 
     ApiItemVo getItem(Long versionId, String name);
@@ -135,5 +139,7 @@ public interface RccCache {
     void loadItem(Long versionId, ApiItemVo itemVo);
     // 加载配置
     void loadItems(Long versionId, List<ApiItemVo> itemVos, boolean clear);
+
+    void loadItemMap(Long versionId, Map<String, ConfigItem> itemMap, boolean clear);
 
 }

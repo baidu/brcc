@@ -25,7 +25,9 @@ import lombok.Data;
 @Data
 public class RefProjectDto {
 
-    // 依赖工程
+    private Long versionId;
+
+    // 依赖版本ID列表
     private List<Long> refIds;
 
 }

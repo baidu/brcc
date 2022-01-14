@@ -16,6 +16,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="gray_flag" jdbcType="TINYINT" property="grayFlag" />
     <result column="main_version_id" jdbcType="BIGINT" property="mainVersionId" />
+    <result column="dependency_ids" jdbcType="VARCHAR" property="dependencyIds" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -131,7 +132,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, name, product_id, memo, project_id, environment_id, check_sum, check_sum_date,
-    check_sum_enable, deleted, update_time, create_time, gray_flag, main_version_id
+    check_sum_enable, deleted, update_time, create_time, gray_flag, main_version_id, dependency_ids
   </sql>
   <select id="selectByExample" parameterType="com.baidu.brcc.domain.VersionExample" resultMap="BaseResultMap">
     select
@@ -184,11 +185,11 @@
     insert into rcc_version (name, product_id, memo,
       project_id, environment_id, check_sum,
       check_sum_date, check_sum_enable, deleted,
-      update_time, create_time, gray_flag, main_version_id)
+      update_time, create_time, gray_flag, main_version_id, dependency_ids)
     values (#{name,jdbcType=VARCHAR}, #{productId,jdbcType=BIGINT}, #{memo,jdbcType=VARCHAR},
       #{projectId,jdbcType=BIGINT}, #{environmentId,jdbcType=BIGINT}, #{checkSum,jdbcType=VARCHAR},
       #{checkSumDate,jdbcType=TIMESTAMP}, #{checkSumEnable,jdbcType=TINYINT}, #{deleted,jdbcType=TINYINT},
-      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{grayFlag,jdbcType=TINYINT}, #{mainVersionId,jdbcType=BIGINT})
+      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{grayFlag,jdbcType=TINYINT}, #{mainVersionId,jdbcType=BIGINT}, #{dependencyIds,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.baidu.brcc.domain.Version">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -235,6 +236,9 @@
       <if test="mainVersionId != null">
         main_version_id,
       </if>
+      <if test="dependencyIds != null">
+        dependency_ids,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="name != null">
@@ -275,6 +279,9 @@
       </if>
       <if test="mainVersionId != null">
         #{mainVersionId,jdbcType=BIGINT},
+      </if>
+      <if test="dependencyIds != null">
+        #{dependencyIds,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -329,6 +336,9 @@
       <if test="record.mainVersionId != null">
         main_version_id = #{mainVersionId,jdbcType=BIGINT},
       </if>
+      <if test="record.dependencyIds != null">
+        dependency_ids = #{dependencyIds,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -349,7 +359,8 @@
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       gray_flag = #{record.grayFlag,jdbcType=TINYINT},
-      main_version_id = #{record.mainVersionId,jdbcType=BIGINT}
+      main_version_id = #{record.mainVersionId,jdbcType=BIGINT},
+      dependency_ids = #{record.dependencyIds,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -396,6 +407,9 @@
       <if test="mainVersionId != null">
         main_version_id = #{mainVersionId,jdbcType=BIGINT},
       </if>
+      <if test="dependencyIds != null">
+        dependency_ids = #{dependencyIds,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -413,7 +427,8 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       gray_flag = #{grayFlag,jdbcType=TINYINT},
-      main_version_id = #{mainVersionId,jdbcType=BIGINT}
+      main_version_id = #{mainVersionId,jdbcType=BIGINT},
+      dependency_ids = #{dependencyIds,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

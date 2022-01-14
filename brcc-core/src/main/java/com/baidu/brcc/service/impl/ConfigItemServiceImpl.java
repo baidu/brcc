@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 import com.baidu.brcc.domain.ConfigGroupExample;
 import com.baidu.brcc.domain.em.FileImportType;
+import com.baidu.brcc.utils.DataTransUtils;
 import com.baidu.brcc.utils.NameTreadFactory;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -152,7 +153,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     @Autowired
     private RccCache rccCache;
 
-    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors()*2
+    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 2
             , 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NameTreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
 
     @Override
@@ -192,6 +193,20 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                 .andProjectIdEqualTo(projectId)
                 .andVersionIdEqualTo(versionId)
                 .toExample()
+        );
+    }
+
+    @Override
+    public Map<String, ConfigItem> selectMapByProjectIdAndVersionId(Long projectId, Long versionId) {
+        return selectMapByExample(ConfigItemExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andDeletedEqualTo(Deleted.OK.getValue())
+                        .andProjectIdEqualTo(projectId)
+                        .andVersionIdEqualTo(versionId)
+                        .toExample(),
+                ConfigItem::getName,
+                Function.identity()
         );
     }
 
@@ -242,7 +257,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                     }
                 }
                 executor.execute(() -> {
-                            try{
+                            try {
                                 if (itemMapEmpty || itemMap.get(name) == null) {
                                     // 新增的
                                     ConfigItem configItemInsert = ConfigItem.newBuilder()
@@ -273,7 +288,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
                                     updateByPrimaryKeySelective(configItemUpdate);
                                     result.incrementAndGet();
                                 }
-                            }catch (Throwable e){
+                            } catch (Throwable e) {
                                 LOGGER.error("batchSave error.", e);
                             }
                         }
@@ -494,6 +509,43 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
             }
         }
         return itemsVos;
+    }
+
+    @Override
+    public Map<String, ConfigItem> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved) {
+        Map<String, ConfigItem> allConfig = rccCache.getItemMap(versionId);
+        if (CollectionUtils.isEmpty(allConfig)) {
+            // get the original configuration
+            Map<String, ConfigItem> items = selectMapByProjectIdAndVersionId(projectId, versionId);
+            // get the common configuration
+            Version version = versionService.selectByPrimaryKey(versionId);
+            resolved.add(versionId);
+            if (version.getDependencyIds().isEmpty()) {
+                rccCache.loadItemMap(versionId, allConfig, true);
+                return items;
+            }
+            List<Long> depIds = DataTransUtils.string2List(version.getDependencyIds());
+            for (Long depId : depIds) {
+                Version item = versionService.selectByPrimaryKey(depId);
+                if (null != item) {
+                    Map<String, ConfigItem> depItem = new HashMap<>();
+                    if (resolved.contains(depId)) {
+                        continue;
+                    }
+                    // 递归调用，结束点：没有子版本或者该版本已被加载
+                    depItem = getCommonAndPrivateByVersionIdInCache(item.getProjectId(), item.getId(), resolved);
+                    if (!CollectionUtils.isEmpty(depItem)) {
+                        allConfig.putAll(depItem);
+                    }
+                    resolved.add(depId);
+                }
+            }
+            if (!CollectionUtils.isEmpty(items)) {
+                allConfig.putAll(items);
+                rccCache.loadItemMap(versionId, allConfig, true);
+            }
+        }
+        return allConfig;
     }
 
     @Override

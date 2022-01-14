@@ -192,7 +192,7 @@ public class RccCacheImplTest {
         when(cache.cacheEnable()).thenReturn(true);
         when(cache.evict(anyString())).thenReturn(Long.valueOf(1));
 
-        rccCacheImpl.evictConfigItem(Long.valueOf(1));
+        rccCacheImpl.evictConfigItem(Arrays.<Long>asList(Long.valueOf(1)));
     }
 
     @Test

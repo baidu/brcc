@@ -68,7 +68,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("admin")
+@RequestMapping("console/admin")
 public class AdminController {
 
     @Autowired

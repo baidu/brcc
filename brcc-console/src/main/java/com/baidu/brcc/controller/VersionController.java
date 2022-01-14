@@ -44,6 +44,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_MS
 import static com.baidu.brcc.common.ErrorStatusMsg.MAIN_VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_CHANGE_LOG_END_TIME_EMPTY_MSG;
@@ -86,12 +88,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import com.baidu.brcc.common.ErrorStatusMsg;
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.GrayInfo;
 import com.baidu.brcc.domain.GrayRule;
+import com.baidu.brcc.domain.Project;
 import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.FileFormat;
 import com.baidu.brcc.domain.em.GrayFlag;
+import com.baidu.brcc.domain.em.ProjectType;
 import com.baidu.brcc.domain.meta.MetaConfigItem;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
@@ -101,10 +106,13 @@ import com.baidu.brcc.domain.vo.GrayRuleReq;
 import com.baidu.brcc.domain.vo.GrayRuleVo;
 import com.baidu.brcc.domain.vo.GrayVersionRuleVo;
 import com.baidu.brcc.domain.vo.ItemReq;
+import com.baidu.brcc.dto.RefProjectDto;
 import com.baidu.brcc.service.BrccInstanceService;
 import com.baidu.brcc.service.ConfigGroupService;
 import com.baidu.brcc.service.GrayInfoService;
 import com.baidu.brcc.service.GrayRuleService;
+import com.baidu.brcc.service.ProjectService;
+import com.baidu.brcc.utils.DataTransUtils;
 import com.baidu.brcc.utils.FileFormat.FileFormatUtils;
 import com.baidu.brcc.utils.Name.NameUtils;
 import com.baidu.brcc.utils.convert.ConvertFileUtil;
@@ -158,7 +166,7 @@ import javax.servlet.http.HttpServletResponse;
  * 管理端版本相关接口
  */
 @RestController
-@RequestMapping("version")
+@RequestMapping("console/version")
 public class VersionController {
 
     @Autowired
@@ -194,6 +202,9 @@ public class VersionController {
 
     @Autowired
     private ConfigGroupService groupService;
+
+    @Autowired
+    private ProjectService projectService;
 
     /**
      * 新增或修改版本
@@ -480,6 +491,9 @@ public class VersionController {
                     versionVo.setName(item.getName());
                     versionVo.setMemo(item.getMemo());
                     versionVo.setEnvironmentId(item.getEnvironmentId());
+                    List<Long> depIds = DataTransUtils.string2List(item.getDependencyIds());
+                    versionVo.setDependencyIds(depIds);
+                    versionVo.setDependencyInfos(versionService.getDepInfosByDepIds(depIds));
                     if (item.getMainVersionId() > 0) {
                         versionVo.setGrayFlag(GrayFlag.GRAY.getValue());
                         versionVo.setMainVersionId(item.getMainVersionId());
@@ -619,6 +633,119 @@ public class VersionController {
         }
 
         return R.ok(treeNodes);
+    }
+
+    // 我的公共版本
+    @GetMapping("myCommonVersionTree")
+    public R<List<VersionNodeVo>> myCommonVersionTree(
+            @LoginUser User user,
+            @RequestParam(name = "productId", defaultValue = "0", required = false) Long productId,
+            @RequestParam(name = "projectId", defaultValue = "0", required = false) Long projectId,
+            @RequestParam(name = "versionId") Long versionId
+    ) {
+        List<VersionNodeVo> versionNodeVos = versionService.myCommonVersion(user, productId, projectId, versionId);
+        if (CollectionUtils.isEmpty(versionNodeVos)) {
+            return R.ok(new ArrayList<>(0));
+        }
+        return R.ok(versionNodeVos);
+
+//        Map<Long, String> productNameMap = toMap(versionNodeVos,
+//                VersionNodeVo::getProductId, VersionNodeVo::getProductName);
+//        Map<Long, TreeNode> productTreeNodeMap = new HashMap<>();
+//        if (!CollectionUtils.isEmpty(productNameMap)) {
+//            for (Map.Entry<Long, String> entry : productNameMap.entrySet()) {
+//                TreeNode treeNode = new TreeNode();
+//                treeNode.setId(entry.getKey());
+//                treeNode.setName(entry.getValue());
+//                treeNode.setType(PRODUCT);
+//                treeNodes.add(treeNode);
+//                productTreeNodeMap.put(entry.getKey(), treeNode);
+//            }
+//        }
+//
+//        Map<Long, List<VersionNodeVo>> projectListMap = toMapList(versionNodeVos, VersionNodeVo::getProjectId);
+//        Map<Long, TreeNode> projectTreeNodeMap = new HashMap<>();
+//        if (!CollectionUtils.isEmpty(projectListMap)) {
+//            for (List<VersionNodeVo> ps : projectListMap.values()) {
+//                if (!CollectionUtils.isEmpty(ps)) {
+//                    VersionNodeVo vo = ps.get(0);
+//                    Long id = vo.getProjectId();
+//                    String name = vo.getProjectName();
+//                    Long pid = vo.getProductId();
+//                    TreeNode treeNode = new TreeNode();
+//                    treeNode.setId(id);
+//                    treeNode.setName(name);
+//                    treeNode.setType(PROJECT);
+//                    projectTreeNodeMap.put(id, treeNode);
+//
+//                    TreeNode pnode = productTreeNodeMap.get(pid);
+//                    if (pnode == null) {
+//                        continue;
+//                    }
+//                    if (pnode.getChildren() == null) {
+//                        pnode.setChildren(new ArrayList<>());
+//                        pnode.setHasChildren(true);
+//                    }
+//                    pnode.getChildren().add(treeNode);
+//                }
+//            }
+//        }
+//
+//        Map<Long, List<VersionNodeVo>> envListMap = toMapList(versionNodeVos, VersionNodeVo::getEnvironmentId);
+//        Map<Long, TreeNode> envTreeNodeMap = new HashMap<>();
+//        if (!CollectionUtils.isEmpty(envListMap)) {
+//            for (List<VersionNodeVo> es : envListMap.values()) {
+//                if (!CollectionUtils.isEmpty(es)) {
+//                    VersionNodeVo vo = es.get(0);
+//                    Long id = vo.getEnvironmentId();
+//                    String name = vo.getEnvironmentName();
+//                    Long pid = vo.getProjectId();
+//                    TreeNode treeNode = new TreeNode();
+//                    treeNode.setId(id);
+//                    treeNode.setName(name);
+//                    treeNode.setType(ENVIRONMENT);
+//                    envTreeNodeMap.put(id, treeNode);
+//
+//                    TreeNode pnode = projectTreeNodeMap.get(pid);
+//                    if (pnode == null) {
+//                        continue;
+//                    }
+//                    if (pnode.getChildren() == null) {
+//                        pnode.setChildren(new ArrayList<>());
+//                        pnode.setHasChildren(true);
+//                    }
+//                    pnode.getChildren().add(treeNode);
+//                }
+//            }
+//        }
+//
+//        Map<Long, List<VersionNodeVo>> versionListMap = toMapList(versionNodeVos, VersionNodeVo::getVersionId);
+//        if (!CollectionUtils.isEmpty(versionListMap)) {
+//            for (List<VersionNodeVo> vs : versionListMap.values()) {
+//                if (!CollectionUtils.isEmpty(vs)) {
+//                    VersionNodeVo vo = vs.get(0);
+//                    Long id = vo.getVersionId();
+//                    String name = vo.getVersionName();
+//                    Long pid = vo.getEnvironmentId();
+//                    TreeNode treeNode = new TreeNode();
+//                    treeNode.setId(id);
+//                    treeNode.setName(name);
+//                    treeNode.setType(VERSION);
+//
+//                    TreeNode pnode = envTreeNodeMap.get(pid);
+//                    if (pnode == null) {
+//                        continue;
+//                    }
+//                    if (pnode.getChildren() == null) {
+//                        pnode.setChildren(new ArrayList<>());
+//                        pnode.setHasChildren(true);
+//                    }
+//                    pnode.getChildren().add(treeNode);
+//                }
+//            }
+//        }
+//
+//        return R.ok(treeNodes);
     }
 
     /**
@@ -810,7 +937,14 @@ public class VersionController {
         int cnt = configItemService.batchSave(user, batchConfigItemReq, configGroup);
 
         // 失效版本下的配置
-        rccCache.evictConfigItem(configGroup.getVersionId());
+        if (configGroup.getVersionId() != null && configGroup.getVersionId() > 0) {
+            List<Long> versionIds = new ArrayList<>();
+            versionIds.add(configGroup.getVersionId());
+            if (projectService.selectByPrimaryKey(configGroup.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(versionId));
+            }
+            rccCache.evictConfigItem(versionIds);
+        }
         return R.ok(cnt);
     }
 
@@ -914,5 +1048,59 @@ public class VersionController {
         // read file
         configItemService.parseProFile(file, configGroup, type);
         return R.ok();
+    }
+
+    @PostMapping("ref")
+    public R addRef(@RequestBody RefProjectDto refProjectDto, @LoginUser User user) {
+        if (user == null) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        if (null == refProjectDto.getVersionId() || refProjectDto.getVersionId() <= 0) {
+            return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
+        }
+        if (null == refProjectDto.getRefIds()) {
+            return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
+        }
+        List<Long> refIdList = refProjectDto.getRefIds();
+        Long versionId = refProjectDto.getVersionId();
+        Version exists = versionService.selectByPrimaryKey(versionId);
+        if (exists == null || Deleted.DELETE.getValue().equals(exists.getDeleted())) {
+            return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        if (!versionService.checkAuths(user, versionId, refProjectDto.getRefIds())) {
+            return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
+        }
+        int cnt = 0;
+        if (refIdList.isEmpty()) {
+            cnt = versionService.updateByPrimaryKeySelective(Version.newBuilder()
+                    .updateTime(new Date())
+                    .dependencyIds("")
+                    .id(versionId)
+                    .build());
+        } else {
+            //剔除掉当前版本自己id
+            refIdList.remove(versionId);
+            // 根据refIdList获取版本信息
+            List<Version> versions = versionService.selectByPrimaryKeys(refIdList);
+            String refIds = "";
+            for (Version version : versions) {
+                refIds += version.getId() + ",";
+            }
+            // 去除最后的逗号
+            refIds = refIds.substring(0, refIds.length() - 1);
+            cnt = versionService.updateByPrimaryKeySelective(Version.newBuilder()
+                    .updateTime(new Date())
+                    .dependencyIds(refIds)
+                    .id(versionId)
+                    .build());
+        }
+        // 失效版本下的配置
+        List<Long> versionIds = new ArrayList<>();
+        versionIds.add(versionId);
+        if (projectService.selectByPrimaryKey(exists.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+            versionIds.addAll(versionService.getChildrenVersionById(versionId));
+        }
+        rccCache.evictConfigItem(versionIds);
+        return R.ok(cnt);
     }
 }

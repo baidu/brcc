@@ -309,6 +309,16 @@ public class VersionExample extends BaseExample {
             return (Criteria) this;
         }
 
+        public Criteria andDependencyIdsLike(String value) {return andDependencyIdsLike(value, Boolean.TRUE);}
+
+        public Criteria andDependencyIdsLike(String value, Boolean condition) {
+            if (condition == null || !condition){
+                return (Criteria) this;
+            }
+            addCriterion("dependency_ids like", value, "dependencyIds");
+            return (Criteria) this;
+        }
+
         public Criteria andNameLike(String value) {
             return andNameLike(value, Boolean.TRUE);
         }
@@ -348,6 +358,24 @@ public class VersionExample extends BaseExample {
                 value = value.concat("%");
             }
             addCriterion("name like", value, "name");
+            return (Criteria) this;
+        }
+
+        public Criteria andDependencyIdsLikeBoth(String value) {
+            return andDependencyIdsLikeBoth(value, Boolean.TRUE);
+        }
+
+        public Criteria andDependencyIdsLikeBoth(String value, Boolean condition) {
+            if (condition == null || !condition){
+                return (Criteria) this;
+            }
+            if (value != null && !value.startsWith("%")) {
+                value = "%".concat(value);
+            }
+            if (value != null && !value.endsWith("%")) {
+                value = value.concat("%");
+            }
+            addCriterion("dependency_ids like", value, "dependencyIds");
             return (Criteria) this;
         }
 

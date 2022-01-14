@@ -46,6 +46,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_REF_ID_NOT_EXISTS_MSG
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_REF_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_TYPE_NOT_AVAILABLE_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.TYPE_NULL_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.TYPE_NULL_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.USERID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.USER_NOT_EXISTS_MSG;
@@ -126,7 +128,7 @@ import lombok.extern.slf4j.Slf4j;
  * 工程相关接口
  */
 @RestController
-@RequestMapping("project")
+@RequestMapping("console/project")
 @Slf4j
 public class ProjectController {
 
@@ -182,7 +184,10 @@ public class ProjectController {
         }
         Date now = DateTimeUtils.now();
         Byte projectType = req.getProjectType();
-        if (projectType != null && !ProjectType.PRIVATE.getValue().equals(projectType) && !ProjectType.PUBLIC.getValue()
+        if (projectType == null) {
+            return R.error(TYPE_NULL_STATUS, TYPE_NULL_MSG);
+        }
+        if (!ProjectType.PRIVATE.getValue().equals(projectType) && !ProjectType.PUBLIC.getValue()
                 .equals(projectType)) {
             return R.error(PROJECT_TYPE_NOT_AVAILABLE_STATUS, PROJECT_TYPE_NOT_AVAILABLE_MSG);
         }

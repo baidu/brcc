@@ -92,7 +92,7 @@ import com.baidu.brcc.utils.time.DateTimeUtils;
  * 管理端环境相关接口
  */
 @RestController
-@RequestMapping("environment")
+@RequestMapping("console/environment")
 public class EnvironmentController {
 
     private static final Logger log = LoggerFactory.getLogger(EnvironmentController.class);
