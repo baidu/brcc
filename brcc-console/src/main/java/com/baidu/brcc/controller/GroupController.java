@@ -88,7 +88,7 @@ import com.baidu.brcc.utils.time.DateTimeUtils;
  * 管理端分组相关接口
  */
 @RestController
-@RequestMapping("group")
+@RequestMapping("console/group")
 public class GroupController {
 
     @Autowired

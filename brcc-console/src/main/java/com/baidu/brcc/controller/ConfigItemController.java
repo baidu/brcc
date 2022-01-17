@@ -40,11 +40,13 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.brcc.domain.em.ProjectType;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -91,7 +93,7 @@ import com.baidu.brcc.utils.time.DateTimeUtils;
  * 管理端配置项相关接口
  */
 @RestController
-@RequestMapping("item")
+@RequestMapping("console/item")
 public class ConfigItemController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigItemController.class);
@@ -266,7 +268,12 @@ public class ConfigItemController {
         }
 
         if (cacheEvictVersionId != null && cacheEvictVersionId > 0) {
-            rccCache.evictConfigItem(cacheEvictVersionId);
+            List<Long> versionIds = new ArrayList<>();
+            versionIds.add(cacheEvictVersionId);
+            if (projectService.selectByPrimaryKey(groupService.selectByPrimaryKey(req.getGroupId()).getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(cacheEvictVersionId));
+            }
+            rccCache.evictConfigItem(versionIds);
         }
 
         return R.ok(id);
@@ -307,8 +314,13 @@ public class ConfigItemController {
         int cnt = configItemService.batchSave(user, itemReq, configGroup);
 
         // 失效版本下的配置
-        if (configGroup.getVersionId() != null && configGroup.getVersionId() >= 0) {
-            rccCache.evictConfigItem(configGroup.getVersionId());
+        if (configGroup.getVersionId() != null && configGroup.getVersionId() > 0) {
+            List<Long> versionIds = new ArrayList<>();
+            versionIds.add(configGroup.getVersionId());
+            if (projectService.selectByPrimaryKey(configGroup.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(configGroup.getVersionId()));
+            }
+            rccCache.evictConfigItem(versionIds);
         }
         return R.ok(cnt);
     }
@@ -369,7 +381,14 @@ public class ConfigItemController {
                 oldConfigMap, newConfigMap, new Date());
 
         // 失效版本下的配置
-        rccCache.evictConfigItem(configItem.getVersionId());
+        if (configItem.getVersionId() != null && configItem.getVersionId() > 0) {
+            List<Long> versionIds = new ArrayList<>();
+            versionIds.add(configItem.getVersionId());
+            if (projectService.selectByPrimaryKey(configItem.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(configItem.getVersionId()));
+            }
+            rccCache.evictConfigItem(versionIds);
+        }
 
         return R.ok(cnt);
     }

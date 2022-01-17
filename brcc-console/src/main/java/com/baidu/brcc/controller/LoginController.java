@@ -55,7 +55,7 @@ import com.baidu.brcc.service.UserService;
  * 用户登录登出相关接口
  */
 @Controller
-@RequestMapping("user")
+@RequestMapping("console/user")
 public class LoginController {
 
     private static final String LOGOUT_HTML_CONTENT1 = "<!DOCTYPE html> <html lang=\"en\"> <body onload=\"logout()\">"

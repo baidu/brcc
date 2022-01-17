@@ -336,4 +336,7 @@ public class ErrorStatusMsg {
 
     public static final Integer NO_ENVIRONMENT_PRI_STATUS = 100235;
     public static final String NO_ENVIRONMENT_PRI_MSG = "无任何环境权限";
+
+    public static final Integer CHILDREN_VERSION_NOT_EMPTY_STATUS = 11000;
+    public static final String CHILDREN_VERSION_NOT_EMPTY_MSG = "该版本仍被其他版本引用，不可删除！";
 }

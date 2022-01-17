@@ -39,7 +39,7 @@ import com.baidu.brcc.service.OperationLogService;
  * 操作日志相关接口
  */
 @RestController
-@RequestMapping("logs")
+@RequestMapping("console/logs")
 public class OperatorLogController {
     @Autowired
     private OperationLogService operationLogService;

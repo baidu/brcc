@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.baidu.brcc.domain.exception.BizException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,9 @@ import com.baidu.brcc.service.RccCache;
 import com.baidu.brcc.service.VersionService;
 import com.baidu.brcc.service.base.GenericServiceImpl;
 import com.baidu.brcc.utils.time.DateTimeUtils;
+
+import static com.baidu.brcc.common.ErrorStatusMsg.CHILDREN_VERSION_NOT_EMPTY_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CHILDREN_VERSION_NOT_EMPTY_STATUS;
 
 @Service("projectService")
 public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, ProjectExample> implements ProjectService {
@@ -108,6 +112,13 @@ public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, Projec
         List<Long> environmentIds = environmentService.selectIdsByProjectId(projectId);
 
         List<Long> versionIds = versionService.selectIdsByEnvironmentIds(projectId, environmentIds);
+
+        for(Long versionId : versionIds) {
+            if(!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId))) {
+                throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+            }
+        }
+
 
         List<String> apiTokenTokens = null;
 

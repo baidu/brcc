@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.baidu.brcc.domain.ConfigItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -184,21 +185,26 @@ public class RccCacheImpl implements RccCache {
     }
 
     @Override
-    public void evictConfigItem(Long versionId) {
-        if (!cache.cacheEnable() || versionId == null) {
+    public void evictConfigItem(List<Long> versionIds) {
+        if (!cache.cacheEnable() || CollectionUtils.isEmpty(versionIds)) {
             return;
         }
         // 删除环境下的所有版本
-        String itemVersionIdKey = getItemVersionIdKey(versionId);
+        List<String> itemVersionIdKeys = new ArrayList<>();
+        for(Long versionId : versionIds) {
+            String itemVersionIdKey = getItemVersionIdKey(versionId);
+            itemVersionIdKeys.add(itemVersionIdKey);
+        }
+
         Long cnt = new RetryActionWithOneParam<List<String>, Long>(
                 "evict",
                 retryTimes,
-                Arrays.asList(itemVersionIdKey)
+                itemVersionIdKeys
         ).action(
                 keys -> cache.evict(keys)
         );
         if (log.isDebugEnabled()) {
-            log.debug("evictConfigItem keys[{}] total[{}] success[{}]", itemVersionIdKey, 1, cnt);
+            log.debug("evictConfigItem keys[{}] total[{}] success[{}]", GsonUtils.toJsonString(itemVersionIdKeys), itemVersionIdKeys.size(), cnt);
         }
     }
 
@@ -581,6 +587,24 @@ public class RccCacheImpl implements RccCache {
     }
 
     @Override
+    public Map<String,ConfigItem> getItemMap(Long versionId) {
+        Map<String, ConfigItem> map = new HashMap<>();
+        if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
+            return map;
+        }
+        String itemVersionIdKey = getItemVersionIdKey(versionId);
+        RetryActionWithTwoParam<String, Class<ConfigItem>, Map<String, ConfigItem>> action =
+                new RetryActionWithTwoParam<>(
+                        "hgetall",
+                        retryTimes,
+                        itemVersionIdKey,
+                        ConfigItem.class
+                );
+        map = action.action((String key, Class<ConfigItem> type) -> cache.hgetall(key, type));
+        return map;
+    }
+
+    @Override
     public List<ApiItemVo> getItems(Long versionId, List<String> names) {
         if (!cache.cacheEnable() || versionId == null || versionId <= 0 || isEmpty(names)) {
             return null;
@@ -863,6 +887,37 @@ public class RccCacheImpl implements RccCache {
                 retryTimes,
                 itemVersionIdKey,
                 map
+        ).action(
+                (String key, Map kvs) -> cache.hmset(key, kvs)
+        );
+    }
+
+    @Override
+    public void loadItemMap(Long versionId, Map<String, ConfigItem> itemMap, boolean clear) {
+        if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
+            return;
+        }
+        String itemVersionIdKey = getItemVersionIdKey(versionId);
+
+        if (clear) {
+            // 删除
+            new RetryActionWithOneParam<List<String>, Long>(
+                    "evict",
+                    retryTimes,
+                    Arrays.asList(itemVersionIdKey)
+            ).action(
+                    (List<String> keys) -> cache.evict(keys)
+            );
+        }
+        // put
+        if (isEmpty(itemMap)) {
+            return;
+        }
+        new RetryActionWithTwoParam<String, Map, Boolean>(
+                "hmset",
+                retryTimes,
+                itemVersionIdKey,
+                itemMap
         ).action(
                 (String key, Map kvs) -> cache.hmset(key, kvs)
         );

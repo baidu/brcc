@@ -35,6 +35,8 @@ public class ProjectListVo extends Project {
 
     private List<String> managers;
 
+    private Byte projectType;
+
     public ProjectListVo copyFrom(Project project) {
         return Project.copyFrom(project, this);
     }

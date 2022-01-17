@@ -20,6 +20,8 @@ package com.baidu.brcc.domain.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class VersionVo {
 
@@ -40,5 +42,9 @@ public class VersionVo {
 
     // 关联的主版本ID
     private Long mainVersionId;
+
+    private List<Long> dependencyIds;
+
+    private List<String> dependencyInfos;
 
 }

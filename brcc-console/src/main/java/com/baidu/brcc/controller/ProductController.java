@@ -69,7 +69,7 @@ import com.baidu.brcc.utils.time.DateTimeUtils;
  * 产品线相关接口
  */
 @RestController
-@RequestMapping("product")
+@RequestMapping("console/product")
 public class ProductController {
 
     @Autowired

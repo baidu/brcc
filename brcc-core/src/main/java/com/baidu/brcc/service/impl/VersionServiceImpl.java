@@ -18,6 +18,8 @@
  */
 package com.baidu.brcc.service.impl;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.CHILDREN_VERSION_NOT_EMPTY_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.CHILDREN_VERSION_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.COPY_CONFIG_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.COPY_CONFIG_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.COPY_GROUP_EXISTS_MSG;
@@ -63,6 +65,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import com.baidu.brcc.domain.VersionExample;
+import com.baidu.brcc.domain.em.ProjectType;
 import com.baidu.brcc.domain.meta.MetaConfigGroup;
 import com.baidu.brcc.domain.meta.MetaConfigItem;
 import org.apache.commons.lang3.StringUtils;
@@ -316,7 +319,9 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         if (version == null) {
             return 0;
         }
-
+        if (!CollectionUtils.isEmpty(getChildrenVersionById(versionId))) {
+            throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+        }
         // 删除版本
         int del = updateByPrimaryKeySelective(Version.newBuilder()
                 .id(versionId)
@@ -353,6 +358,20 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
 
     @Override
     public int deleteByProjectId(Long projectId) {
+        // if common, check the children versions
+        if (projectService.selectByPrimaryKey(projectId).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+            List<Version> versions = selectByExample(VersionExample.newBuilder()
+                    .build()
+                    .createCriteria()
+                    .andProjectIdEqualTo(projectId)
+                    .andDeletedEqualTo(Deleted.OK.getValue())
+                    .toExample());
+            for (Version item : versions) {
+                if(!CollectionUtils.isEmpty(getChildrenVersionById(item.getId()))) {
+                    throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+                }
+            }
+        }
         return updateByExampleSelective(
                 Version.newBuilder()
                         .deleted(Deleted.DELETE.getValue())
@@ -362,7 +381,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                         .build()
                         .createCriteria()
                         .andProjectIdEqualTo(projectId)
-                        .andDeletedEqualTo(Deleted.DELETE.getValue())
+                        .andDeletedEqualTo(Deleted.OK.getValue())
                         .toExample());
     }
 
@@ -451,7 +470,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                                 .andVersionIdEqualTo(destGroup.getVersionId())
                                 .andDeletedEqualTo(Deleted.OK.getValue())
                                 .toExample(),
-                        ConfigItem :: getName,
+                        ConfigItem::getName,
                         Function.identity(),
                         MetaConfigItem.COLUMN_NAME_ID,
                         MetaConfigItem.COLUMN_NAME_NAME,
@@ -598,6 +617,125 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
     }
 
     @Override
+    public List<VersionNodeVo> myCommonVersion(User user, Long productId, Long projectId, Long versionId) {
+        Map<Long, Product> productManageMap = new HashMap<>();
+        Map<Long, Project> projectManageMap = new HashMap<>();
+        Map<Long, Project> projectMemberMap = new HashMap<>();
+        Map<Long, Environment> envAccessMap = new HashMap<>();
+        Map<Long, Version> versionAccessMap = new HashMap<>();
+        Map<Long, ConfigGroup> groupAccessMap = new HashMap<>();
+
+        configGroupService.loadGroupByUser(
+                user,
+                ConfigGroupService.VERSION,
+                productManageMap,
+                projectManageMap,
+                projectMemberMap,
+                envAccessMap,
+                versionAccessMap,
+                groupAccessMap
+        );
+
+        List<VersionNodeVo> versionNodeVos = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(versionAccessMap)) {
+            Set<Long> lostEnvironmentIds = new HashSet<>();
+            Set<Long> lostProjectIds = new HashSet<>();
+            Set<Long> lostProductIds = new HashSet<>();
+            for (Version version : versionAccessMap.values()) {
+                if (productId != null && productId > 0 && !productId.equals(version.getProductId())) {
+                    continue;
+                }
+                if (projectId != null && projectId > 0 && !projectId.equals(version.getProjectId())) {
+                    continue;
+                }
+                VersionNodeVo vo = new VersionNodeVo();
+                vo.setVersionId(version.getId());
+                vo.setVersionName(version.getName());
+                vo.setEnvironmentId(version.getEnvironmentId());
+                vo.setProjectId(version.getProjectId());
+                vo.setProductId(version.getProductId());
+                versionNodeVos.add(vo);
+
+                if (!envAccessMap.containsKey(version.getEnvironmentId())) {
+                    lostEnvironmentIds.add(version.getEnvironmentId());
+                }
+
+                if (!projectManageMap.containsKey(version.getProjectId())) {
+                    lostProjectIds.add(version.getProjectId());
+                }
+
+                if (!productManageMap.containsKey(version.getProductId())) {
+                    lostProductIds.add(version.getProductId());
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(lostProductIds)) {
+                List<Product> products = productService.selectByPrimaryKeys(
+                        lostProductIds,
+                        MetaProduct.COLUMN_NAME_ID,
+                        MetaProduct.COLUMN_NAME_NAME
+                );
+
+                if (!CollectionUtils.isEmpty(products)) {
+                    for (Product product : products) {
+                        productManageMap.put(product.getId(), product);
+                    }
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(lostProjectIds)) {
+                List<Project> projects = projectService.selectByPrimaryKeys(
+                        lostProjectIds,
+                        MetaProject.COLUMN_NAME_ID,
+                        MetaProject.COLUMN_NAME_NAME,
+                        MetaProject.COLUMN_NAME_PRODUCTID
+                );
+
+                if (!CollectionUtils.isEmpty(projects)) {
+                    for (Project project : projects) {
+                        projectManageMap.put(project.getId(), project);
+                    }
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(lostEnvironmentIds)) {
+                List<Environment> environments = environmentService.selectByPrimaryKeys(
+                        lostEnvironmentIds,
+                        MetaEnvironment.COLUMN_NAME_ID,
+                        MetaEnvironment.COLUMN_NAME_NAME,
+                        MetaEnvironment.COLUMN_NAME_PROJECTID,
+                        MetaEnvironment.COLUMN_NAME_PRODUCTID
+                );
+
+                if (!CollectionUtils.isEmpty(environments)) {
+                    for (Environment environment : environments) {
+                        envAccessMap.put(environment.getId(), environment);
+                    }
+                }
+            }
+
+            for (VersionNodeVo vo : versionNodeVos) {
+                Environment environment = envAccessMap.get(vo.getEnvironmentId());
+                if (environment != null) {
+                    vo.setEnvironmentName(environment.getName());
+                }
+                Project project = projectManageMap.get(vo.getProjectId());
+                if (project != null) {
+                    vo.setProjectName(project.getName());
+                }
+                Product product = productManageMap.get(vo.getProductId());
+                if (product != null) {
+                    vo.setProductName(product.getName());
+                }
+            }
+        }
+        versionNodeVos.removeIf(item -> projectService.selectByPrimaryKey(item.getProjectId()).getProjectType()
+                .equals(ProjectType.PRIVATE.getValue()));
+        versionNodeVos.removeIf(item -> item.getVersionId().equals(versionId));
+        return versionNodeVos;
+    }
+
+    @Override
     public Boolean checkAuth(User user, Long srcVerId, Long destVerId) {
 
         List<Version> versions = this.selectByExample(VersionExample.newBuilder()
@@ -623,6 +761,31 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
 
         return checkRet;
 
+    }
+
+    @Override
+    public Boolean checkAuths(User user, Long versionId, List<Long> depIds) {
+        List<Long> ids = new ArrayList<>();
+        ids.add(versionId);
+        List<Version> versions = this.selectByExample(VersionExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andIdIn(ids)
+                .toExample());
+        if (CollectionUtils.isEmpty(versions)) {
+
+            return false;
+        }
+
+        boolean checkRet = false;
+        for (Version version : versions) {
+            checkRet = environmentUserService.checkAuth(version.getProductId(),
+                    version.getProjectId(),
+                    version.getEnvironmentId(),
+                    user);
+        }
+
+        return checkRet;
     }
 
     @Override
@@ -744,10 +907,66 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
     @Override
     public List<Version> selectByEnvironmentId(Long environmentId) {
         return selectByExample(VersionExample.newBuilder()
-        .build()
-        .createCriteria()
-        .andEnvironmentIdEqualTo(environmentId)
-        .andDeletedEqualTo(Deleted.OK.getValue())
-        .toExample());
+                .build()
+                .createCriteria()
+                .andEnvironmentIdEqualTo(environmentId)
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample());
+    }
+
+    @Override
+    public List<String> getDepInfosByDepIds(List<Long> depIds) {
+        List<String> res = new ArrayList<>();
+        if (depIds == null || depIds.size() <= 0) {
+            return res;
+        }
+        for (Long id : depIds) {
+            Version version = selectByPrimaryKey(id);
+            String depInfo = projectService.selectByPrimaryKey(version.getProjectId()).getName() + "/" +
+                    environmentService.selectByPrimaryKey(version.getEnvironmentId()).getName() + "/" +
+                    selectByPrimaryKey(id).getName();
+            res.add(depInfo);
+        }
+        return res;
+    }
+
+    @Override
+    public List<Long> getChildrenVersionById(Long versionId) {
+        List<Long> res = new ArrayList<>();
+        List<Version> versions = selectByExample(VersionExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andDependencyIdsLike(versionId.toString())
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample()
+        );
+        versions.addAll(selectByExample(VersionExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andDependencyIdsLikeBoth(versionId.toString()+",")
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample()
+        ));
+        versions.addAll(selectByExample(VersionExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andDependencyIdsLikeBoth(","+versionId.toString()+",")
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample()
+        ));
+        versions.addAll(selectByExample(VersionExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andDependencyIdsLikeBoth(","+versionId.toString())
+                .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample()
+        ));
+        if (CollectionUtils.isEmpty(versions)) {
+            return res;
+        }
+        for (Version item : versions) {
+            res.add(item.getId());
+        }
+        return res;
     }
 }

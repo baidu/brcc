@@ -21,6 +21,7 @@ package com.baidu.brcc.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.baidu.brcc.domain.ConfigGroup;
 import com.baidu.brcc.domain.ConfigItem;
@@ -40,6 +41,8 @@ public interface ConfigItemService extends GenericService<ConfigItem, Long, Conf
     List<ConfigItem> selectByProjectIdAndVersionId(Long projectId, Long versionId);
 
     List<ConfigItem> selectByProjectIdAndVersionIdAndNames(Long projectId, Long versionId, List<String> names);
+
+    Map<String, ConfigItem> selectMapByProjectIdAndVersionId(Long projectId, Long versionId);
 
     Integer batchSave(User user, BatchConfigItemReq itemReq, ConfigGroup configGroup);
 
@@ -61,6 +64,8 @@ public interface ConfigItemService extends GenericService<ConfigItem, Long, Conf
     ApiItemVo getByVersionIdAndName(Long projectId, Long versionId, String name);
 
     List<ApiItemVo> getAllByVersionIdInCache(Long projectId, Long versionId);
+
+    Map<String, ConfigItem> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved);
 
     List<ApiItemVo> getItemsByVersionIdAndNamesInCache(Long projectId, Long versionId, List<String> names);
 
