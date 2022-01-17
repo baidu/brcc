@@ -69,7 +69,7 @@ public class ApiCountInterceptor implements HandlerInterceptor {
     private int interval;
 
     /**
-     * 定时线程，用于同步本地缓存至redis
+     * 定时线程，用于同步本地缓存至数据库
      */
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
