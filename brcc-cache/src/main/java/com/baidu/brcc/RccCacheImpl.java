@@ -570,7 +570,7 @@ public class RccCacheImpl implements RccCache {
         if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
             return null;
         }
-        String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
+        String itemVersionIdKey = getItemVersionIdKey(versionId);
 
         RetryActionWithTwoParam<String, Class<ApiItemVo>, Map<String, ApiItemVo>> action =
                 new RetryActionWithTwoParam<>(
@@ -593,7 +593,7 @@ public class RccCacheImpl implements RccCache {
         if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
             return map;
         }
-        String itemVersionIdKey = getItemVersionIdKey(versionId);
+        String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
         RetryActionWithTwoParam<String, Class<ConfigItem>, Map<String, ConfigItem>> action =
                 new RetryActionWithTwoParam<>(
                         "hgetall",
