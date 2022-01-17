@@ -31,6 +31,7 @@ public class CacheKeyGenerator {
     public static final String ENVIRONMENT_PROJECT_ID_KEY_PREFIX = "hash.environment.projectId.";
     public static final String VERSION_ENVIRONMENT_ID_KEY_PREFIX = "hash.version.environmentId.";
     public static final String ITEM_VERSION_ID_KEY_PREFIX = "hash.item.versionId.";
+    public static final String ITEM_VERSION_ID_KEY_PREFIX_V2 = "hash.itemConfig.versionId.";
 
     public static String getUserNameKey(String userName) {
         Objects.requireNonNull(userName);
@@ -71,5 +72,11 @@ public class CacheKeyGenerator {
         Objects.requireNonNull(versionId);
         return ITEM_VERSION_ID_KEY_PREFIX.concat(versionId.toString());
     }
+
+    public static String getItemConfigVersionIdKey(Long versionId) {
+        Objects.requireNonNull(versionId);
+        return ITEM_VERSION_ID_KEY_PREFIX_V2.concat(versionId.toString());
+    }
+
 
 }
