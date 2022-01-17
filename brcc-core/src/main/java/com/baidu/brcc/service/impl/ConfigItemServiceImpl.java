@@ -515,6 +515,7 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     public Map<String, ConfigItem> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved) {
         Map<String, ConfigItem> allConfig = rccCache.getItemMap(versionId);
         if (CollectionUtils.isEmpty(allConfig)) {
+            allConfig = new HashMap<>();
             // get the original configuration
             Map<String, ConfigItem> items = selectMapByProjectIdAndVersionId(projectId, versionId);
             // get the common configuration
