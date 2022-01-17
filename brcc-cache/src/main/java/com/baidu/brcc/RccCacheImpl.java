@@ -20,6 +20,7 @@ package com.baidu.brcc;
 
 import static com.baidu.brcc.CacheKeyGenerator.getApiTokenKey;
 import static com.baidu.brcc.CacheKeyGenerator.getEnvironmentProjectIdKey;
+import static com.baidu.brcc.CacheKeyGenerator.getItemConfigVersionIdKey;
 import static com.baidu.brcc.CacheKeyGenerator.getItemVersionIdKey;
 import static com.baidu.brcc.CacheKeyGenerator.getProjectNameKey;
 import static com.baidu.brcc.CacheKeyGenerator.getUserNameKey;
@@ -592,7 +593,7 @@ public class RccCacheImpl implements RccCache {
         if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
             return map;
         }
-        String itemVersionIdKey = getItemVersionIdKey(versionId);
+        String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
         RetryActionWithTwoParam<String, Class<ConfigItem>, Map<String, ConfigItem>> action =
                 new RetryActionWithTwoParam<>(
                         "hgetall",
@@ -897,7 +898,7 @@ public class RccCacheImpl implements RccCache {
         if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
             return;
         }
-        String itemVersionIdKey = getItemVersionIdKey(versionId);
+        String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
 
         if (clear) {
             // 删除
