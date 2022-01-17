@@ -193,7 +193,7 @@ public class RccCacheImpl implements RccCache {
         // 删除环境下的所有版本
         List<String> itemVersionIdKeys = new ArrayList<>();
         for(Long versionId : versionIds) {
-            String itemVersionIdKey = getItemVersionIdKey(versionId);
+            String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
             itemVersionIdKeys.add(itemVersionIdKey);
         }
 
