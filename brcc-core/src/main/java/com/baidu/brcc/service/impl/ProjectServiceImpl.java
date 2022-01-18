@@ -114,9 +114,9 @@ public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, Projec
         List<Long> versionIds = versionService.selectIdsByEnvironmentIds(projectId, environmentIds);
 
         for(Long versionId : versionIds) {
-            if(!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId))) {
-                throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
-            }
+//            if(!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId))) {
+//                throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+//            }
         }
 
 

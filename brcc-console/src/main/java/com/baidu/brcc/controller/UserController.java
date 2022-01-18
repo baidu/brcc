@@ -33,7 +33,7 @@ import com.baidu.brcc.dto.UserDto;
 import com.baidu.brcc.service.UserService;
 
 @RestController
-@RequestMapping("console/user")
+@RequestMapping(path = {"console/user", "user"})
 public class UserController {
 
     @Autowired

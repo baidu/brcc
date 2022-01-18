@@ -65,7 +65,7 @@ public interface ConfigItemService extends GenericService<ConfigItem, Long, Conf
 
     List<ApiItemVo> getAllByVersionIdInCache(Long projectId, Long versionId);
 
-    Map<String, ConfigItem> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved);
+    List<ApiItemVo> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved);
 
     List<ApiItemVo> getItemsByVersionIdAndNamesInCache(Long projectId, Long versionId, List<String> names);
 

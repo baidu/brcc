@@ -319,9 +319,9 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         if (version == null) {
             return 0;
         }
-        if (!CollectionUtils.isEmpty(getChildrenVersionById(versionId))) {
-            throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
-        }
+//        if (!CollectionUtils.isEmpty(getChildrenVersionById(versionId))) {
+//            throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+//        }
         // 删除版本
         int del = updateByPrimaryKeySelective(Version.newBuilder()
                 .id(versionId)
@@ -367,9 +367,9 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                     .andDeletedEqualTo(Deleted.OK.getValue())
                     .toExample());
             for (Version item : versions) {
-                if(!CollectionUtils.isEmpty(getChildrenVersionById(item.getId()))) {
-                    throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
-                }
+//                if(!CollectionUtils.isEmpty(getChildrenVersionById(item.getId()))) {
+//                    throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+//                }
             }
         }
         return updateByExampleSelective(
@@ -931,7 +931,7 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
     }
 
     @Override
-    public List<Long> getChildrenVersionById(Long versionId) {
+    public List<Long> getChildrenVersionById(Long versionId, Set<Long> resolved) {
         List<Long> res = new ArrayList<>();
         List<Version> versions = selectByExample(VersionExample.newBuilder()
                 .build()
@@ -965,7 +965,13 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
             return res;
         }
         for (Version item : versions) {
+            if (resolved.contains(item.getId())) {
+                continue;
+            }
             res.add(item.getId());
+            resolved.add(item.getId());
+            List<Long> childrenIds = getChildrenVersionById(item.getId(), resolved);
+            res.addAll(childrenIds);
         }
         return res;
     }

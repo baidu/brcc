@@ -56,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("console/instance")
+@RequestMapping(path={"console/instance","instance"})
 public class BrccInstanceController {
 
     @Autowired

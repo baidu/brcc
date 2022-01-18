@@ -54,7 +54,7 @@ import com.baidu.brcc.service.VersionService;
  * "environmentName":"e1","versionId":47,"versionName":"1","groupId":477,"groupName":"test1"}
  */
 @RestController
-@RequestMapping("console/parent")
+@RequestMapping(path = {"console/parent", "parent"})
 public class GetParentController {
 
     @Autowired

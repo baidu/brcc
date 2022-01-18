@@ -166,7 +166,7 @@ import javax.servlet.http.HttpServletResponse;
  * 管理端版本相关接口
  */
 @RestController
-@RequestMapping("console/version")
+@RequestMapping(path = {"console/version", "version"})
 public class VersionController {
 
     @Autowired
@@ -940,9 +940,9 @@ public class VersionController {
         if (configGroup.getVersionId() != null && configGroup.getVersionId() > 0) {
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(configGroup.getVersionId());
-            if (projectService.selectByPrimaryKey(configGroup.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-                versionIds.addAll(versionService.getChildrenVersionById(versionId));
-            }
+//            if (projectService.selectByPrimaryKey(configGroup.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+//                versionIds.addAll(versionService.getChildrenVersionById(versionId));
+//            }
             rccCache.evictConfigItem(versionIds);
         }
         return R.ok(cnt);
@@ -1097,9 +1097,9 @@ public class VersionController {
         // 失效版本下的配置
         List<Long> versionIds = new ArrayList<>();
         versionIds.add(versionId);
-        if (projectService.selectByPrimaryKey(exists.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-            versionIds.addAll(versionService.getChildrenVersionById(versionId));
-        }
+//        if (projectService.selectByPrimaryKey(exists.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+//            versionIds.addAll(versionService.getChildrenVersionById(versionId));
+//        }
         rccCache.evictConfigItem(versionIds);
         return R.ok(cnt);
     }

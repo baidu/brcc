@@ -104,7 +104,7 @@ public interface RccCache {
     // 读取配置项
     List<ApiItemVo> getItems(Long versionId);
 
-    Map<String, ConfigItem> getItemMap(Long versionId);
+//    Map<String, ConfigItem> getItemMap(Long versionId);
 
     List<ApiItemVo> getItems(Long versionId, List<String> names);
 
@@ -140,6 +140,6 @@ public interface RccCache {
     // 加载配置
     void loadItems(Long versionId, List<ApiItemVo> itemVos, boolean clear);
 
-    void loadItemMap(Long versionId, Map<String, ConfigItem> itemMap, boolean clear);
+//    void loadItemMap(Long versionId, Map<String, ConfigItem> itemMap, boolean clear);
 
 }
