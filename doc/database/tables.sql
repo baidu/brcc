@@ -268,6 +268,7 @@ CREATE TABLE `rcc_version` (
   `create_time` datetime NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT '创建时间',
   `gray_flag` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '灰度标识',
   `main_version_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '关联的主版本',
+  `dependency_ids` varchar(500) NOT NULL DEFAULT '' COMMENT '依赖的版本ID列表',
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name`) USING BTREE,
   KEY `idx_envid` (`environment_id`) USING BTREE,
