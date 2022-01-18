@@ -319,9 +319,10 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
         if (version == null) {
             return 0;
         }
-//        if (!CollectionUtils.isEmpty(getChildrenVersionById(versionId))) {
-//            throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
-//        }
+        Set<Long> resolved = new HashSet<>();
+        if (!CollectionUtils.isEmpty(getChildrenVersionById(versionId, resolved))) {
+            throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+        }
         // 删除版本
         int del = updateByPrimaryKeySelective(Version.newBuilder()
                 .id(versionId)
