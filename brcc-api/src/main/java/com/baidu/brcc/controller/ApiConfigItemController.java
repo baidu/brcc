@@ -379,11 +379,12 @@ public class ApiConfigItemController {
             return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
         }
         if (cacheEvictVersionId != null && cacheEvictVersionId > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(cacheEvictVersionId);
-//            if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-//                versionIds.addAll(versionService.getChildrenVersionById(versionId));
-//            }
+            if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
+            }
             rccCache.evictConfigItem(versionIds);
         }
         return R.ok(id);
@@ -449,9 +450,10 @@ public class ApiConfigItemController {
         // 失效版本下的配置
         List<Long> versionIds = new ArrayList<>();
         versionIds.add(configItem.getVersionId());
-//        if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-//            versionIds.addAll(versionService.getChildrenVersionById(versionId));
-//        }
+        Set<Long> resolved = new HashSet<>();
+        if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+            versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
+        }
         rccCache.evictConfigItem(versionIds);
         return R.ok(cnt);
     }
@@ -541,11 +543,12 @@ public class ApiConfigItemController {
 
         }
         if (cacheEvictVersionId != null && cacheEvictVersionId > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(cacheEvictVersionId);
-//            if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-//                versionIds.addAll(versionService.getChildrenVersionById(versionId));
-//            }
+            if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
+            }
             rccCache.evictConfigItem(versionIds);
         }
         return R.ok(configItem.getId());
@@ -612,11 +615,12 @@ public class ApiConfigItemController {
 
         // 失效版本下的配置
         if (configGroup.getVersionId() != null && configGroup.getVersionId() > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(configGroup.getVersionId());
-//            if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-//                versionIds.addAll(versionService.getChildrenVersionById(versionId));
-//            }
+            if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
+            }
             rccCache.evictConfigItem(versionIds);
         }
         return R.ok(cnt);

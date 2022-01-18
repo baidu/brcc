@@ -270,11 +270,12 @@ public class ConfigItemController {
         }
 
         if (cacheEvictVersionId != null && cacheEvictVersionId > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(cacheEvictVersionId);
-//            if (projectService.selectByPrimaryKey(groupService.selectByPrimaryKey(req.getGroupId()).getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-//                versionIds.addAll(versionService.getChildrenVersionById(cacheEvictVersionId));
-//            }
+            if (projectService.selectByPrimaryKey(groupService.selectByPrimaryKey(req.getGroupId()).getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(cacheEvictVersionId, resolved));
+            }
             rccCache.evictConfigItem(versionIds);
         }
 
@@ -385,11 +386,12 @@ public class ConfigItemController {
 
         // 失效版本下的配置
         if (configItem.getVersionId() != null && configItem.getVersionId() > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(configItem.getVersionId());
-//            if (projectService.selectByPrimaryKey(configItem.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-//                versionIds.addAll(versionService.getChildrenVersionById(configItem.getVersionId()));
-//            }
+            if (projectService.selectByPrimaryKey(configItem.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
+                versionIds.addAll(versionService.getChildrenVersionById(configItem.getVersionId(), resolved));
+            }
             rccCache.evictConfigItem(versionIds);
         }
 
