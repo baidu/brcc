@@ -367,9 +367,10 @@ public class VersionServiceImpl extends GenericServiceImpl<Version, Long, Versio
                     .andDeletedEqualTo(Deleted.OK.getValue())
                     .toExample());
             for (Version item : versions) {
-//                if(!CollectionUtils.isEmpty(getChildrenVersionById(item.getId()))) {
-//                    throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
-//                }
+                Set<Long> resolved = new HashSet<>();
+                if(!CollectionUtils.isEmpty(getChildrenVersionById(item.getId(), resolved))) {
+                    throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+                }
             }
         }
         return updateByExampleSelective(
