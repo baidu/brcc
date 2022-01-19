@@ -1,6 +1,6 @@
 /*
  * Copyright (c) Baidu Inc. All rights reserved.
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -71,6 +71,7 @@ import com.baidu.brcc.service.UserService;
 import com.baidu.brcc.service.VersionService;
 import com.baidu.brcc.utils.DataTransUtils;
 import com.baidu.brcc.utils.time.DateTimeUtils;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -125,9 +126,10 @@ public class ApiConfigItemController {
 
     /**
      * 根据配置名称获取指定配置项
-     * @param token api token
+     *
+     * @param token     api token
      * @param versionId 版本ID
-     * @param name 配置名称
+     * @param name      配置名称
      * @return
      */
     @GetMapping("item/{key}")
@@ -150,20 +152,28 @@ public class ApiConfigItemController {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
         }
         Set<Long> resolved = new HashSet<>();
-        Map<String, ConfigItem> itemMap = configItemService.getCommonAndPrivateByVersionIdInCache(apiToken.getProjectId(), versionId, resolved);
+        List<ApiItemVo> items = configItemService.getCommonAndPrivateByVersionIdInCache(apiToken.getProjectId(), versionId, resolved);
         ApiItemVo itemVo = new ApiItemVo();
-        if (!itemMap.containsKey(name)) {
-            return R.error(CONFIG_ITEM_NOT_EXISTS_STATUS, CONFIG_ITEM_NOT_EXISTS_MSG);
+        itemVo.setKey(name);
+        Boolean flag = false;
+        for (ApiItemVo apiItemVo : items) {
+            if (apiItemVo.getKey().equals(name)) {
+                itemVo.setValue(apiItemVo.getValue());
+                itemVo.setGroupId(apiItemVo.getGroupId());
+                flag = true;
+            }
         }
-        ConfigItem configItem = itemMap.get(name);
-        itemVo.setValue(configItem.getVal());
-        itemVo.setGroupId(configItem.getGroupId());
-        return R.ok(itemVo);
+        if (flag) {
+            return R.ok(itemVo);
+        }
+        return R.error(CONFIG_ITEM_NOT_EXISTS_STATUS, CONFIG_ITEM_NOT_EXISTS_MSG);
     }
+
 
     /**
      * 获取所有配置项
-     * @param token api token
+     *
+     * @param token     api token
      * @param versionId 版本ID
      * @return
      */
@@ -180,7 +190,7 @@ public class ApiConfigItemController {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
         }
         Set<Long> resolved = new HashSet<>();
-        List<ApiItemVo> itemsVos = DataTransUtils.map2List(configItemService.getCommonAndPrivateByVersionIdInCache(apiToken.getProjectId(), versionId, resolved));
+        List<ApiItemVo> itemsVos = configItemService.getCommonAndPrivateByVersionIdInCache(apiToken.getProjectId(), versionId, resolved);
 
         if (CollectionUtils.isEmpty(itemsVos)) {
             return R.ok(new ArrayList<>(0));
@@ -190,12 +200,13 @@ public class ApiConfigItemController {
 
     /**
      * get configItem by groupId
-     * @param token api token
+     *
+     * @param token   api token
      * @param groupId groupID
      * @return
      */
     @GetMapping("groupItem")
-    public R<List<ApiItemVo>> getItemByGroupId (String token, Long groupId) {
+    public R<List<ApiItemVo>> getItemByGroupId(String token, Long groupId) {
         // check token
         if (isBlank(token)) {
             return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
@@ -212,7 +223,7 @@ public class ApiConfigItemController {
         // get all configItems by groupId
         Map<String, String> itemMap = configItemService.findConfigItemsByGroupId(groupId);
         List<ApiItemVo> apiItemVos = new ArrayList<>();
-        for(Map.Entry<String, String> entry : itemMap.entrySet()) {
+        for (Map.Entry<String, String> entry : itemMap.entrySet()) {
             ApiItemVo item = new ApiItemVo();
             item.setKey(entry.getKey());
             item.setValue(entry.getValue());
@@ -226,10 +237,10 @@ public class ApiConfigItemController {
 
     /**
      * 批量获取指定配置项
+     *
      * @param token api token
-     * @param reqVo
-     *  reqVo.versionId 版本ID
-     *  reqVo.keys 配置KEY列表，如果为空则获取版本下的所有配置项
+     * @param reqVo reqVo.versionId 版本ID
+     *              reqVo.keys 配置KEY列表，如果为空则获取版本下的所有配置项
      * @return
      */
     @PostMapping("batchItem")
@@ -246,43 +257,39 @@ public class ApiConfigItemController {
             return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
         }
         Set<Long> resolved = new HashSet<>();
-        Map<String, ConfigItem> itemMap = configItemService.getCommonAndPrivateByVersionIdInCache(apiToken.getProjectId(), versionId, resolved);
-        if (CollectionUtils.isEmpty(itemMap)) {
+        List<ApiItemVo> result = configItemService.getCommonAndPrivateByVersionIdInCache(apiToken.getProjectId(),
+                versionId, resolved);
+        if (CollectionUtils.isEmpty(result)) {
             return R.ok(new ArrayList<>(0));
         }
         List<String> keys = reqVo.getKeys();
         if (CollectionUtils.isEmpty(keys)) {
-            List<ApiItemVo> allConfig = DataTransUtils.map2List(itemMap);
-            return R.ok(allConfig);
+            return R.ok(result);
         }
-        List<ApiItemVo> result = new ArrayList<>();
-        for (String key : keys) {
-            if (itemMap.containsKey(key)) {
-                ConfigItem configItem = itemMap.get(key);
-                ApiItemVo apiItemVo = new ApiItemVo();
-                apiItemVo.setKey(key);
-                apiItemVo.setValue(configItem.getVal());
-                apiItemVo.setGroupId(configItem.getGroupId());
-                result.add(apiItemVo);
+        List<ApiItemVo> apiItemVos = new ArrayList<>();
+        for (ApiItemVo apiItemVo : result) {
+                if (keys.contains(apiItemVo.getKey())) {
+                    ApiItemVo itemVo = new ApiItemVo();
+                    itemVo.setKey(apiItemVo.getKey());
+                    itemVo.setValue(apiItemVo.getValue());
+                    itemVo.setGroupId(apiItemVo.getGroupId());
+                    apiItemVos.add(itemVo);
+                }
             }
-        }
-        if (CollectionUtils.isEmpty(result)) {
-            return R.ok(new ArrayList<>(0));
-        }
-        return R.ok(result);
+        return R.ok(apiItemVos);
     }
 
     /**
      * 增加配置
-     * @param token api token
+     *
+     * @param token        api token
      * @param itemAddReqVo 新增配置信息
-     *  itemAddReqVo.versionId 版本ID
-     *  itemAddReqVo.key 配置KEY
-     *  itemAddReqVo.value 配置值
-     *  itemAddReqVo.groupId 分组ID
-     *  itemAddReqVo.memo 配置简介
-     * @return
-     * ？
+     *                     itemAddReqVo.versionId 版本ID
+     *                     itemAddReqVo.key 配置KEY
+     *                     itemAddReqVo.value 配置值
+     *                     itemAddReqVo.groupId 分组ID
+     *                     itemAddReqVo.memo 配置简介
+     * @return ？
      */
     @SaveLog(scene = "0000",
             paramsIdxes = {1},
@@ -372,10 +379,11 @@ public class ApiConfigItemController {
             return R.error(CONFIG_ITEM_EXISTS_STATUS, CONFIG_ITEM_EXISTS_MSG);
         }
         if (cacheEvictVersionId != null && cacheEvictVersionId > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(cacheEvictVersionId);
             if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-                versionIds.addAll(versionService.getChildrenVersionById(versionId));
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
             }
             rccCache.evictConfigItem(versionIds);
         }
@@ -384,12 +392,12 @@ public class ApiConfigItemController {
 
     /**
      * 删除配置
-     * @param token api token
-     * @param apiItemDeleteVo 删除配置信息
-     *  apiItemDeleteVo.versionId 版本ID
-     *  apiItemDeleteVo.key 配置key
-     *@return
      *
+     * @param token           api token
+     * @param apiItemDeleteVo 删除配置信息
+     *                        apiItemDeleteVo.versionId 版本ID
+     *                        apiItemDeleteVo.key 配置key
+     * @return
      */
     @SaveLog(scene = "0002",
             paramsIdxes = {1},
@@ -442,8 +450,9 @@ public class ApiConfigItemController {
         // 失效版本下的配置
         List<Long> versionIds = new ArrayList<>();
         versionIds.add(configItem.getVersionId());
+        Set<Long> resolved = new HashSet<>();
         if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-            versionIds.addAll(versionService.getChildrenVersionById(versionId));
+            versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
         }
         rccCache.evictConfigItem(versionIds);
         return R.ok(cnt);
@@ -451,12 +460,13 @@ public class ApiConfigItemController {
 
     /**
      * 修改配置
-     * @param token api token
+     *
+     * @param token         api token
      * @param apiItemEditVo 配置信息
-     *   apiItemEditVo.versionId 版本ID
-     *   apiItemEditVo.key 配置key
-     *   apiItemEditVo.value 配置值
-     *   apiItemEditVo.memo 配置简介
+     *                      apiItemEditVo.versionId 版本ID
+     *                      apiItemEditVo.key 配置key
+     *                      apiItemEditVo.value 配置值
+     *                      apiItemEditVo.memo 配置简介
      * @return
      */
     @SaveLog(scene = "0000",
@@ -482,8 +492,8 @@ public class ApiConfigItemController {
         Date now = DateTimeUtils.now();
         Long cacheEvictVersionId = null;
         if (name == null) {
-                return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
-            }
+            return R.error(CONFIG_KEY_NOT_EXISTS_STATUS, CONFIG_KEY_NOT_EXISTS_MSG);
+        }
         ConfigItem configItem = configItemService.selectByProjectIdAndVersionIdAndName(tokenVo.getProjectId(), versionId, name);
         if (configItem == null || Deleted.DELETE.getValue().equals(configItem.getDeleted())) {
             return R.error(CONFIG_ITEM_NOT_EXISTS_STATUS, CONFIG_ITEM_NOT_EXISTS_MSG);
@@ -533,10 +543,11 @@ public class ApiConfigItemController {
 
         }
         if (cacheEvictVersionId != null && cacheEvictVersionId > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(cacheEvictVersionId);
             if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-                versionIds.addAll(versionService.getChildrenVersionById(versionId));
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
             }
             rccCache.evictConfigItem(versionIds);
         }
@@ -545,11 +556,12 @@ public class ApiConfigItemController {
 
     /**
      * 批量修改配置
-     * @param token api token
+     *
+     * @param token           api token
      * @param batchEditItemVo 配置信息
-     *  batchEditItemVo.groupId 分组ID
-     *  batchEditItemVo.versionId 版本ID
-     *  batchEditItemVo.items 分组下的配置列表
+     *                        batchEditItemVo.groupId 分组ID
+     *                        batchEditItemVo.versionId 版本ID
+     *                        batchEditItemVo.items 分组下的配置列表
      * @return
      */
     @SaveLog(scene = "0001",
@@ -591,7 +603,7 @@ public class ApiConfigItemController {
             }
         }
         Date now = DateTimeUtils.now();
-        User user= new User();
+        User user = new User();
         user.setName("openApi_user");
         user.setUpdateTime(now);
         BatchConfigItemReq batchConfigItemReq = new BatchConfigItemReq();
@@ -603,10 +615,11 @@ public class ApiConfigItemController {
 
         // 失效版本下的配置
         if (configGroup.getVersionId() != null && configGroup.getVersionId() > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(configGroup.getVersionId());
             if (projectService.selectByPrimaryKey(tokenVo.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-                versionIds.addAll(versionService.getChildrenVersionById(versionId));
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
             }
             rccCache.evictConfigItem(versionIds);
         }

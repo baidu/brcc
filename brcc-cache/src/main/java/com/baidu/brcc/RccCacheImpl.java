@@ -20,7 +20,6 @@ package com.baidu.brcc;
 
 import static com.baidu.brcc.CacheKeyGenerator.getApiTokenKey;
 import static com.baidu.brcc.CacheKeyGenerator.getEnvironmentProjectIdKey;
-import static com.baidu.brcc.CacheKeyGenerator.getItemConfigVersionIdKey;
 import static com.baidu.brcc.CacheKeyGenerator.getItemVersionIdKey;
 import static com.baidu.brcc.CacheKeyGenerator.getProjectNameKey;
 import static com.baidu.brcc.CacheKeyGenerator.getUserNameKey;
@@ -193,7 +192,7 @@ public class RccCacheImpl implements RccCache {
         // 删除环境下的所有版本
         List<String> itemVersionIdKeys = new ArrayList<>();
         for(Long versionId : versionIds) {
-            String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
+            String itemVersionIdKey = getItemVersionIdKey(versionId);
             itemVersionIdKeys.add(itemVersionIdKey);
         }
 
@@ -586,25 +585,6 @@ public class RccCacheImpl implements RccCache {
         }
         return map.values().stream().filter(Objects :: nonNull).collect(Collectors.toList());
     }
-
-    @Override
-    public Map<String,ConfigItem> getItemMap(Long versionId) {
-        Map<String, ConfigItem> map = new HashMap<>();
-        if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
-            return map;
-        }
-        String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
-        RetryActionWithTwoParam<String, Class<ConfigItem>, Map<String, ConfigItem>> action =
-                new RetryActionWithTwoParam<>(
-                        "hgetall",
-                        retryTimes,
-                        itemVersionIdKey,
-                        ConfigItem.class
-                );
-        map = action.action((String key, Class<ConfigItem> type) -> cache.hgetall(key, type));
-        return map;
-    }
-
     @Override
     public List<ApiItemVo> getItems(Long versionId, List<String> names) {
         if (!cache.cacheEnable() || versionId == null || versionId <= 0 || isEmpty(names)) {
@@ -888,37 +868,6 @@ public class RccCacheImpl implements RccCache {
                 retryTimes,
                 itemVersionIdKey,
                 map
-        ).action(
-                (String key, Map kvs) -> cache.hmset(key, kvs)
-        );
-    }
-
-    @Override
-    public void loadItemMap(Long versionId, Map<String, ConfigItem> itemMap, boolean clear) {
-        if (!cache.cacheEnable() || versionId == null || versionId <= 0) {
-            return;
-        }
-        String itemVersionIdKey = getItemConfigVersionIdKey(versionId);
-
-        if (clear) {
-            // 删除
-            new RetryActionWithOneParam<List<String>, Long>(
-                    "evict",
-                    retryTimes,
-                    Arrays.asList(itemVersionIdKey)
-            ).action(
-                    (List<String> keys) -> cache.evict(keys)
-            );
-        }
-        // put
-        if (isEmpty(itemMap)) {
-            return;
-        }
-        new RetryActionWithTwoParam<String, Map, Boolean>(
-                "hmset",
-                retryTimes,
-                itemVersionIdKey,
-                itemMap
         ).action(
                 (String key, Map kvs) -> cache.hmset(key, kvs)
         );

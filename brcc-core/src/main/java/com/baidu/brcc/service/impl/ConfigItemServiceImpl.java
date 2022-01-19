@@ -512,38 +512,50 @@ public class ConfigItemServiceImpl extends GenericServiceImpl<ConfigItem, Long, 
     }
 
     @Override
-    public Map<String, ConfigItem> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved) {
-        Map<String, ConfigItem> allConfig = rccCache.getItemMap(versionId);
+    public List<ApiItemVo> getCommonAndPrivateByVersionIdInCache(Long projectId, Long versionId, Set<Long> resolved) {
+        List<ApiItemVo> allConfig = rccCache.getItems(versionId);
+//        Map<String, ConfigItem> allConfig = rccCache.getItemMap(versionId);
         if (CollectionUtils.isEmpty(allConfig)) {
-            allConfig = new HashMap<>();
+            allConfig = new ArrayList<>();
             // get the original configuration
-            Map<String, ConfigItem> items = selectMapByProjectIdAndVersionId(projectId, versionId);
+            List<ConfigItem> items = selectByProjectIdAndVersionId(projectId, versionId);
+            if (!CollectionUtils.isEmpty(items)) {
+                for (ConfigItem item : items) {
+                    ApiItemVo vo = new ApiItemVo().copy(item);
+                    allConfig.add(vo);
+                }
+            }
             // get the common configuration
             Version version = versionService.selectByPrimaryKey(versionId);
             resolved.add(versionId);
             if (version.getDependencyIds().isEmpty()) {
-                rccCache.loadItemMap(versionId, allConfig, true);
-                return items;
+                rccCache.loadItems(versionId, allConfig, true);
+                return allConfig;
             }
             List<Long> depIds = DataTransUtils.string2List(version.getDependencyIds());
             for (Long depId : depIds) {
                 Version item = versionService.selectByPrimaryKey(depId);
                 if (null != item) {
-                    Map<String, ConfigItem> depItem = new HashMap<>();
+//                    Map<String, ConfigItem> depItem = new HashMap<>();
+                    List<ApiItemVo> depItem = new ArrayList<>();
                     if (resolved.contains(depId)) {
                         continue;
                     }
                     // 递归调用，结束点：没有子版本或者该版本已被加载
                     depItem = getCommonAndPrivateByVersionIdInCache(item.getProjectId(), item.getId(), resolved);
                     if (!CollectionUtils.isEmpty(depItem)) {
-                        allConfig.putAll(depItem);
+//                        allConfig.putAll(depItem);
+                        for (ApiItemVo itemVo : depItem) {
+                            if (!DataTransUtils.listContainsConfigKey(allConfig, itemVo)) {
+                                allConfig.add(itemVo);
+                            }
+                        }
                     }
                     resolved.add(depId);
                 }
             }
-            if (!CollectionUtils.isEmpty(items)) {
-                allConfig.putAll(items);
-                rccCache.loadItemMap(versionId, allConfig, true);
+            if (!CollectionUtils.isEmpty(allConfig)) {
+                rccCache.loadItems(versionId, allConfig, true);
             }
         }
         return allConfig;

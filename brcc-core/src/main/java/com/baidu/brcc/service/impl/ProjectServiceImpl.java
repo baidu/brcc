@@ -19,7 +19,9 @@
 package com.baidu.brcc.service.impl;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.baidu.brcc.domain.exception.BizException;
@@ -114,7 +116,8 @@ public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, Projec
         List<Long> versionIds = versionService.selectIdsByEnvironmentIds(projectId, environmentIds);
 
         for(Long versionId : versionIds) {
-            if(!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId))) {
+            Set<Long> resolved = new HashSet<>();
+            if(!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId, resolved))) {
                 throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
             }
         }

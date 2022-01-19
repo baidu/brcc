@@ -73,7 +73,7 @@ import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
  */
 @Slf4j
 @RestController
-@RequestMapping("console/index")
+@RequestMapping(path = {"console/index", "index"})
 public class IndexController {
 
     @Autowired

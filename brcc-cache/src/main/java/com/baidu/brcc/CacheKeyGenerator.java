@@ -73,10 +73,10 @@ public class CacheKeyGenerator {
         return ITEM_VERSION_ID_KEY_PREFIX.concat(versionId.toString());
     }
 
-    public static String getItemConfigVersionIdKey(Long versionId) {
-        Objects.requireNonNull(versionId);
-        return ITEM_VERSION_ID_KEY_PREFIX_V2.concat(versionId.toString());
-    }
+//    public static String getItemConfigVersionIdKey(Long versionId) {
+//        Objects.requireNonNull(versionId);
+//        return ITEM_VERSION_ID_KEY_PREFIX_V2.concat(versionId.toString());
+//    }
 
 
 }

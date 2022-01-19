@@ -128,7 +128,7 @@ import lombok.extern.slf4j.Slf4j;
  * 工程相关接口
  */
 @RestController
-@RequestMapping("console/project")
+@RequestMapping(path = {"console/project", "project"})
 @Slf4j
 public class ProjectController {
 

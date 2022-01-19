@@ -83,9 +83,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import com.baidu.brcc.common.ErrorStatusMsg;
@@ -166,7 +168,7 @@ import javax.servlet.http.HttpServletResponse;
  * 管理端版本相关接口
  */
 @RestController
-@RequestMapping("console/version")
+@RequestMapping(path = {"console/version", "version"})
 public class VersionController {
 
     @Autowired
@@ -938,10 +940,11 @@ public class VersionController {
 
         // 失效版本下的配置
         if (configGroup.getVersionId() != null && configGroup.getVersionId() > 0) {
+            Set<Long> resolved = new HashSet<>();
             List<Long> versionIds = new ArrayList<>();
             versionIds.add(configGroup.getVersionId());
             if (projectService.selectByPrimaryKey(configGroup.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-                versionIds.addAll(versionService.getChildrenVersionById(versionId));
+                versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
             }
             rccCache.evictConfigItem(versionIds);
         }
@@ -1096,9 +1099,10 @@ public class VersionController {
         }
         // 失效版本下的配置
         List<Long> versionIds = new ArrayList<>();
+        Set<Long> resolved = new HashSet<>();
         versionIds.add(versionId);
         if (projectService.selectByPrimaryKey(exists.getProjectId()).getProjectType().equals(ProjectType.PUBLIC.getValue())) {
-            versionIds.addAll(versionService.getChildrenVersionById(versionId));
+            versionIds.addAll(versionService.getChildrenVersionById(versionId, resolved));
         }
         rccCache.evictConfigItem(versionIds);
         return R.ok(cnt);

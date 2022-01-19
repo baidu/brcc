@@ -19,6 +19,7 @@
 package com.baidu.brcc.service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.service.base.GenericService;
@@ -72,5 +73,5 @@ public interface VersionService extends GenericService<Version, Long, VersionExa
 
     List<String> getDepInfosByDepIds(List<Long> depIds);
 
-    List<Long> getChildrenVersionById(Long versionId);
+    List<Long> getChildrenVersionById(Long versionId, Set<Long> resolved);
 }
