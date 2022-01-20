@@ -8,7 +8,7 @@
     <parent>
         <artifactId>brcc</artifactId>
         <groupId>com.baidu.mapp</groupId>
-        <version>1.5.7-SNAPSHOT</version>
+        <version>1.5.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <properties>
