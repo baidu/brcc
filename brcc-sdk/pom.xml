@@ -36,11 +36,6 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.9.0</version>
-		</dependency>
-		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-http</artifactId>
 			<version>5.5.8</version>
