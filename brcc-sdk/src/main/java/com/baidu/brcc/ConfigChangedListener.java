@@ -30,8 +30,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +74,7 @@ public class ConfigChangedListener implements Runnable {
         if (es == null) {
             ThreadFactory threadFactory = new ThreadFactory() {
                 @Override
-                public Thread newThread(@NotNull Runnable r) {
+                public Thread newThread(Runnable r) {
                     return new Thread(r, "ConfigChangedListener-Thread");
                 }
             };
