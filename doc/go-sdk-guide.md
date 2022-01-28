@@ -44,7 +44,7 @@ save above configuration to local file. eg. "brcc.toml"
 ```go
 // 使用toml配置文件初始化brcc客户端, name为配置文件路径
 name := "brcc.toml"
-client, err := rcc.NewClientWithConf(name)
+client, err := rcc.StartWithConfFile(name)
 if err != nil {
 	panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
@@ -65,7 +65,7 @@ brccConf := &rcc.Conf{
     CacheDir:            "/tmp/brcc",
 }
 
-client, err := rcc.NewClientWithConf(brccConf)
+client, err := rcc.StartWithConf(brccConf)
 if err != nil {
     panic(fmt.Sprintf("init brcc error: %v", err.Error()))
 }
