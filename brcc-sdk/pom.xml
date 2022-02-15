@@ -58,6 +58,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<driver4j-dependency.version>1.0.1-SNAPSHOT</driver4j-dependency.version>
+		<spring.version>5.1.19.RELEASE</spring.version>
+		<hutool.version>5.7.19</hutool.version>
+		<junit.version>4.13.2</junit.version>
+		<hutool.version>5.7.19</hutool.version>
 	</properties>
 
 	<dependencyManagement>
@@ -65,12 +69,13 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-core</artifactId>
-				<version>5.1.19.RELEASE</version>
+				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>cn.hutool</groupId>
-				<artifactId>hutool-http</artifactId>
-				<version>5.7.19</version>
+				<artifactId>hutool-bom</artifactId>
+				<version>${hutool.version}</version>
+				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
@@ -81,7 +86,7 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
-				<version>5.1.19.RELEASE</version>
+				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -98,11 +103,21 @@
 				<artifactId>mockito-core</artifactId>
 				<version>3.6.0</version>
 				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<artifactId>byte-buddy</artifactId>
+						<groupId>net.bytebuddy</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>byte-buddy-agent</artifactId>
+						<groupId>net.bytebuddy</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.13.2</version>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
