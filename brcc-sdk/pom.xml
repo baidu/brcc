@@ -58,16 +58,67 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<driver4j-dependency.version>1.0.1-SNAPSHOT</driver4j-dependency.version>
+		<spring.version>5.1.19.RELEASE</spring.version>
+		<hutool.version>5.7.19</hutool.version>
+		<junit.version>4.13.2</junit.version>
+		<hutool.version>5.7.19</hutool.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.baidu.driver4j</groupId>
-				<artifactId>driver4j-dependency</artifactId>
-				<version>${driver4j-dependency.version}</version>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-bom</artifactId>
+				<version>${hutool.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.8.6</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.30</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.20</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>3.6.0</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<artifactId>byte-buddy</artifactId>
+						<groupId>net.bytebuddy</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>byte-buddy-agent</artifactId>
+						<groupId>net.bytebuddy</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
