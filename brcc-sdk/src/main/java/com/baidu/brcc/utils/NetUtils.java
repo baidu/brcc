@@ -30,11 +30,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NetUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NetUtils.class);
     private static final String DEFAULT_LOCAL_IP = "127.0.0.1";
     private static final String DEFAULT_LOCAL_HOSTNAME = "localhost";
 
@@ -74,7 +73,7 @@ public class NetUtils {
             try {
                 address = InetAddress.getLocalHost();
             } catch (UnknownHostException e) {
-                LOGGER.error("getLocalIp error.", e);
+                log.error("getLocalIp error.", e);
             }
         }
         if (address == null) {
@@ -140,7 +139,7 @@ public class NetUtils {
             try {
                 address = InetAddress.getLocalHost();
             } catch (UnknownHostException e) {
-                LOGGER.error("getLocalHostName error.", e);
+                log.error("getLocalHostName error.", e);
             }
         }
         if (address == null) {
@@ -161,8 +160,8 @@ public class NetUtils {
                     .getNetworkInterfaces(); nics.hasMoreElements(); ) {
                 NetworkInterface ifc = nics.nextElement();
                 if (ifc.isUp()) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Testing interface: " + ifc.getDisplayName());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Testing interface: " + ifc.getDisplayName());
                     }
                     if (ifc.getIndex() < lowest || result == null) {
                         lowest = ifc.getIndex();
@@ -183,8 +182,8 @@ public class NetUtils {
                                             && !address.isLoopbackAddress()
                                             // 是否首选
                                             && isPreferredAddress(address)) {
-                                if (LOGGER.isDebugEnabled()) {
-                                    LOGGER.debug("Found non-loopback interface: "
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Found non-loopback interface: "
                                             + ifc.getDisplayName());
                                 }
                                 result = address;
@@ -195,7 +194,7 @@ public class NetUtils {
                 }
             }
         } catch (IOException ex) {
-            LOGGER.error("Cannot get first non-loopback address", ex);
+            log.error("Cannot get first non-loopback address", ex);
         }
 
         if (result != null) {
@@ -205,7 +204,7 @@ public class NetUtils {
         try {
             return InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            LOGGER.warn("Unable to retrieve localhost");
+            log.warn("Unable to retrieve localhost");
         }
 
         return null;
@@ -214,8 +213,8 @@ public class NetUtils {
     private static boolean ignoreInterface(String interfaceName) {
         for (String regex : getIgnoredInterfaces()) {
             if (interfaceName.matches(regex)) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Ignoring interface: " + interfaceName);
+                if (log.isDebugEnabled()) {
+                    log.debug("Ignoring interface: " + interfaceName);
                 }
                 return true;
             }
@@ -227,8 +226,8 @@ public class NetUtils {
 
         if (isUseOnlySiteLocalInterfaces()) {
             final boolean siteLocalAddress = address.isSiteLocalAddress();
-            if (!siteLocalAddress && LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Ignoring address: " + address.getHostAddress());
+            if (!siteLocalAddress && log.isDebugEnabled()) {
+                log.debug("Ignoring address: " + address.getHostAddress());
             }
             return siteLocalAddress;
         }
@@ -242,8 +241,8 @@ public class NetUtils {
                 return true;
             }
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Ignoring address: " + address.getHostAddress());
+        if (log.isDebugEnabled()) {
+            log.debug("Ignoring address: " + address.getHostAddress());
         }
         return false;
     }
@@ -329,21 +328,21 @@ public class NetUtils {
         }
         InputStream is = null;
         try {
-            is = LOGGER.getClass().getResourceAsStream("/META-INF/maven/com.baidu.mapp/brcc-sdk/pom.properties");
+            is = log.getClass().getResourceAsStream("/META-INF/maven/com.baidu.mapp/brcc-sdk/pom.properties");
             Properties p = new Properties();
             if (is != null) {
                 p.load(is);
                 SDK_VERSION = p.getProperty("version", "unknown");
             }
         } catch (IOException e) {
-            LOGGER.error("Cannot get SDK version:", e);
+            log.error("Cannot get SDK version:", e);
         } finally {
             try {
                 if (is != null) {
                     is.close();
                 }
             } catch (IOException ex) {
-                LOGGER.error("Cannot get SDK version:", ex);
+                log.error("Cannot get SDK version:", ex);
             }
         }
         return SDK_VERSION;

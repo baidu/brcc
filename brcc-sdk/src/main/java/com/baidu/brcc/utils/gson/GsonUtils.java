@@ -20,8 +20,6 @@ package com.baidu.brcc.utils.gson;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.baidu.brcc.model.R;
 import com.baidu.brcc.model.RList;
@@ -34,10 +32,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class GsonUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GsonUtils.class);
 
     private static final Gson GSON = GsonFactory.createGson();
 
@@ -94,9 +92,9 @@ public class GsonUtils {
         try {
             jsonObject = GSON.fromJson(json, JsonObject.class);
         } catch (JsonSyntaxException e) {
-            LOGGER.error("to json object fail.", e);
+            log.error("to json object fail.", e);
         } catch (Exception e) {
-            LOGGER.error("to json object fail.", e);
+            log.error("to json object fail.", e);
         }
         return jsonObject;
     }
@@ -109,9 +107,9 @@ public class GsonUtils {
         try {
             jsonArray = GSON.fromJson(json, JsonArray.class);
         } catch (JsonSyntaxException e) {
-            LOGGER.error("to json array fail.", e);
+            log.error("to json array fail.", e);
         } catch (Exception e) {
-            LOGGER.error("to json array fail.", e);
+            log.error("to json array fail.", e);
         }
         if (jsonArray == null) {
             return new JsonArray(0);
@@ -127,9 +125,9 @@ public class GsonUtils {
         try {
             t = GSON.fromJson(json, cls);
         } catch (JsonSyntaxException e) {
-            LOGGER.error("to object fail.", e);
+            log.error("to object fail.", e);
         } catch (Exception e) {
-            LOGGER.error("to object fail.", e);
+            log.error("to object fail.", e);
         }
         return t;
     }
@@ -142,9 +140,9 @@ public class GsonUtils {
         try {
             t = GSON.fromJson(new String(json), cls);
         } catch (JsonSyntaxException e) {
-            LOGGER.error("to object fail.", e);
+            log.error("to object fail.", e);
         } catch (Exception e) {
-            LOGGER.error("to object fail.", e);
+            log.error("to object fail.", e);
         }
         return t;
     }
@@ -175,7 +173,7 @@ public class GsonUtils {
         try {
             t = GSON.fromJson(json, cls);
         } catch (Exception e) {
-            LOGGER.error("to object fail.", e);
+            log.error("to object fail.", e);
         }
         return t;
     }
@@ -197,7 +195,7 @@ public class GsonUtils {
         try {
             result = jsonObject.getAsByte();
         } catch (NumberFormatException ex) {
-            LOGGER.error("getByteOrDefault fail.", ex);
+            log.error("getByteOrDefault fail.", ex);
         }
         return result;
     }
@@ -211,7 +209,7 @@ public class GsonUtils {
         try {
             result = jsonObject.getAsInt();
         } catch (NumberFormatException ex) {
-            LOGGER.error("getIntegerOrDefault fail.", ex);
+            log.error("getIntegerOrDefault fail.", ex);
         }
         return result;
     }
@@ -225,7 +223,7 @@ public class GsonUtils {
         try {
             result = jsonObject.getAsLong();
         } catch (NumberFormatException ex) {
-            LOGGER.error("getLongOrDefault fail.", ex);
+            log.error("getLongOrDefault fail.", ex);
         }
         return result;
     }
@@ -239,7 +237,7 @@ public class GsonUtils {
         try {
             result = jsonObject.getAsDouble();
         } catch (NumberFormatException ex) {
-            LOGGER.error("getDoubleOrDefault fail.", ex);
+            log.error("getDoubleOrDefault fail.", ex);
         }
         return result;
     }

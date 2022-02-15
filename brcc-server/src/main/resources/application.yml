@@ -1,5 +1,5 @@
 rcc:
-  noauths: /,/api/**/*,/index.html,/check,/user/login,/user/loginByUuap,/rpc/ExtConfigServerService,/img/**/*,/js/**/*,/css/**/*,/swagger-ui.html,/webjars/**,/v2/**,/swagger-resources/**,/csrf
+  noauths: /,/api/**/*,/index.html,/check,/console/user/login,/user/loginByUuap,/rpc/ExtConfigServerService,/img/**/*,/js/**/*,/css/**/*,/swagger-ui.html,/webjars/**,/v2/**,/swagger-resources/**,/csrf
   user:
     type:
       default: 1
