@@ -46,16 +46,40 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<driver4j-dependency.version>1.0.1-SNAPSHOT</driver4j-dependency.version>
+		<brcc.version>1.5.9-SNAPSHOT</brcc.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.baidu.driver4j</groupId>
-				<artifactId>driver4j-dependency</artifactId>
-				<version>${driver4j-dependency.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>5.1.19.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-autoconfigure</artifactId>
+				<version>2.1.18.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>com.baidu.mapp</groupId>
+				<artifactId>brcc-sdk</artifactId>
+				<version>${brcc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.20</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>3.6.0</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.13.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
