@@ -71,6 +71,7 @@
 				<groupId>cn.hutool</groupId>
 				<artifactId>hutool-http</artifactId>
 				<version>5.7.19</version>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
@@ -96,11 +97,13 @@
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
 				<version>3.6.0</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.13.2</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
