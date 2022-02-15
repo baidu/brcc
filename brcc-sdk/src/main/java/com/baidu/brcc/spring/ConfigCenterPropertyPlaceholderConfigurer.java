@@ -27,8 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -56,14 +55,13 @@ import com.baidu.brcc.utils.StringUtils;
 /**
  * A extend utility class for spring property configuration resolve from configuration center server.<br>
  */
+@Slf4j
 public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer implements
         ApplicationContextAware, DisposableBean, ApplicationListener {
 
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigCenterPropertyPlaceholderConfigurer.class);
-
     private Environment environment;
 
     /**
@@ -315,9 +313,7 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
         try {
             valueSeparatorTmp = getFieldValue(rccPropertySourcesPropertyResolver, "valueSeparator", String.class);
         } catch (Exception ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("get field valueSeparator by feflection error", ex);
-            }
+                logger.error("get field valueSeparator by feflection error", ex);
         }
         if (valueSeparatorTmp == null) {
             valueSeparatorTmp = SystemPropertyUtils.VALUE_SEPARATOR;
@@ -393,7 +389,7 @@ public class ConfigCenterPropertyPlaceholderConfigurer extends PropertySourcesPl
 
         }
 
-        LOGGER.info(logContent.toString());
+        logger.info(logContent.toString());
     }
 
     private Map<String, String> loadFromCC() throws IOException {

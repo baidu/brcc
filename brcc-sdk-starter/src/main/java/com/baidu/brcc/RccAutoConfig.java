@@ -21,8 +21,7 @@ package com.baidu.brcc;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -40,8 +39,8 @@ import com.baidu.brcc.spring.ConfigCenterPropertyPlaceholderConfigurer;
 
 @Configuration
 @AutoConfigureBefore(PropertyPlaceholderAutoConfiguration.class)
+@Slf4j
 public class RccAutoConfig implements ApplicationContextAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RccAutoConfig.class);
 
     private static final String RCC_BEAN_NAME = "configCenterPropertySourcesPlaceholderConfigurer";
 
@@ -94,7 +93,7 @@ public class RccAutoConfig implements ApplicationContextAware {
                         resources.add(source);
                     }
                 } catch (Exception ex) {
-                    LOGGER.error("load resources error when set locations value .the path is {}", path, ex);
+                    log.error("load resources error when set locations value .the path is {}", path, ex);
                     throw new RuntimeException("load resources error", ex);
                 }
             }

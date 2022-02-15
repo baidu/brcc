@@ -29,8 +29,7 @@ import java.util.Properties;
 
 import com.baidu.brcc.utils.HttpClient;
 import com.baidu.brcc.utils.HutoolHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import com.baidu.brcc.exception.RccException;
@@ -45,9 +44,9 @@ import com.baidu.brcc.utils.NetUtils;
 import com.baidu.brcc.utils.StringUtils;
 import com.baidu.brcc.utils.gson.GsonUtils;
 
+@Slf4j
 public class ConfigLoader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigLoader.class);
 
     // 版本ID
     private static final String HEADER_VERSION_ID = "Rcc-Version-Id";
@@ -284,8 +283,8 @@ public class ConfigLoader {
 
     protected void doCallback(List<ChangedConfigItem> changedConfigItems) {
         if (CollectionUtils.isEmpty(changedConfigItems)) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Empty changed config items call back.");
+            if (log.isDebugEnabled()) {
+                log.debug("Empty changed config items call back.");
             }
             return;
         }
@@ -298,7 +297,7 @@ public class ConfigLoader {
                 try {
                     configItemChangedCallable.changed(changedItems);
                 } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         }
