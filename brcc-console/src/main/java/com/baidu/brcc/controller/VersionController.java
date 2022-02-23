@@ -99,6 +99,7 @@ import com.baidu.brcc.domain.VersionExample;
 import com.baidu.brcc.domain.em.FileFormat;
 import com.baidu.brcc.domain.em.GrayFlag;
 import com.baidu.brcc.domain.em.ProjectType;
+import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.domain.meta.MetaConfigItem;
 import com.baidu.brcc.domain.vo.ApiItemVo;
 import com.baidu.brcc.domain.vo.BatchConfigItemReq;
@@ -475,6 +476,9 @@ public class VersionController {
         Environment environment = environmentService.selectByPrimaryKey(environmentId);
         if (environment == null || Deleted.DELETE.getValue().equals(environment.getDeleted())) {
             return R.error(ENVIRONMENT_NOT_EXISTS_STATUS, ENVIRONMENT_NOT_EXISTS_MSG);
+        }
+        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+            return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
         Pagination<VersionVo> pagination = versionService.pagination(VersionExample.newBuilder()
