@@ -20,6 +20,8 @@ package com.baidu.brcc.service.impl;
 
 import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_EXISTS_MSG;
@@ -41,6 +43,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.baidu.brcc.domain.base.R;
+import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.domain.exception.BizException;
 import com.baidu.brcc.domain.meta.MetaProject;
 import com.baidu.brcc.utils.Name.NameUtils;
@@ -128,7 +131,9 @@ public class ProductServiceImpl extends GenericServiceImpl<Product, Long, Produc
     ) {
         int offset = (pageNo - 1) * pageSize;
         boolean isAdmin = UserRole.SYSADMIN.getValue().equals(user.getRole());
-
+        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+            throw new BizException(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
+        }
         Set<Long> productIds = null;
         // 不是系统管理员
         if (!isAdmin) {

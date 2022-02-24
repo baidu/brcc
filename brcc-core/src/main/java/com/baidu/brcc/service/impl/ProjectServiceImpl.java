@@ -115,10 +115,12 @@ public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, Projec
 
         List<Long> versionIds = versionService.selectIdsByEnvironmentIds(projectId, environmentIds);
 
-        for(Long versionId : versionIds) {
-            Set<Long> resolved = new HashSet<>();
-            if(!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId, resolved))) {
-                throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+        if (null != versionIds && !versionIds.isEmpty()) {
+            for (Long versionId : versionIds) {
+                Set<Long> resolved = new HashSet<>();
+                if (!CollectionUtils.isEmpty(versionService.getChildrenVersionById(versionId, resolved))) {
+                    throw new BizException(CHILDREN_VERSION_NOT_EMPTY_STATUS, CHILDREN_VERSION_NOT_EMPTY_MSG);
+                }
             }
         }
 
@@ -196,6 +198,15 @@ public class ProjectServiceImpl extends GenericServiceImpl<Project, Long, Projec
                 .createCriteria()
                 .andProductIdEqualTo(productId)
                 .andDeletedEqualTo(Deleted.OK.getValue())
+                .toExample());
+    }
+
+    @Override
+    public Project selectByToken(String token) {
+        return selectOneByExample(ProjectExample.newBuilder()
+                .build()
+                .createCriteria()
+                .andApiTokenEqualTo(token)
                 .toExample());
     }
 }

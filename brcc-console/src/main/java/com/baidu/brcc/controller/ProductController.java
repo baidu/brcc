@@ -20,6 +20,8 @@ package com.baidu.brcc.controller;
 
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRODUCT_EXISTS_MSG;
@@ -36,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.brcc.domain.em.SortType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -150,6 +153,9 @@ public class ProductController {
     ) {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
+        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+            return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         Pagination<ProductVo> productVoPagination =
                 productService.queryProductByUser(name, sortField, sortBy, user, pageNo, pageSize);
