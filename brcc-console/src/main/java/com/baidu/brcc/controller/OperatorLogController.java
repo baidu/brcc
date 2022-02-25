@@ -69,7 +69,7 @@ public class OperatorLogController {
         }
         int offset = (pageNo - 1) * pageSize;
         Pagination<OperationLog> pagination = operationLogService.pagination(OperationLogExample.newBuilder()
-                .orderByClause("id desc")
+                .orderByClause("`id` desc")
                 .start(offset)
                 .limit(pageSize)
                 .build()

@@ -826,7 +826,7 @@ public class VersionController {
         int offset = (pageNo - 1) * pageSize;
         Pagination<ConfigChangeLogWithBLOBs> logs =
                 configChangeLogService.pagination(ConfigChangeLogExample.newBuilder()
-                        .orderByClause("id desc")
+                        .orderByClause("`id` desc")
                         .start(offset)
                         .limit(pageSize)
                         .build()
