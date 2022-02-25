@@ -92,7 +92,7 @@ public class BrccInstanceController {
         AtomicInteger active = new AtomicInteger(0);
         AtomicInteger notActive = new AtomicInteger(0);
         List<BrccInstanceDto> brccInstances = brccInstanceService.selectByExample(BrccInstanceExample.newBuilder()
-                        .orderByClause("id desc")
+                        .orderByClause("`id` desc")
                         .build()
                         .createCriteria()
                         .andVersionIdEqualTo(versionId)
