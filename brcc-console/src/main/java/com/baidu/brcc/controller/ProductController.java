@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baidu.brcc.domain.em.SortType;
+import com.baidu.brcc.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -154,7 +155,7 @@ public class ProductController {
         if (user == null) {
             return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
         }
-        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+        if (!SqlUtils.isValid(sortBy)) {
             return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         Pagination<ProductVo> productVoPagination =

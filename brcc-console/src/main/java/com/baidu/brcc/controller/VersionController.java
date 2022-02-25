@@ -118,6 +118,7 @@ import com.baidu.brcc.service.ProjectService;
 import com.baidu.brcc.utils.DataTransUtils;
 import com.baidu.brcc.utils.FileFormat.FileFormatUtils;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import com.baidu.brcc.utils.convert.ConvertFileUtil;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -477,12 +478,12 @@ public class VersionController {
         if (environment == null || Deleted.DELETE.getValue().equals(environment.getDeleted())) {
             return R.error(ENVIRONMENT_NOT_EXISTS_STATUS, ENVIRONMENT_NOT_EXISTS_MSG);
         }
-        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+        if (!SqlUtils.isValid(sortBy)) {
             return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
         Pagination<VersionVo> pagination = versionService.pagination(VersionExample.newBuilder()
-                        .orderByClause(MetaVersion.getSafeColumnNameByField(sortField) + " " + sortBy,
+                        .orderByClause(sortField + " " + sortBy,
                                 isNotBlank(sortField))
                         .start(offset)
                         .limit(pageSize)

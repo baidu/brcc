@@ -47,6 +47,7 @@ import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.domain.exception.BizException;
 import com.baidu.brcc.domain.meta.MetaProject;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import com.baidu.brcc.utils.time.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -131,7 +132,7 @@ public class ProductServiceImpl extends GenericServiceImpl<Product, Long, Produc
     ) {
         int offset = (pageNo - 1) * pageSize;
         boolean isAdmin = UserRole.SYSADMIN.getValue().equals(user.getRole());
-        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+        if (!SqlUtils.isValid(sortBy)) {
             throw new BizException(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         Set<Long> productIds = null;

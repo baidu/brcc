@@ -52,6 +52,7 @@ import java.util.Set;
 
 import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -273,7 +274,7 @@ public class EnvironmentController {
         if (null == projectId || projectId <= 0) {
             return R.error(PROJECT_ID_NOT_EXISTS_STATUS, PROJECT_ID_NOT_EXISTS_MSG);
         }
-        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+        if (!SqlUtils.isValid(sortBy)) {
             return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         Project project = projectService.selectByPrimaryKey(projectId);

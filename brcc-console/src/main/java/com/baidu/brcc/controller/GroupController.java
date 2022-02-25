@@ -59,6 +59,7 @@ import com.baidu.brcc.domain.vo.FindTreeInfoReq;
 import com.baidu.brcc.domain.vo.FindTreeInfoVo;
 import com.baidu.brcc.service.ProjectService;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -262,7 +263,7 @@ public class GroupController {
         if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
             return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
         }
-        if (!sortBy.equals(SortType.DESC.getValue()) && !sortBy.equals(SortType.ASC.getValue())) {
+        if (!SqlUtils.isValid(sortBy)) {
             return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
