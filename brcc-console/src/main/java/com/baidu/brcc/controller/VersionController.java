@@ -483,7 +483,7 @@ public class VersionController {
         }
         int offset = (pageNo - 1) * pageSize;
         Pagination<VersionVo> pagination = versionService.pagination(VersionExample.newBuilder()
-                        .orderByClause(sortField + " " + sortBy,
+                        .orderByClause(MetaVersion.getSafeColumnNameByField(sortField) + " " + sortBy,
                                 isNotBlank(sortField))
                         .start(offset)
                         .limit(pageSize)
