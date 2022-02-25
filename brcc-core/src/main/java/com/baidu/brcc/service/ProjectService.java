@@ -39,5 +39,7 @@ public interface ProjectService extends GenericService<Project, Long, ProjectExa
 
     List<Project> selectByProductId(Long productId);
 
+    Project selectByToken(String token);
+
 
 }

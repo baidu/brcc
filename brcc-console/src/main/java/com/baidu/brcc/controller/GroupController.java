@@ -34,6 +34,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.NAME_NULL_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NAME_NULL_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.TYPE_NULL_MSG;
@@ -52,10 +54,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.baidu.brcc.domain.Project;
+import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.domain.vo.FindTreeInfoReq;
 import com.baidu.brcc.domain.vo.FindTreeInfoVo;
 import com.baidu.brcc.service.ProjectService;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -258,6 +262,9 @@ public class GroupController {
         Version version = versionService.selectByPrimaryKey(versionId);
         if (version == null || Deleted.DELETE.getValue().equals(version.getDeleted())) {
             return R.error(VERSION_NOT_EXISTS_STATUS, VERSION_NOT_EXISTS_MSG);
+        }
+        if (!SqlUtils.isValid(sortBy)) {
+            return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
         Pagination<ConfigGroupVo> pagination = groupService.pagination(ConfigGroupExample.newBuilder()

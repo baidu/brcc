@@ -21,6 +21,8 @@ package com.baidu.brcc.config;
 import java.util.List;
 
 import com.baidu.brcc.interceptor.ApiCountInterceptor;
+import com.baidu.brcc.service.ProductService;
+import com.baidu.brcc.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -59,6 +61,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     BrccInstanceService brccInstanceService;
+
+    @Autowired
+    ProductService productService;
+
+    @Autowired
+    ProjectService projectService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -103,7 +111,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean uriCostFilterRegistration() {
         FilterRegistrationBean uriCostFilterBean = new FilterRegistrationBean();
-        uriCostFilterBean.setFilter(new UriCostFilter(brccInstanceService));
+        uriCostFilterBean.setFilter(new UriCostFilter(brccInstanceService, projectService, productService));
         uriCostFilterBean.setOrder(99);
         uriCostFilterBean.addUrlPatterns("/*");
         return uriCostFilterBean;

@@ -149,8 +149,8 @@
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
+    <if test='orderByClause == "`id` desc"'>
+      order by id desc
     </if>
     <if test="limit != null and limit > 0">
        limit

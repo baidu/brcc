@@ -31,6 +31,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NO_ENVIRONMENT_PRI_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NO_ENVIRONMENT_PRI_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_ID_NOT_EXISTS_MSG;
@@ -48,7 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,6 +273,9 @@ public class EnvironmentController {
         }
         if (null == projectId || projectId <= 0) {
             return R.error(PROJECT_ID_NOT_EXISTS_STATUS, PROJECT_ID_NOT_EXISTS_MSG);
+        }
+        if (!SqlUtils.isValid(sortBy)) {
+            return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         Project project = projectService.selectByPrimaryKey(projectId);
         if (project == null || Deleted.DELETE.getValue().equals(project.getDeleted())) {

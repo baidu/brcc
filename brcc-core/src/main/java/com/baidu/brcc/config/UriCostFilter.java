@@ -29,6 +29,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.baidu.brcc.domain.Project;
+import com.baidu.brcc.service.ProductService;
+import com.baidu.brcc.service.ProjectService;
 import com.baidu.brcc.utils.LogFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.baidu.brcc.common.InstanceEventType;
 import com.baidu.brcc.dto.InstanceInfoEventDto;
 import com.baidu.brcc.service.BrccInstanceService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class UriCostFilter implements Filter {
     private Logger LOGGER = LoggerFactory.getLogger(UriCostFilter.class);
@@ -57,8 +61,14 @@ public class UriCostFilter implements Filter {
 
     private BrccInstanceService brccInstanceService;
 
-    public UriCostFilter(BrccInstanceService brccInstanceService) {
+    private ProjectService projectService;
+
+    private ProductService productService;
+
+    public UriCostFilter(BrccInstanceService brccInstanceService, ProjectService projectService, ProductService productService) {
         this.brccInstanceService = brccInstanceService;
+        this.projectService = projectService;
+        this.productService = productService;
     }
 
     @Override
@@ -96,12 +106,22 @@ public class UriCostFilter implements Filter {
                 if(!uri.endsWith(".js") && !uri.endsWith(".css") && !uri.startsWith("/img/")
                         && !uri.startsWith("/index/") && !uri.endsWith(".png")) {
                     uri = LogFilter.getUrl(request);
+                    String productName = "";
+                    if (isCollectInfo(uri)) {
+                        String token = request.getParameter("token");
+                         Project project = projectService.selectByToken(token);
+                        if (null != project) {
+                            Long productId = project.getProductId();
+                            productName = productService.selectByPrimaryKey(productId).getName();
+                        }
+                    }
                     LOGGER.debug(
-                            "request_uri\t[{}]\tnet_cost[{}]\tserver_cost[{}]\tremote_addr[{}]",
+                            "request_uri\t[{}]\tnet_cost[{}]\tserver_cost[{}]\tremote_addr[{}]\tproduct_name[{}]",
                             uri,
                             rccTs > 0 ? start - rccTs : -1,
                             end - start,
-                            request.getRemoteAddr()
+                            request.getRemoteAddr(),
+                            productName
                     );
                 }
             }
@@ -147,6 +167,13 @@ public class UriCostFilter implements Filter {
             }
             brccInstanceService.submitEvent(event);
         }
+    }
+
+    private boolean isCollectInfo(String uri) {
+        if (uri.startsWith("/api") && !uri.startsWith("/api/auth")) {
+            return true;
+        }
+        return false;
     }
 
     @Override

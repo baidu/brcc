@@ -23,6 +23,7 @@ import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.CHINESE_NOT_ALLOWED_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PARAM_ERROR_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PRIV_MIS_STATUS;
@@ -66,8 +67,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.baidu.brcc.domain.em.SortType;
 import com.baidu.brcc.domain.vo.ResetApiPasswordVo;
 import com.baidu.brcc.utils.Name.NameUtils;
+import com.baidu.brcc.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -431,6 +434,9 @@ public class ProjectController {
     ) {
         if (null == productId || productId <= 0) {
             return R.error(PRODUCT_ID_EMPTY_STATUS, PRODUCT_ID_EMPTY_MSG);
+        }
+        if (!SqlUtils.isValid(sortBy)) {
+            return R.error(PARAM_ERROR_STATUS, PARAM_ERROR_MSG);
         }
         int offset = (pageNo - 1) * pageSize;
         Map<Long, Boolean> adminProjectMap = new HashMap<>();

@@ -59,7 +59,7 @@
 		<java.version>1.8</java.version>
 		<driver4j-dependency.version>1.0.1-SNAPSHOT</driver4j-dependency.version>
 		<spring.version>5.1.19.RELEASE</spring.version>
-		<hutool.version>5.7.19</hutool.version>
+		<hutool.version>5.7.21</hutool.version>
 		<junit.version>4.13.2</junit.version>
 		<hutool.version>5.7.19</hutool.version>
 	</properties>
