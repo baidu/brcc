@@ -106,7 +106,7 @@ public class UriCostFilter implements Filter {
                 if(!uri.endsWith(".js") && !uri.endsWith(".css") && !uri.startsWith("/img/")
                         && !uri.startsWith("/index/") && !uri.endsWith(".png")) {
                     uri = LogFilter.getUrl(request);
-                    String productName = "";
+                    String productName = "rcc-console/rpc";
                     if (isCollectInfo(uri)) {
                         String token = request.getParameter("token");
                          Project project = projectService.selectByToken(token);
