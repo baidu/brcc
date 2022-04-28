@@ -103,7 +103,7 @@ public class ConfigLoader {
         this.enableInterruptService = enableInterruptService;
         this.enableGray = enableGray;
 
-        this.httpClient = new HutoolHttpClient((int)readTimeOut, (int)connectionTimeOut);
+        this.httpClient = new HutoolHttpClient((int)connectionTimeOut, (int)readTimeOut);
 
         init();
     }
