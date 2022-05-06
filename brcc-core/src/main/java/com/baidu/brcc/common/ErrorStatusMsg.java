@@ -198,6 +198,9 @@ public class ErrorStatusMsg {
 
 
     // API 相关
+    // 产品线
+    public static final Integer PRODUCT_NAME_NOT_EXISTS_STATUS = 100200;
+    public static final String PRODUCT_NAME_NOT_EXISTS_MSG = "产品线名称不能为空";
     // 工程
     // 工程名不能为空
     public static final Integer PROJECT_NAME_NOT_EXISTS_STATUS = 100201;
