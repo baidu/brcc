@@ -13,9 +13,6 @@ public class ApiProjectReqVo {
     // 用户名
     private String userName;
 
-    // 工程管理员
-    private List<String> managers;
-
     // 工程名称
     private String name;
 
