@@ -393,6 +393,9 @@ public class ConfigLoader {
     }
 
     public void destory() {
+        if (null != configChangedListener) {
+            configChangedListener.close();
+        }
 
     }
 }
