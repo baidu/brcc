@@ -26,6 +26,8 @@ import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NAME_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NAME_NOT_EXISTS_STATUS;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NOT_EXISTS_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.GROUP_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EMPTY_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.PROJECT_API_TOKEN_NOT_EXISTS_MSG;
@@ -293,6 +295,52 @@ public class ApiVersionController {
             return R.ok(new ArrayList<>(0));
         }
         return R.ok(apiGroupVos);
+    }
+
+    /**
+     * list group by versionId and groupName
+     *
+     * @param token
+     * @param versionId
+     * @param groupName
+     * @return
+     */
+    @GetMapping("group/{groupName}")
+    public R<ApiGroupVo> getGroup(String token, Long versionId, @PathVariable("groupName") String groupName) {
+        // check project
+        if (isBlank(token)) {
+            return R.error(PROJECT_API_TOKEN_NOT_EMPTY_STATUS, PROJECT_API_TOKEN_NOT_EMPTY_MSG);
+        }
+        // check version id
+        if (versionId == null || versionId <= 0) {
+            return R.error(VERSION_ID_NOT_EXISTS_STATUS, VERSION_ID_NOT_EXISTS_MSG);
+        }
+        // check groupName
+        if (isBlank(groupName)) {
+            return R.error(GROUP_NAME_NOT_EXISTS_STATUS, GROUP_NAME_NOT_EXISTS_MSG);
+        }
+        // check apiToken valid
+        ApiToken apiToken = apiTokenCacheService.getApiToken(token);
+        if (apiToken == null) {
+            return R.error(PROJECT_API_TOKEN_NOT_EXISTS_STATUS, PROJECT_API_TOKEN_NOT_EXISTS_MSG);
+        }
+        // get group by versionId
+        ConfigGroup configGroup = configGroupService.selectOneByExample(ConfigGroupExample.newBuilder()
+                        .build()
+                        .createCriteria()
+                        .andDeletedEqualTo(Deleted.OK.getValue())
+                        .andVersionIdEqualTo(versionId)
+                        .andNameEqualTo(groupName)
+                        .toExample(),
+                MetaConfigGroup.COLUMN_NAME_ID
+        );
+        if (configGroup == null) {
+            return R.error(GROUP_NOT_EXISTS_STATUS, GROUP_NOT_EXISTS_MSG);
+        }
+        ApiGroupVo apiGroupVo = new ApiGroupVo();
+        apiGroupVo.setGroupId(configGroup.getId());
+        apiGroupVo.setGroupName(groupName);
+        return R.ok(apiGroupVo);
     }
 
     /**
