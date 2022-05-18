@@ -43,7 +43,7 @@ public class ApiGroupController {
     ConfigGroupService groupService;
 
     /**
-     * 删除分组
+     * 根据分组ID删除分组
      *
      * @param groupId
      * @return
