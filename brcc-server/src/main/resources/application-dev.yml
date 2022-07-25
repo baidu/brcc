@@ -1,9 +1,8 @@
 redis:
-  host: 127.0.0.1
-  port: 6379
-  password: 123456
+  host: 10.12.184.32
+  port: 8979
 db:
-  host: 127.0.0.1
-  port: 3306
-  username: xxx
-  password: xxx
+  host: lin2rd00.bcc-szth.baidu.com
+  port: 8306
+  username: sh_stu
+  password: 123456

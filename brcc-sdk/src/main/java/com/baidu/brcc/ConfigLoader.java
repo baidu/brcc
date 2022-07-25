@@ -66,7 +66,7 @@ public class ConfigLoader {
 
     private static final String AUTH_API = "/api/auth";
     private static final String ENV_API = "/api/environment/{0}";
-    private static final String VERSION_API = "/api/v2/version/{0}";
+    private static final String VERSION_API = "/api/v2/versixon/{0}";
     private static final String ITEM_API = "/api/item";
 
     private boolean enableInterruptService;
