@@ -92,3 +92,13 @@ http://ip:port 其中IP为服务启动的IP，Port为web服务监听端口，例
 - [制作Docker镜像](./docker-guide.md)
 
 - [Kubernetes](./k8s-guide.md)
+
+## Docker-compose 快速部署
+
+
+ 在工程根目录执行: `docker-compose up -d`
+
+> 这里使用的 docker-compose 3
+
+浏览器访问WebUI: http://localhost:8088
+ 

@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  mysql:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile-mysql
+
+  redis:
+    image: redis:5.0
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_PORT=8088
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=brcc
+      - DB_PASSWORD=brcc123456
+    ports:
+      - "8088:8088"
+    links:
+      - mysql
+      - redis
+    depends_on:
+      - mysql
+      - redis
+
+
+
+
+
