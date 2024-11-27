@@ -193,7 +193,7 @@ public class AdminController {
                 return R.error(USER_NOT_EXISTS_STATUS, USER_NOT_EXISTS_MSG);
             }
             if (!UserRole.SYSADMIN.getValue().equals(loginUser.getRole())
-                    && (user.getId() == null || !user.getId().equals(loginUser.getId()))) {
+                    || (user.getId() == null || !user.getId().equals(loginUser.getId()))) {
                 return R.error(PRIV_MIS_STATUS, PRIV_MIS_MSG);
             }
             newUser.setId(userId);
