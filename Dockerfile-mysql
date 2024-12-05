@@ -1,0 +1,9 @@
+FROM mysql:5.7
+ENV MYSQL_DATABASE brcc
+ENV MYSQL_ROOT_PASSWORD brcc123456
+
+COPY  doc/database/*.sql /docker-entrypoint-initdb.d/
+
+RUN chmod 777 /docker-entrypoint-initdb.d -R
+
+CMD [ "mysqld", "--sql-mode=", "--max_allowed_packet=1024M", "--character-set-server=utf8mb4" ]
