@@ -170,7 +170,7 @@ public class UriCostFilter implements Filter {
     }
 
     private boolean isCollectInfo(String uri) {
-        if (uri.startsWith("/api") && !uri.startsWith("/api/auth") && !uri.startsWith("/api/projectAdd")) {
+        if (uri.startsWith("/api") && !uri.startsWith("/api/auth")) {
             return true;
         }
         return false;
