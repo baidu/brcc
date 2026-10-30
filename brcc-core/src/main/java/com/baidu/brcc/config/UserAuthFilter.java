@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.util.UrlPathHelper;
 
 import com.baidu.brcc.domain.User;
 import com.baidu.brcc.domain.base.R;
@@ -96,7 +97,8 @@ public class UserAuthFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         try {
-            String uri = httpServletRequest.getRequestURI();
+            // 与 Spring MVC 匹配 handler 的路径保持一致：去掉 context path、解码、去除 ';' 内容
+            String uri = UrlPathHelper.defaultInstance.getLookupPathForRequest(httpServletRequest);
             boolean noAuth = noAuth(uri);
             User user = null;
             if (!noAuth) {

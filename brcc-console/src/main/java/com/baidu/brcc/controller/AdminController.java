@@ -270,7 +270,12 @@ public class AdminController {
     public R queryUser(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
                        @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
                        @RequestParam(value = "userRole", required = false) Byte userRole,
-                       @RequestParam(value = "name", defaultValue = "", required = false) String name) {
+                       @RequestParam(value = "name", defaultValue = "", required = false) String name,
+                       @LoginUser User loginUser) {
+
+        if (null == loginUser) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
 
         int offset = (pageNo - 1) * pageSize;
         Pagination<UserVo> pagination = userService.pagination(

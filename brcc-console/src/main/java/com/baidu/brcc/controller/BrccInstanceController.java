@@ -18,6 +18,8 @@
  */
 package com.baidu.brcc.controller;
 
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_MSG;
+import static com.baidu.brcc.common.ErrorStatusMsg.NON_LOGIN_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_ID_NOT_EXISTS_MSG;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_ID_NOT_EXISTS_STATUS;
 import static com.baidu.brcc.common.ErrorStatusMsg.VERSION_NOT_EXISTS_MSG;
@@ -119,7 +121,10 @@ public class BrccInstanceController {
     }
 
     @PostMapping("delete/{id}")
-    public R delete(@PathVariable("id") Long id) {
+    public R delete(@PathVariable("id") Long id, @LoginUser User user) {
+        if (null == user) {
+            return R.error(NON_LOGIN_STATUS, NON_LOGIN_MSG);
+        }
         int cnt = brccInstanceService.deleteByPrimaryKey(id);
         return R.ok(cnt);
     }

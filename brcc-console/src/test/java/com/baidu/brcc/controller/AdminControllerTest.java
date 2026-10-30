@@ -157,7 +157,10 @@ public class AdminControllerTest {
         Pagination<User> pagination = mock(Pagination.class);
         when(pagination.getDataList()).thenReturn(Arrays.asList(mock(User.class)));
         when(userService.<User>pagination(any(), any(), anyVararg())).thenReturn(pagination);
-        R result = adminController.queryUser(1, 20, UserRole.SYSADMIN.getValue(), "name");
+        R result = adminController.queryUser(1, 20, UserRole.SYSADMIN.getValue(), "name", null);
+        Assert.assertEquals(443, result.getStatus());
+
+        result = adminController.queryUser(1, 20, UserRole.SYSADMIN.getValue(), "name", normalLoginUser);
         Assert.assertEquals(0, result.getStatus());
     }
 }

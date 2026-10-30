@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -39,13 +40,23 @@ import com.baidu.brcc.service.impl.UserServiceImpl;
 
 public class UserAuthFilterTest {
 
+    // 与 brcc-server application.yml 中 rcc.noauths 一致
+    private static final List<String> STOCK_NO_AUTHS = Arrays.asList(
+            "/", "/api/**/*", "/index.html", "/check", "/console/user/login", "/user/loginByUuap",
+            "/rpc/ExtConfigServerService", "/img/**/*", "/js/**/*", "/css/**/*", "/swagger-ui.html",
+            "/webjars/**", "/v2/**", "/swagger-resources/**", "/csrf");
+
     private String xtoken = "abc";
     UserAuthFilter userAuthFilter;
 
     @Before
     public void setUp() {
         UserCache userCache = mock(UserCache.class);
-        when(userCache.getUserByToken(xtoken)).thenReturn(mock(User.class));
+        User user = new User();
+        user.setId(1L);
+        user.setName("user");
+        user.setStatus((byte) 0);
+        when(userCache.getUserByToken(xtoken)).thenReturn(user);
         UserService userService = mock(UserService.class);
         byte defaultUserType = (byte) 0;
         userAuthFilter = new UserAuthFilter(null, userCache, userService, defaultUserType);
@@ -68,23 +79,74 @@ public class UserAuthFilterTest {
 
     @Test
     public void testDoFilter() throws Exception {
-        MockHttpServletRequest request = mock(MockHttpServletRequest.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/admin/queryUser");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
-        when(request.getParameter("rcc-token")).thenReturn(xtoken);
+        request.setParameter("rcc-token", xtoken);
         userAuthFilter.doFilter(request, response, chain);
+        Assert.assertNotNull(chain.getRequest());
     }
 
     @Test
     public void testDoFilterNoToken() throws Exception {
-        MockHttpServletRequest request = mock(MockHttpServletRequest.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/admin/queryUser");
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
-        when(request.getParameter("rcc-token")).thenReturn("");
         userAuthFilter.doFilter(request, response, chain);
+        Assert.assertNull(chain.getRequest());
 
-        when(request.getRemoteUser()).thenReturn(xtoken);
+        request.setRemoteUser(xtoken);
+        chain = new MockFilterChain();
         userAuthFilter.doFilter(request, response, chain);
+    }
+
+    /**
+     * context path 被 noauths 覆盖时（如 /v2、/api），控制台接口仍需鉴权
+     */
+    @Test
+    public void testDoFilterWithContextPath() throws Exception {
+        UserAuthFilter filter = new UserAuthFilter(STOCK_NO_AUTHS, mock(UserCache.class),
+                mock(UserService.class), (byte) 0);
+        String[][] cases = {
+                {"/v2", "/v2/admin/queryUser"},
+                {"/v2", "/v2/console/admin/queryUser"},
+                {"/api", "/api/admin/queryUser"},
+                {"/v2", "/v2/instance/delete/1"},
+                {"", "/admin/queryUser"},
+                {"", "/admin/queryUser;/v2/x"},
+        };
+        for (String[] c : cases) {
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", c[1]);
+            request.setContextPath(c[0]);
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            MockFilterChain chain = new MockFilterChain();
+            filter.doFilter(request, response, chain);
+            Assert.assertNull(c[1] + " should be blocked", chain.getRequest());
+            Assert.assertTrue(c[1], response.getContentAsString().contains("\"status\":443"));
+        }
+    }
+
+    /**
+     * context path 下的白名单接口不受影响
+     */
+    @Test
+    public void testDoFilterWhitelistWithContextPath() throws Exception {
+        UserAuthFilter filter = new UserAuthFilter(STOCK_NO_AUTHS, mock(UserCache.class),
+                mock(UserService.class), (byte) 0);
+        String[][] cases = {
+                {"/v2", "/v2/check"},
+                {"/v2", "/v2/v2/api-docs"},
+                {"/api", "/api/api/auth"},
+                {"", "/check"},
+                {"", "/v2/api-docs"},
+        };
+        for (String[] c : cases) {
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", c[1]);
+            request.setContextPath(c[0]);
+            MockFilterChain chain = new MockFilterChain();
+            filter.doFilter(request, new MockHttpServletResponse(), chain);
+            Assert.assertNotNull(c[1] + " should pass", chain.getRequest());
+        }
     }
 
     @Test
